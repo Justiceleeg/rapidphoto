@@ -12,8 +12,8 @@
 ## 3. Authentication Client
 - [x] 3.1 Create auth client (S1-28)
 - [x] 3.2 Create auth hooks (S1-29)
-- [ ] 3.3 Implement base API client (S1-30) - Not needed for auth, using Better-Auth React client directly
-- [ ] 3.4 Implement auth client methods (S1-31) - Not needed for auth, using Better-Auth React client directly
+- [x] 3.3 Implement base API client (S1-30)
+- [x] 3.4 Implement auth client methods (S1-31)
 
 ## 4. Authentication Pages
 - [x] 4.1 Create auth layout (S1-32)

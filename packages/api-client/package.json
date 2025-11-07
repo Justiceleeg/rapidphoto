@@ -1,0 +1,19 @@
+{
+  "name": "@rapidphoto/api-client",
+  "version": "0.1.0",
+  "description": "Shared API client for RapidPhoto",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "scripts": {
+    "build": "tsc",
+    "dev": "tsc --watch"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "packageManager": "pnpm@10.14.0",
+  "devDependencies": {
+    "@types/node": "^20.19.24",
+    "typescript": "^5.9.3"
+  }
+}

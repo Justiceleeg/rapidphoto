@@ -19,5 +19,5 @@
 - [x] 3.1 Can register new user via API
 - [x] 3.2 Can login with credentials via API
 - [x] 3.3 Session management works correctly
-- [ ] 3.4 Protected routes require authentication
+- [x] 3.4 Protected routes require authentication
 

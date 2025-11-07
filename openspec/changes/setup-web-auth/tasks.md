@@ -22,8 +22,8 @@
 - [x] 4.4 Create dashboard layout with auth guard (S1-35)
 
 ## 5. Verification
-- [ ] 5.1 Can register new user on web
-- [ ] 5.2 Can login on web
-- [ ] 5.3 Redirects to dashboard after login
-- [ ] 5.4 Protected routes require authentication
+- [x] 5.1 Can register new user on web
+- [x] 5.2 Can login on web
+- [x] 5.3 Redirects to dashboard after login
+- [x] 5.4 Protected routes require authentication
 

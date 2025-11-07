@@ -301,6 +301,99 @@ export function Providers({ children }: { children: React.ReactNode }) {
 }
 ```
 
+### tamagui-config
+
+#### Web (Next.js) - tamagui.config.ts
+
+```typescript
+import { config } from '@tamagui/config/v3';
+import { createTamagui } from 'tamagui';
+
+const appConfig = createTamagui(config);
+
+export default appConfig;
+
+export type Conf = typeof appConfig;
+
+declare module 'tamagui' {
+  interface TamaguiCustomConfig extends Conf {}
+}
+```
+
+#### Web (Next.js) - next.config.ts (with Tamagui plugin)
+
+```typescript
+import { tamaguiPlugin } from '@tamagui/vite-plugin';
+import { defineConfig } from 'next/config';
+
+export default defineConfig({
+  transpilePackages: ['@rapidphoto/shared', '@rapidphoto/api-client'],
+  images: {
+    domains: ['your-r2-domain.r2.dev'],
+  },
+  vitePlugins: [
+    tamaguiPlugin({
+      config: './tamagui.config.ts',
+      components: ['tamagui'],
+      useReactNativeWeb: true,
+    }),
+  ],
+});
+```
+
+#### Web - Root Layout with TamaguiProvider
+
+```typescript
+import { TamaguiProvider } from '@tamagui/core';
+import config from '../tamagui.config';
+
+export default function RootLayout({ children }: { children: React.ReactNode }) {
+  return (
+    <html lang="en">
+      <body>
+        <TamaguiProvider config={config}>
+          {children}
+        </TamaguiProvider>
+      </body>
+    </html>
+  );
+}
+```
+
+#### Mobile (React Native) - tamagui.config.ts
+
+```typescript
+import { config } from '@tamagui/config/v3';
+import { createTamagui } from 'tamagui';
+
+const appConfig = createTamagui(config);
+
+export default appConfig;
+
+export type Conf = typeof appConfig;
+
+declare module 'tamagui' {
+  interface TamaguiCustomConfig extends Conf {}
+}
+```
+
+#### Mobile - Root Layout with TamaguiProvider
+
+```typescript
+import { TamaguiProvider } from '@tamagui/core';
+import config from '../tamagui.config';
+
+export default function RootLayout() {
+  return (
+    <TamaguiProvider config={config}>
+      {/* Your app content */}
+    </TamaguiProvider>
+  );
+}
+```
+
+**Note**: The same `tamagui.config.ts` can be shared between web and mobile for a unified design system.
+
 ## Mobile
 
 ### expo-config

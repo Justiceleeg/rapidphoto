@@ -141,7 +141,7 @@ Testing: Vitest
 ```yaml
 Framework: Next.js 15 (App Router)
 Language: TypeScript
-UI: React 19 + Tailwind CSS
+UI: React 19 + Tamagui
 State Management:
   - React Query (server state)
   - Zustand (client state)
@@ -1063,7 +1063,7 @@ apps/web/
 │       └── upload-store.ts           # Zustand upload state
 │
 └── styles/
-    └── globals.css                   # Tailwind + custom styles
+    └── globals.css                   # Tamagui styles
 ```
 
 ### State Management Strategy

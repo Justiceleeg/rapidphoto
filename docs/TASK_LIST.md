@@ -9,14 +9,14 @@
 
 ### Tech Stack Summary
 - **Backend**: Hono + TypeScript, PostgreSQL, Drizzle ORM, Better-Auth, Cloudflare R2
-- **Web**: Next.js 15, React Query, Zustand, Tailwind CSS
-- **Mobile**: React Native + Expo, React Query, Zustand
+- **Web**: Next.js 15, React Query, Zustand, Tamagui
+- **Mobile**: React Native + Expo, React Query, Zustand, Tamagui
 - **Deployment**: Railway (Full stack)
 - **Monorepo**: pnpm workspace
 
 ### Vertical Slices Overview
 - **Slice 0**: Foundation & Infrastructure (2-3 hours) - 18 tasks
-- **Slice 1**: Authentication (Backend + Web + Mobile + Deploy) (4-5 hours) - 45 tasks
+- **Slice 1**: Authentication (Backend + Web + Mobile + Deploy) (4-5 hours) - 54 tasks
 - **Slice 2**: Single Photo Upload (Backend + Web + Mobile + Deploy) (6-7 hours) - 65 tasks
 - **Slice 3**: Multiple Photo Upload with Progress (Backend + Web + Mobile + Deploy) (6-7 hours) - 75 tasks
 - **Slice 4**: Gallery (Backend + Web + Mobile + Deploy) (4-5 hours) - 50 tasks
@@ -395,69 +395,138 @@
 
 **Verification**: Can register/login on web, redirects to dashboard
 
+### Chunk 1.3.5: Web Frontend - Tamagui Setup
+
+**Prerequisites**: [S1-35]
+
+- **[S1-36]** Install Tamagui dependencies for web
+  - **Time**: 10 min | **Complexity**: Low
+  - **Dependencies**: [S1-22]
+  - **Commands**: `pnpm add @tamagui/core @tamagui/config @tamagui/vite-plugin @tamagui/animations-react-native`
+  - **Note**: Use Tamagui v1.136.1 or latest v1.x
+
+- **[S1-37]** Configure Tamagui for Next.js
+  - **Time**: 30 min | **Complexity**: Medium
+  - **Dependencies**: [S1-36]
+  - **Files**: 
+    - `apps/web/tamagui.config.ts`
+    - `apps/web/next.config.ts` (update to include Tamagui plugin)
+  - **Content**: See [CODE_REFERENCE.md](./CODE_REFERENCE.md#tamagui-config)
+
+- **[S1-38]** Setup Tamagui provider in root layout
+  - **Time**: 15 min | **Complexity**: Low
+  - **Dependencies**: [S1-37]
+  - **File**: `apps/web/app/layout.tsx`
+  - **Note**: Wrap app with TamaguiProvider
+
+- **[S1-39]** Remove Tailwind CSS dependencies
+  - **Time**: 10 min | **Complexity**: Low
+  - **Dependencies**: [S1-37]
+  - **Commands**: `pnpm remove tailwindcss postcss autoprefixer`
+  - **Files**: Remove `tailwind.config.js`, `postcss.config.mjs` (or update to remove Tailwind)
+
+- **[S1-40]** Remove Tailwind CSS imports and classes
+  - **Time**: 15 min | **Complexity**: Low
+  - **Dependencies**: [S1-39]
+  - **Files**: 
+    - `apps/web/app/globals.css` (remove Tailwind directives)
+    - Update any existing components with Tailwind classes
+
+- **[S1-41]** Refactor login page to use Tamagui components
+  - **Time**: 30 min | **Complexity**: Medium
+  - **Dependencies**: [S1-38]
+  - **File**: `apps/web/app/(auth)/login/page.tsx`
+  - **Note**: Replace HTML/Tailwind with Tamagui components (Button, Input, YStack, etc.)
+
+- **[S1-42]** Refactor register page to use Tamagui components
+  - **Time**: 30 min | **Complexity**: Medium
+  - **Dependencies**: [S1-38]
+  - **File**: `apps/web/app/(auth)/register/page.tsx`
+  - **Note**: Replace HTML/Tailwind with Tamagui components
+
+- **[S1-43]** Refactor dashboard layout to use Tamagui components
+  - **Time**: 30 min | **Complexity**: Medium
+  - **Dependencies**: [S1-38]
+  - **File**: `apps/web/app/(dashboard)/layout.tsx`
+  - **Note**: Replace HTML/Tailwind with Tamagui components
+
+**Verification**: Web app uses Tamagui, Tailwind removed, auth pages styled with Tamagui
+
 ### Chunk 1.4: Mobile Frontend - Auth
 
 **Prerequisites**: [S1-19], [S0-18]
 
-- **[S1-36]** Initialize Expo project
+- **[S1-44]** Initialize Expo project
   - **Time**: 10 min | **Complexity**: Low
   - **Dependencies**: [S0-02]
   - **Commands**: `cd apps && pnpx create-expo-app@latest mobile --template blank-typescript`
 
-- **[S1-37]** Configure for monorepo
+- **[S1-45]** Configure for monorepo
   - **Time**: 10 min | **Complexity**: Low
-  - **Dependencies**: [S1-36]
+  - **Dependencies**: [S1-44]
   - **Actions**: Update `package.json` name to `@rapidphoto/mobile`
 
-- **[S1-38]** Install mobile dependencies
+- **[S1-46]** Install mobile dependencies
   - **Time**: 5 min | **Complexity**: Low
-  - **Dependencies**: [S1-37]
+  - **Dependencies**: [S1-45]
   - **Commands**: `pnpm add expo-router @tanstack/react-query zustand better-auth @rapidphoto/shared @rapidphoto/api-client`
 
-- **[S1-39]** Configure Expo Router
+- **[S1-47]** Install and configure Tamagui for mobile
+  - **Time**: 30 min | **Complexity**: Medium
+  - **Dependencies**: [S1-46]
+  - **Commands**: `pnpm add @tamagui/core @tamagui/config @tamagui/animations-react-native react-native-reanimated`
+  - **Files**: 
+    - `apps/mobile/tamagui.config.ts` (can share config with web)
+    - `apps/mobile/app/_layout.tsx` (add TamaguiProvider)
+  - **Note**: Use Tamagui v1.136.1 or latest v1.x, configure for React Native
+
+- **[S1-48]** Configure Expo Router
   - **Time**: 15 min | **Complexity**: Low
-  - **Dependencies**: [S1-38]
+  - **Dependencies**: [S1-47]
   - **File**: `apps/mobile/app.json`
   - **Content**: See [CODE_REFERENCE.md](./CODE_REFERENCE.md#expo-config)
 
-- **[S1-40]** Setup environment variables
+- **[S1-49]** Setup environment variables
   - **Time**: 5 min | **Complexity**: Low
-  - **Dependencies**: [S1-36]
+  - **Dependencies**: [S1-44]
   - **File**: `apps/mobile/.env`
   - **Variables**: `EXPO_PUBLIC_API_URL=http://localhost:4000`
 
-- **[S1-41]** Create root layout with React Query
+- **[S1-50]** Create root layout with React Query and Tamagui
   - **Time**: 15 min | **Complexity**: Low
-  - **Dependencies**: [S1-38]
+  - **Dependencies**: [S1-47]
   - **File**: `apps/mobile/app/_layout.tsx`
+  - **Note**: Ensure TamaguiProvider wraps React Query provider
 
-- **[S1-42]** Create auth stack layout
+- **[S1-51]** Create auth stack layout
   - **Time**: 10 min | **Complexity**: Low
-  - **Dependencies**: [S1-39]
+  - **Dependencies**: [S1-48]
   - **File**: `apps/mobile/app/(auth)/_layout.tsx`
 
-- **[S1-43]** Create auth client for mobile
+- **[S1-52]** Create auth client for mobile
   - **Time**: 15 min | **Complexity**: Low
-  - **Dependencies**: [S1-38]
+  - **Dependencies**: [S1-46]
   - **File**: `apps/mobile/lib/auth-client.ts`
 
-- **[S1-44]** Create login screen
+- **[S1-53]** Create login screen with Tamagui
   - **Time**: 30 min | **Complexity**: Medium
-  - **Dependencies**: [S1-43], [S1-42]
+  - **Dependencies**: [S1-52], [S1-51]
   - **File**: `apps/mobile/app/(auth)/login.tsx`
+  - **Note**: Use Tamagui components for unified experience with web
 
-- **[S1-45]** Create register screen
+- **[S1-54]** Create register screen with Tamagui
   - **Time**: 30 min | **Complexity**: Medium
-  - **Dependencies**: [S1-43], [S1-42]
+  - **Dependencies**: [S1-52], [S1-51]
   - **File**: `apps/mobile/app/(auth)/register.tsx`
+  - **Note**: Use Tamagui components for unified experience with web
 
 **Verification**: Can register/login on mobile, navigates to tabs
 
 ### Chunk 1.5: Deploy Authentication
 
-**Prerequisites**: [S1-35], [S1-45]
+**Prerequisites**: [S1-43], [S1-54]
 
-- **[S1-46]** Deploy API to Railway
+- **[S1-57]** Deploy API to Railway
   - **Time**: 20 min | **Complexity**: Medium
   - **Dependencies**: [S1-19]
   - **Steps**:
@@ -469,9 +538,9 @@
     6. Run migrations: `pnpm --filter @rapidphoto/api db:migrate`
     7. Test: `https://your-api.railway.app/health`
 
-- **[S1-47]** Deploy Web to Railway
+- **[S1-58]** Deploy Web to Railway
   - **Time**: 20 min | **Complexity**: Medium
-  - **Dependencies**: [S1-35], [S1-46]
+  - **Dependencies**: [S1-43], [S1-57]
   - **Steps**:
     1. Add web service to Railway project
     2. Set root directory: `apps/web`
@@ -480,15 +549,15 @@
     5. Configure env: `NEXT_PUBLIC_API_URL=https://your-api.railway.app`
     6. Test: Visit web URL, test login
 
-- **[S1-48]** Update mobile to use production API
+- **[S1-59]** Update mobile to use production API
   - **Time**: 5 min | **Complexity**: Low
-  - **Dependencies**: [S1-46]
+  - **Dependencies**: [S1-57]
   - **File**: `apps/mobile/.env`
   - **Action**: Update `EXPO_PUBLIC_API_URL` to production API URL
 
-- **[S1-49]** Test authentication in production
+- **[S1-60]** Test authentication in production
   - **Time**: 15 min | **Complexity**: Low
-  - **Dependencies**: [S1-47], [S1-48]
+  - **Dependencies**: [S1-58], [S1-59]
   - **Tests**:
     - Register new user on web
     - Login on web

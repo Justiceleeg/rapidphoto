@@ -1,13 +1,16 @@
 {
   "name": "rapidphoto",
   "version": "1.0.0",
-  "description": "",
-  "main": "index.js",
+  "description": "RapidPhoto monorepo",
+  "private": true,
+  "packageManager": "pnpm@10.14.0",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
-  },
-  "keywords": [],
-  "author": "",
-  "license": "ISC",
-  "packageManager": "pnpm@10.14.0"
+    "dev": "pnpm --filter \"./apps/*\" --parallel dev",
+    "dev:web": "pnpm --filter @rapidphoto/web dev",
+    "dev:api": "pnpm --filter @rapidphoto/api dev",
+    "dev:mobile": "pnpm --filter @rapidphoto/mobile dev",
+    "build": "pnpm --filter \"./apps/*\" --filter \"./packages/*\" build",
+    "test": "pnpm --filter \"./apps/*\" --filter \"./packages/*\" test",
+    "lint": "pnpm --filter \"./apps/*\" --filter \"./packages/*\" lint"
+  }
 }

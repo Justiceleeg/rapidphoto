@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { useAuth } from "@/lib/hooks/use-auth";
 import { toast } from "sonner";
 import Link from "next/link";
+import { YStack, XStack, Input, Button, Label, Text, H1 } from "tamagui";
 
 export default function LoginPage() {
   const router = useRouter();
@@ -28,50 +29,62 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="bg-white p-8 rounded-lg shadow-md">
-      <h1 className="text-2xl font-bold text-center mb-6">Login</h1>
-      <form onSubmit={handleSubmit} className="space-y-4">
-        <div>
-          <label htmlFor="email" className="block text-sm font-medium text-gray-700">
-            Email
-          </label>
-          <input
-            id="email"
-            type="email"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            required
-            className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
-          />
-        </div>
-        <div>
-          <label htmlFor="password" className="block text-sm font-medium text-gray-700">
-            Password
-          </label>
-          <input
-            id="password"
-            type="password"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            required
-            className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
-          />
-        </div>
-        <button
-          type="submit"
-          disabled={isLoading}
-          className="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 disabled:opacity-50"
-        >
-          {isLoading ? "Logging in..." : "Login"}
-        </button>
+    <YStack
+      backgroundColor="$background"
+      padding="$4"
+      borderRadius="$4"
+      shadowColor="$shadowColor"
+      shadowOffset={{ width: 0, height: 2 }}
+      shadowOpacity={0.1}
+      shadowRadius={8}
+      elevation={4}
+      space="$4"
+    >
+      <H1 textAlign="center" marginBottom="$2">Login</H1>
+      <form onSubmit={handleSubmit}>
+        <YStack space="$4">
+          <YStack space="$2">
+            <Label htmlFor="email">Email</Label>
+            <Input
+              id="email"
+              type="email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              placeholder="Enter your email"
+              required
+            />
+          </YStack>
+          <YStack space="$2">
+            <Label htmlFor="password">Password</Label>
+            <Input
+              id="password"
+              type="password"
+              secureTextEntry
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              placeholder="Enter your password"
+              required
+            />
+          </YStack>
+          <Button
+            type="submit"
+            disabled={isLoading}
+            theme="blue"
+            size="$4"
+          >
+            {isLoading ? "Logging in..." : "Login"}
+          </Button>
+        </YStack>
       </form>
-      <p className="mt-4 text-center text-sm text-gray-600">
-        Don't have an account?{" "}
-        <Link href="/register" className="text-indigo-600 hover:text-indigo-500">
-          Register
-        </Link>
-      </p>
-    </div>
+      <XStack justifyContent="center" marginTop="$4">
+        <Text fontSize="$3" color="$gray10">
+          Don't have an account?{" "}
+          <Link href="/register" style={{ color: "$blue10" }}>
+            Register
+          </Link>
+        </Text>
+      </XStack>
+    </YStack>
   );
 }
 

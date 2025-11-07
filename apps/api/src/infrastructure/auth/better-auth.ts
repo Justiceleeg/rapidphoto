@@ -21,6 +21,10 @@ export const auth = betterAuth({
   },
   secret: env.authSecret,
   baseURL: env.authUrl,
+  trustedOrigins: [
+    'http://localhost:3000', // Web app
+    'http://localhost:4000', // API
+  ],
   advanced: {
     database: {
       generateId: () => crypto.randomUUID(),

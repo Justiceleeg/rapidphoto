@@ -1,8 +1,52 @@
 "use client";
 
+import React from "react";
+import "@tamagui/core/reset.css";
+import "@tamagui/polyfill-dev";
+
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { useState } from "react";
 import { Toaster } from "sonner";
+import { ReactNode } from "react";
+import { StyleSheet } from "react-native";
+import { useServerInsertedHTML } from "next/navigation";
+import { NextThemeProvider, useRootTheme } from "@tamagui/next-theme";
+import { TamaguiProvider } from "tamagui";
+import tamaguiConfig from "../tamagui.config";
+
+function NextTamaguiProvider({ children }: { children: ReactNode }) {
+  const [theme, setTheme] = useRootTheme();
+
+  useServerInsertedHTML(() => {
+    // @ts-ignore
+    const rnwStyle = StyleSheet.getSheet();
+    return (
+      <>
+        <style
+          dangerouslySetInnerHTML={{ __html: rnwStyle.textContent }}
+          id={rnwStyle.id}
+        />
+        <style
+          dangerouslySetInnerHTML={{
+            __html: tamaguiConfig.getNewCSS(),
+          }}
+        />
+      </>
+    );
+  });
+
+  return (
+    <NextThemeProvider skipNextHead defaultTheme="light">
+      <TamaguiProvider 
+        config={tamaguiConfig} 
+        disableRootThemeClass 
+        defaultTheme={theme || "light"}
+      >
+        {children}
+      </TamaguiProvider>
+    </NextThemeProvider>
+  );
+}
 
 export function Providers({ children }: { children: React.ReactNode }) {
   const [queryClient] = useState(
@@ -19,8 +63,10 @@ export function Providers({ children }: { children: React.ReactNode }) {
 
   return (
     <QueryClientProvider client={queryClient}>
-      {children}
-      <Toaster />
+      <NextTamaguiProvider>
+        {children}
+        <Toaster />
+      </NextTamaguiProvider>
     </QueryClientProvider>
   );
 }

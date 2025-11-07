@@ -2,6 +2,7 @@
 import "./config/dotenv.js";
 
 import { Hono } from "hono";
+import { cors } from "hono/cors";
 import { serve } from "@hono/node-server";
 import { env } from "./config/env.js";
 import authRoutes from "./infrastructure/http/routes/auth.routes.js";
@@ -14,6 +15,17 @@ type Variables = {
 };
 
 const app = new Hono<{ Variables: Variables }>();
+
+// CORS middleware
+app.use(
+  "*",
+  cors({
+    origin: ["http://localhost:3000"],
+    credentials: true,
+    allowMethods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+    allowHeaders: ["Content-Type", "Authorization", "Cookie"],
+  })
+);
 
 // Health check endpoint
 app.get("/health", (c) => {

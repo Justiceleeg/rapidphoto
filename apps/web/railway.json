@@ -1,0 +1,12 @@
+{
+  "$schema": "https://railway.app/railway.schema.json",
+  "build": {
+    "buildCommand": "pnpm install && pnpm --filter @rapidphoto/web build"
+  },
+  "deploy": {
+    "startCommand": "pnpm --filter @rapidphoto/web start",
+    "restartPolicyType": "ON_FAILURE",
+    "restartPolicyMaxRetries": 10
+  }
+}
+

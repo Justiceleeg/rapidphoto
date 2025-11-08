@@ -6,6 +6,7 @@ import { cors } from "hono/cors";
 import { serve } from "@hono/node-server";
 import { env } from "./config/env.js";
 import authRoutes from "./infrastructure/http/routes/auth.routes.js";
+import uploadRoutes, { completePhotoRoute } from "./infrastructure/http/routes/upload.routes.js";
 import { authMiddleware } from "./infrastructure/auth/auth.middleware.js";
 import { auth } from "./infrastructure/auth/better-auth.js";
 
@@ -34,6 +35,12 @@ app.get("/health", (c) => {
 
 // Mount auth routes
 app.route("/api/auth", authRoutes);
+
+// Mount upload routes
+app.route("/api/upload", uploadRoutes);
+
+// Mount photo complete route
+app.route("/api/photos", completePhotoRoute);
 
 // Protected route example
 app.get("/api/me", authMiddleware, async (c) => {

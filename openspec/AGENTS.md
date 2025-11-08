@@ -453,4 +453,20 @@ openspec validate --strict # Is it correct?
 openspec archive <change-id> [--yes|-y]  # Mark complete (add --yes for automation)
 ```
 
+## Styling Conventions
+
+**When working on web or mobile apps** (`apps/web/` or `apps/mobile/`), always reference `docs/STYLING.md` for styling guidelines.
+
+This project uses Tamagui for all UI components and styling. Do not add custom CSS or use invalid theme values.
+
+## Railway Deployment
+
+**When deploying to Railway** or working with Railway configuration files, always reference `docs/RAILWAY.md` for deployment guidelines and common issues.
+
+Key points:
+- Railway uses Railpack (not Nixpacks) for builds
+- Monorepo services must have root directory set to `/` in Railway dashboard
+- Use `railpack.json` for custom build configurations
+- Build workspace packages in dependency order
+
 Remember: Specs are truth. Changes are proposals. Keep them in sync.

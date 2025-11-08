@@ -11,8 +11,7 @@
     "start:prod": "pnpm db:migrate && node dist/index.js",
     "db:generate": "drizzle-kit generate",
     "db:migrate": "drizzle-kit migrate",
-    "db:studio": "drizzle-kit studio",
-    "test:batch-upload": "tsx test-batch-upload.ts"
+    "db:studio": "drizzle-kit studio"
   },
   "keywords": [],
   "author": "",

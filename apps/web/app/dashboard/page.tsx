@@ -43,7 +43,7 @@ export default function DashboardPage() {
             size="$4"
             flex={1}
           >
-            <Link href="/dashboard/upload">
+            <Link href="/upload">
               Upload Photo
             </Link>
           </Button>

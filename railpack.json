@@ -2,12 +2,6 @@
   "$schema": "https://schema.railpack.com",
   "steps": {
     "install": {
-      "inputs": [
-        {
-          "local": true,
-          "include": ["."]
-        }
-      ],
       "commands": [
         "pnpm install"
       ]
@@ -25,6 +19,13 @@
     }
   },
   "deploy": {
+    "inputs": [
+      "...",
+      {
+        "step": "build",
+        "include": ["."]
+      }
+    ],
     "startCommand": "pnpm --filter @rapidphoto/web start"
   }
 }

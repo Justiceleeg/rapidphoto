@@ -21,3 +21,6 @@ const apiClient = createApiClient({
 
 // Create upload client
 export const uploadClient = new UploadClient(apiClient);
+
+// Export the API URL for direct fetch calls (e.g., SSE)
+export const API_URL = apiUrl;

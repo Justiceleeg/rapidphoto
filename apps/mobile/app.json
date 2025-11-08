@@ -15,7 +15,11 @@
     },
     "ios": {
       "supportsTablet": true,
-      "bundleIdentifier": "com.rapidphoto.mobile"
+      "bundleIdentifier": "com.rapidphoto.mobile",
+      "infoPlist": {
+        "NSCameraUsageDescription": "This app needs access to your camera to take photos for upload.",
+        "NSPhotoLibraryUsageDescription": "This app needs access to your photo library to select photos for upload."
+      }
     },
     "android": {
       "adaptiveIcon": {
@@ -24,7 +28,12 @@
       },
       "edgeToEdgeEnabled": true,
       "predictiveBackGestureEnabled": false,
-      "package": "com.rapidphoto.mobile"
+      "package": "com.rapidphoto.mobile",
+      "permissions": [
+        "CAMERA",
+        "READ_EXTERNAL_STORAGE",
+        "WRITE_EXTERNAL_STORAGE"
+      ]
     },
     "web": {
       "favicon": "./assets/favicon.png"

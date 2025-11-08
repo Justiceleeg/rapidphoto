@@ -1451,4 +1451,104 @@
 
 ---
 
+---
+
+## Future Enhancements (Nice to Have)
+
+### HEIC Format Support
+
+**Goal**: Support Apple's HEIC photo format for upload and display across all platforms  
+**Status**: Future Enhancement  
+**Priority**: Nice to Have
+
+#### Overview
+Enable users to upload and view HEIC photos from iOS devices. HEIC is Apple's efficient image format that provides better compression than JPEG while maintaining quality.
+
+#### Current State
+- **Upload**: `expo-image-picker` can select HEIC files on iOS
+- **Storage**: R2 can store HEIC files (format-agnostic)
+- **Display**: 
+  - iOS: Native support via React Native Image component
+  - Android: Limited support
+  - Web: No native browser support (Safari has partial support)
+
+#### Recommended Approach: Server-Side On-Demand Conversion
+
+**Why**: Converting 100+ HEIC files on upload would add 100-300 seconds of processing time, significantly slowing down bulk uploads.
+
+**Implementation**:
+1. Store HEIC files as-is in R2 (fast uploads)
+2. Convert to JPEG on-demand when displaying to web/Android clients
+3. Use server-side conversion service (Cloudflare Workers, AWS Lambda, or backend service)
+4. Cache converted images for performance
+
+#### Tasks (Future)
+
+- **[F-01]** Add HEIC MIME type detection
+  - **Time**: 15 min | **Complexity**: Low
+  - **File**: `apps/api/src/application/commands/init-upload/init-upload.handler.ts`
+  - **Note**: Accept `image/heic` and `image/heif` MIME types
+
+- **[F-02]** Setup image conversion service
+  - **Time**: 2 hours | **Complexity**: High
+  - **Options**: 
+    - Cloudflare Workers with `@cloudflare/workers-image-conversion`
+    - AWS Lambda with Sharp
+    - Backend service with `sharp` or `heic-convert`
+  - **Note**: Convert HEIC → JPEG on-demand
+
+- **[F-03]** Create image conversion endpoint
+  - **Time**: 45 min | **Complexity**: Medium
+  - **File**: `apps/api/src/infrastructure/http/routes/image.routes.ts`
+  - **Endpoint**: `GET /api/photos/:id/image?format=jpeg`
+  - **Note**: Convert and cache converted images
+
+- **[F-04]** Update photo entity to track format
+  - **Time**: 20 min | **Complexity**: Low
+  - **File**: `apps/api/src/domain/photo/photo.entity.ts`
+  - **Note**: Add `originalFormat` and `convertedFormat` fields
+
+- **[F-05]** Update gallery to request appropriate format
+  - **Time**: 30 min | **Complexity**: Medium
+  - **Files**: 
+    - `apps/web/components/gallery/PhotoGrid.tsx`
+    - `apps/mobile/components/gallery/PhotoGrid.tsx`
+  - **Note**: Request JPEG for web/Android, original for iOS
+
+- **[F-06]** Add format detection in image picker
+  - **Time**: 15 min | **Complexity**: Low
+  - **File**: `apps/mobile/components/upload/ImagePicker.tsx`
+  - **Note**: Preserve original MIME type from `expo-image-picker`
+
+- **[F-07]** Test HEIC upload and conversion
+  - **Time**: 30 min | **Complexity**: Low
+  - **Tests**:
+    - Upload HEIC from iOS
+    - Verify stored in R2
+    - Verify conversion on web/Android
+    - Verify original format on iOS
+
+#### Alternative Approaches
+
+1. **Client-Side Conversion** (Not Recommended)
+   - Convert HEIC → JPEG before upload
+   - Pros: Universal compatibility
+   - Cons: Slow (100-300s for 100 photos), battery drain, UI blocking
+
+2. **Background Server-Side Conversion**
+   - Upload HEIC, convert in background, store both formats
+   - Pros: Fast uploads, universal compatibility
+   - Cons: More storage, background job complexity
+
+3. **Progressive Enhancement** (Simplest)
+   - Store HEIC as-is, show placeholder on unsupported platforms
+   - Pros: Fastest, simplest
+   - Cons: Web/Android users can't view directly
+
+#### Notes
+- HEIC files are typically 50% smaller than JPEG at same quality
+- Conversion adds ~1-3 seconds per image server-side
+- Consider caching converted images in R2 or CDN
+- Monitor conversion costs if using cloud services
+
 **Good luck with your implementation! 🚀**

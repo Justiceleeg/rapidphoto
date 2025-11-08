@@ -1,10 +1,11 @@
 {
   "$schema": "https://railway.app/railway.schema.json",
   "build": {
-    "buildCommand": "cd ../.. && pnpm install && pnpm --filter @rapidphoto/api-client build && pnpm --filter @rapidphoto/web build"
+    "buildCommand": "pnpm install && pnpm --filter @rapidphoto/api-client build && pnpm --filter @rapidphoto/web build",
+    "watchPatterns": ["apps/web/**"]
   },
   "deploy": {
-    "startCommand": "cd ../.. && pnpm --filter @rapidphoto/web start",
+    "startCommand": "pnpm --filter @rapidphoto/web start",
     "restartPolicyType": "ON_FAILURE",
     "restartPolicyMaxRetries": 10
   }

@@ -20,5 +20,5 @@
 ## 4. Upload Routes
 - [x] 4.1 Create upload routes (`apps/api/src/infrastructure/http/routes/upload.routes.ts`)
 - [x] 4.2 Mount upload routes in main app
-- [ ] 4.3 Test single photo upload flow
+- [x] 4.3 Test single photo upload flow
 

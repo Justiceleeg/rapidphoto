@@ -15,6 +15,20 @@
       "when": 1762618312612,
       "tag": "0001_same_revanche",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1762632204668,
+      "tag": "0002_massive_demogoblin",
+      "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "7",
+      "when": 1762632418084,
+      "tag": "0003_icy_slyde",
+      "breakpoints": true
     }
   ]
 }

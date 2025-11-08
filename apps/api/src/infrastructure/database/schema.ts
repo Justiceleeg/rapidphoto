@@ -61,11 +61,30 @@ export const verification = pgTable("verification", {
     .notNull(),
 });
 
+export const uploadJob = pgTable("upload_jobs", {
+  id: text("id").primaryKey(),
+  userId: text("user_id")
+    .notNull()
+    .references(() => user.id, { onDelete: "cascade" }),
+  totalPhotos: integer("total_photos").notNull(),
+  completedPhotos: integer("completed_photos").notNull().default(0),
+  failedPhotos: integer("failed_photos").notNull().default(0),
+  status: text("status").notNull().default("pending"),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+  updatedAt: timestamp("updated_at")
+    .defaultNow()
+    .$onUpdate(() => new Date())
+    .notNull(),
+});
+
 export const photo = pgTable("photo", {
   id: text("id").primaryKey(),
   userId: text("user_id")
     .notNull()
     .references(() => user.id, { onDelete: "cascade" }),
+  jobId: text("job_id").references(() => uploadJob.id, {
+    onDelete: "set null",
+  }),
   filename: text("filename").notNull(),
   fileSize: integer("file_size").notNull(),
   mimeType: text("mime_type").notNull(),

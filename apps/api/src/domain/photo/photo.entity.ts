@@ -3,6 +3,7 @@ export type PhotoStatus = "pending" | "completed" | "failed";
 export interface Photo {
   id: string;
   userId: string;
+  jobId: string | null;
   filename: string;
   fileSize: number;
   mimeType: string;

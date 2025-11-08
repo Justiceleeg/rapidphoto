@@ -17,6 +17,7 @@ export class PhotoRepositoryImpl implements PhotoRepository {
       .values({
         id,
         userId: photoData.userId,
+        jobId: photoData.jobId ?? null,
         filename: photoData.filename,
         fileSize: photoData.fileSize,
         mimeType: photoData.mimeType,
@@ -82,6 +83,7 @@ export class PhotoRepositoryImpl implements PhotoRepository {
     return {
       id: row.id,
       userId: row.userId,
+      jobId: row.jobId,
       filename: row.filename,
       fileSize: row.fileSize,
       mimeType: row.mimeType,

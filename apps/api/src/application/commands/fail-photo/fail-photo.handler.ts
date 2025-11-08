@@ -1,18 +1,16 @@
 import { PhotoRepository } from "../../../domain/photo/photo.repository.js";
 import { UploadJobRepository } from "../../../domain/upload-job/upload-job.repository.js";
-import { R2Service } from "../../../infrastructure/storage/r2.service.js";
 import { ProgressService } from "../../../infrastructure/sse/progress.service.js";
-import { CompletePhotoCommand } from "./complete-photo.command.js";
+import { FailPhotoCommand } from "./fail-photo.command.js";
 
-export class CompletePhotoHandler {
+export class FailPhotoHandler {
   constructor(
     private photoRepository: PhotoRepository,
     private uploadJobRepository: UploadJobRepository,
-    private r2Service: R2Service,
     private progressService: ProgressService
   ) {}
 
-  async handle(command: CompletePhotoCommand): Promise<void> {
+  async handle(command: FailPhotoCommand): Promise<void> {
     // Find photo by ID
     const photo = await this.photoRepository.findById(command.photoId);
 
@@ -25,35 +23,32 @@ export class CompletePhotoHandler {
       throw new Error("Unauthorized: Photo does not belong to user");
     }
 
-    // Get R2 URL (public URL if configured, otherwise null)
-    const r2Url = this.r2Service.getObjectUrl(photo.r2Key);
-
-    // Update photo status to "completed" and set R2 URL
+    // Update photo status to "failed"
     await this.photoRepository.update(command.photoId, {
-      status: "completed",
-      r2Url,
+      status: "failed",
     });
 
     // If photo is part of an upload job, update job progress
     if (photo.jobId) {
       const job = await this.uploadJobRepository.findById(photo.jobId);
       if (job) {
-        const newCompletedPhotos = job.completedPhotos + 1;
-        const isComplete =
-          newCompletedPhotos + job.failedPhotos >= job.totalPhotos;
+        const newFailedPhotos = job.failedPhotos + 1;
+        const totalProcessed = job.completedPhotos + newFailedPhotos;
+        const isComplete = totalProcessed >= job.totalPhotos;
+        const shouldMarkFailed = newFailedPhotos > 0 && isComplete;
 
         await this.uploadJobRepository.update(photo.jobId, {
-          completedPhotos: newCompletedPhotos,
-          status: isComplete ? "completed" : "in-progress",
+          failedPhotos: newFailedPhotos,
+          status: shouldMarkFailed ? "failed" : isComplete ? "completed" : "in-progress",
         });
 
         // Publish progress event
         this.progressService.publish({
           jobId: job.id,
-          completedPhotos: newCompletedPhotos,
-          failedPhotos: job.failedPhotos,
+          completedPhotos: job.completedPhotos,
+          failedPhotos: newFailedPhotos,
           totalPhotos: job.totalPhotos,
-          status: isComplete ? "completed" : "in-progress",
+          status: shouldMarkFailed ? "failed" : isComplete ? "completed" : "in-progress",
         });
       }
     }

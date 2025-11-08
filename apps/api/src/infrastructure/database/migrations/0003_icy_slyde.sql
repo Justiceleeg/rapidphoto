@@ -1,0 +1,2 @@
+ALTER TABLE "photo" ADD COLUMN "job_id" text;--> statement-breakpoint
+ALTER TABLE "photo" ADD CONSTRAINT "photo_job_id_upload_jobs_id_fk" FOREIGN KEY ("job_id") REFERENCES "public"."upload_jobs"("id") ON DELETE set null ON UPDATE no action;

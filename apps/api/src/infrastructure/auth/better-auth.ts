@@ -22,7 +22,7 @@ export const auth = betterAuth({
   secret: env.authSecret,
   baseURL: env.authUrl,
   trustedOrigins: [
-    'http://localhost:3000', // Web app
+    ...env.allowedOrigins,
     'http://localhost:4000', // API
   ],
   advanced: {

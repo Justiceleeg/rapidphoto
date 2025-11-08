@@ -80,9 +80,11 @@ export default function LoginPage() {
       <XStack justifyContent="center" marginTop="$4">
         <Text fontSize="$3" color="$gray10">
           Don't have an account?{" "}
-          <Link href="/register" style={{ color: "$blue10" }}>
-            Register
-          </Link>
+          <Text asChild>
+            <Link href="/register" style={{ color: "$blue10" }}>
+              Register
+            </Link>
+          </Text>
         </Text>
       </XStack>
     </YStack>

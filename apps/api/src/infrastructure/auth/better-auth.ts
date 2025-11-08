@@ -24,6 +24,8 @@ export const auth = betterAuth({
   trustedOrigins: [
     ...env.allowedOrigins,
     'http://localhost:4000', // API
+    'rapidphoto://', // Mobile app scheme
+    'exp://', // Expo development scheme
   ],
   advanced: {
     database: {

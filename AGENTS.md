@@ -16,3 +16,9 @@ Use `@/openspec/AGENTS.md` to learn:
 Keep this managed block so 'openspec update' can refresh the instructions.
 
 <!-- OPENSPEC:END -->
+
+## Styling Conventions
+
+**When working on web or mobile apps** (`apps/web/` or `apps/mobile/`), always reference `docs/STYLING.md` for styling guidelines.
+
+This project uses Tamagui for all UI components and styling. Do not add custom CSS or use invalid theme values.

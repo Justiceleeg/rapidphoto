@@ -13,6 +13,7 @@
     "lint": "eslint"
   },
   "dependencies": {
+    "@rapidphoto/api-client": "workspace:*",
     "@tamagui/colors": "^1.136.2",
     "@tamagui/config": "^1.136.1",
     "@tamagui/core": "^1.136.1",

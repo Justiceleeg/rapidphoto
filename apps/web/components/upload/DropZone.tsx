@@ -49,23 +49,23 @@ export function DropZone() {
   });
 
   return (
-    <YStack
-      {...getRootProps()}
-      borderWidth={2}
-      borderStyle="dashed"
-      borderColor={isDragActive ? "$blue9" : "$gray8"}
-      borderRadius="$4"
-      padding="$6"
-      backgroundColor={isDragActive ? "$blue2" : "$gray2"}
-      cursor="pointer"
-      opacity={uploadState === "uploading" || uploadState === "pending" ? 0.5 : 1}
-      transition="all 0.2s"
-      hoverStyle={{
-        borderColor: "$blue9",
-        backgroundColor: "$blue2",
-      }}
-    >
-      <input {...getInputProps()} />
+    <div {...getRootProps()}>
+      <YStack
+        borderWidth={2}
+        borderStyle="dashed"
+        borderColor={isDragActive ? "$blue9" : "$gray8"}
+        borderRadius="$4"
+        padding="$6"
+        backgroundColor={isDragActive ? "$blue2" : "$gray2"}
+        cursor="pointer"
+        opacity={uploadState === "uploading" || uploadState === "pending" ? 0.5 : 1}
+        transition="all 0.2s"
+        hoverStyle={{
+          borderColor: "$blue9",
+          backgroundColor: "$blue2",
+        }}
+      >
+        <input {...getInputProps()} />
       <XStack alignItems="center" justifyContent="center" space="$3">
         <Text fontSize="$6" color={isDragActive ? "$blue11" : "$gray11"}>
           {isDragActive
@@ -81,7 +81,8 @@ export function DropZone() {
       >
         Supported formats: JPG, PNG, GIF, WEBP (max 10MB)
       </Text>
-    </YStack>
+      </YStack>
+    </div>
   );
 }
 

@@ -1,11 +1,12 @@
 import { Hono } from "hono";
+import type { Variables } from "../../../index.js";
 import { authMiddleware } from "../../auth/auth.middleware.js";
 import { InitUploadHandler } from "../../../application/commands/init-upload/init-upload.handler.js";
 import { CompletePhotoHandler } from "../../../application/commands/complete-photo/complete-photo.handler.js";
 import { PhotoRepositoryImpl } from "../../database/repositories/photo.repository.impl.js";
 import { R2Service } from "../../storage/r2.service.js";
 
-const uploadRoutes = new Hono();
+const uploadRoutes = new Hono<{ Variables: Variables }>();
 
 // Initialize services and handlers
 const photoRepository = new PhotoRepositoryImpl();
@@ -53,7 +54,7 @@ uploadRoutes.post("/init", authMiddleware, async (c) => {
 });
 
 // Export complete handler separately for mounting at /api/photos
-export const completePhotoRoute = new Hono();
+export const completePhotoRoute = new Hono<{ Variables: Variables }>();
 
 completePhotoRoute.post("/:id/complete", authMiddleware, async (c) => {
   try {

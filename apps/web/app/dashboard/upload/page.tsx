@@ -63,7 +63,6 @@ export default function UploadPage() {
                 uploadState === "pending" ||
                 uploadState === "completed"
               }
-              theme="blue"
               size="$4"
             >
               {uploadState === "uploading"

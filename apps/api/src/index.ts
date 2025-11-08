@@ -10,7 +10,7 @@ import uploadRoutes, { completePhotoRoute } from "./infrastructure/http/routes/u
 import { authMiddleware } from "./infrastructure/auth/auth.middleware.js";
 import { auth } from "./infrastructure/auth/better-auth.js";
 
-type Variables = {
+export type Variables = {
   user: typeof auth.$Infer.Session.user | null;
   session: typeof auth.$Infer.Session.session | null;
 };

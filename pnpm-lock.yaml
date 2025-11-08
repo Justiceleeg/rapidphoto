@@ -126,6 +126,9 @@ importers:
 
   apps/web:
     dependencies:
+      '@rapidphoto/api-client':
+        specifier: workspace:*
+        version: link:../../packages/api-client
       '@tamagui/colors':
         specifier: ^1.136.2
         version: 1.136.2

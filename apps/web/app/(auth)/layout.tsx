@@ -12,7 +12,7 @@ export default function AuthLayout({
       minHeight="100vh"
       alignItems="center"
       justifyContent="center"
-      backgroundColor="$gray2"
+      backgroundColor="$background"
     >
       <YStack maxWidth={400} width="100%" space="$4" padding="$4">
         {children}

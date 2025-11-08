@@ -3,7 +3,8 @@
 import { useAuth } from "@/lib/hooks/use-auth";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
-import { YStack, Text, H1, Button } from "tamagui";
+import Link from "next/link";
+import { YStack, Text, H1, Button, XStack } from "tamagui";
 
 export default function DashboardPage() {
   const { user, signOut } = useAuth();
@@ -20,7 +21,7 @@ export default function DashboardPage() {
   };
 
   return (
-    <YStack padding="$4">
+    <YStack padding="$4" space="$4">
       <YStack
         borderWidth={4}
         borderStyle="dashed"
@@ -35,13 +36,25 @@ export default function DashboardPage() {
         <Text fontSize="$4" color="$gray11" marginBottom="$3">
           You are logged in as {user?.name || user?.email}
         </Text>
-        <Button
-          onPress={handleSignOut}
-          backgroundColor="$red9"
-          size="$4"
-        >
-          Sign Out
-        </Button>
+        <XStack space="$3">
+          <Button
+            asChild
+            backgroundColor="$blue9"
+            size="$4"
+            flex={1}
+          >
+            <Link href="/dashboard/upload">
+              Upload Photo
+            </Link>
+          </Button>
+          <Button
+            onPress={handleSignOut}
+            backgroundColor="$red9"
+            size="$4"
+          >
+            Sign Out
+          </Button>
+        </XStack>
       </YStack>
     </YStack>
   );

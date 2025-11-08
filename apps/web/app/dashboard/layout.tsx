@@ -32,7 +32,7 @@ export default function DashboardLayout({
   }
 
   return (
-    <YStack minHeight="100vh" backgroundColor="$gray2">
+    <YStack minHeight="100vh" backgroundColor="$background">
       <YStack
         backgroundColor="$background"
         shadowColor="$shadowColor"

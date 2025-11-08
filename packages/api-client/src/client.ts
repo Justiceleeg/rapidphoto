@@ -59,6 +59,7 @@ export class ApiClient {
     const response = await fetch(url, {
       method: 'GET',
       headers: this.getHeaders(options?.headers as Record<string, string>),
+      credentials: options?.credentials || 'same-origin',
       ...options,
     });
 
@@ -74,6 +75,7 @@ export class ApiClient {
       method: 'POST',
       headers: this.getHeaders(options?.headers as Record<string, string>),
       body: data ? JSON.stringify(data) : undefined,
+      credentials: options?.credentials || 'same-origin',
       ...options,
     });
 
@@ -129,15 +131,22 @@ export class ApiClient {
    */
   private async handleResponse<T>(response: Response): Promise<T> {
     if (!response.ok) {
+      let errorMessage = `HTTP error! status: ${response.status}`;
       try {
-        const error = await response.json() as { message?: string; status?: number };
-        throw new Error(error.message || `HTTP error! status: ${response.status}`);
-      } catch (err) {
-        if (err instanceof Error) {
-          throw err;
+        const errorText = await response.text();
+        if (errorText) {
+          try {
+            const error = JSON.parse(errorText) as { message?: string; error?: string; status?: number };
+            errorMessage = error.message || error.error || errorMessage;
+          } catch {
+            errorMessage = errorText || errorMessage;
+          }
         }
-        throw new Error(response.statusText || `HTTP error! status: ${response.status}`);
+      } catch (err) {
+        // If we can't parse the error, use status text
+        errorMessage = response.statusText || errorMessage;
       }
+      throw new Error(errorMessage);
     }
 
     // Handle empty responses

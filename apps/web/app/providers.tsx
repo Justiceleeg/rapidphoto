@@ -5,17 +5,24 @@ import "@tamagui/core/reset.css";
 import "@tamagui/polyfill-dev";
 
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Toaster } from "sonner";
 import { ReactNode } from "react";
 import { StyleSheet as RNStyleSheet } from "react-native-web";
 import { useServerInsertedHTML } from "next/navigation";
 import { NextThemeProvider, useRootTheme } from "@tamagui/next-theme";
-import { TamaguiProvider } from "tamagui";
+import { TamaguiProvider, YStack } from "tamagui";
 import tamaguiConfig from "../tamagui.config";
 
 function NextTamaguiProvider({ children }: { children: ReactNode }) {
   const [theme, setTheme] = useRootTheme();
+
+  // Force light theme
+  useEffect(() => {
+    if (theme !== "light") {
+      setTheme("light");
+    }
+  }, [theme, setTheme]);
 
   useServerInsertedHTML(() => {
     // @ts-ignore
@@ -36,13 +43,15 @@ function NextTamaguiProvider({ children }: { children: ReactNode }) {
   });
 
   return (
-    <NextThemeProvider skipNextHead defaultTheme="light">
+    <NextThemeProvider skipNextHead defaultTheme="light" forcedTheme="light">
       <TamaguiProvider 
         config={tamaguiConfig} 
         disableRootThemeClass 
-        defaultTheme={theme || "light"}
+        defaultTheme="light"
       >
-        {children}
+        <YStack minHeight="100vh" backgroundColor="$background">
+          {children}
+        </YStack>
       </TamaguiProvider>
     </NextThemeProvider>
   );

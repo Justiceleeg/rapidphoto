@@ -24,6 +24,7 @@
     "next": "16.0.1",
     "react": "19.2.0",
     "react-dom": "19.2.0",
+    "react-dropzone": "^14.3.8",
     "react-native-web": "^0.21.2",
     "sonner": "^1.7.1",
     "tamagui": "^1.136.1",

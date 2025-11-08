@@ -463,7 +463,7 @@ var hslToRgb = /* @__PURE__ */ __name((hue, saturation, lightness) => {
   const secondComponent = chroma * (1 - Math.abs(huePrime % 2 - 1));
   let red5 = 0;
   let green5 = 0;
-  let blue3 = 0;
+  let blue5 = 0;
   if (huePrime >= 0 && huePrime < 1) {
     red5 = chroma;
     green5 = secondComponent;
@@ -472,35 +472,35 @@ var hslToRgb = /* @__PURE__ */ __name((hue, saturation, lightness) => {
     green5 = chroma;
   } else if (huePrime >= 2 && huePrime < 3) {
     green5 = chroma;
-    blue3 = secondComponent;
+    blue5 = secondComponent;
   } else if (huePrime >= 3 && huePrime < 4) {
     green5 = secondComponent;
-    blue3 = chroma;
+    blue5 = chroma;
   } else if (huePrime >= 4 && huePrime < 5) {
     red5 = secondComponent;
-    blue3 = chroma;
+    blue5 = chroma;
   } else if (huePrime >= 5 && huePrime < 6) {
     red5 = chroma;
-    blue3 = secondComponent;
+    blue5 = secondComponent;
   }
   const lightnessModification = l - chroma / 2;
   const finalRed = red5 + lightnessModification;
   const finalGreen = green5 + lightnessModification;
-  const finalBlue = blue3 + lightnessModification;
+  const finalBlue = blue5 + lightnessModification;
   return [finalRed, finalGreen, finalBlue].map(roundColor);
 }, "hslToRgb");
 function parseToHsla(color2) {
-  const [red5, green5, blue3, alpha] = parseToRgba(color2).map((value, index) => (
+  const [red5, green5, blue5, alpha] = parseToRgba(color2).map((value, index) => (
     // 3rd index is alpha channel which is already normalized
     index === 3 ? value : value / 255
   ));
-  const max = Math.max(red5, green5, blue3);
-  const min = Math.min(red5, green5, blue3);
+  const max = Math.max(red5, green5, blue5);
+  const min = Math.min(red5, green5, blue5);
   const lightness = (max + min) / 2;
   if (max === min) return [0, 0, lightness, alpha];
   const delta = max - min;
   const saturation = lightness > 0.5 ? delta / (2 - max - min) : delta / (max + min);
-  const hue = 60 * (red5 === max ? (green5 - blue3) / delta + (green5 < blue3 ? 6 : 0) : green5 === max ? (blue3 - red5) / delta + 2 : (red5 - green5) / delta + 4);
+  const hue = 60 * (red5 === max ? (green5 - blue5) / delta + (green5 < blue5 ? 6 : 0) : green5 === max ? (blue5 - red5) / delta + 2 : (red5 - green5) / delta + 4);
   return [hue, saturation, lightness, alpha];
 }
 __name(parseToHsla, "parseToHsla");
@@ -1230,6 +1230,38 @@ var masks = {
   })
 };
 
+// ../../node_modules/.pnpm/@tamagui+colors@1.136.2/node_modules/@tamagui/colors/dist/esm/dark/blue.mjs
+var blue = {
+  blue1: "hsl(212, 35.0%, 9.2%)",
+  blue2: "hsl(216, 50.0%, 11.8%)",
+  blue3: "hsl(214, 59.4%, 15.3%)",
+  blue4: "hsl(214, 65.8%, 17.9%)",
+  blue5: "hsl(213, 71.2%, 20.2%)",
+  blue6: "hsl(212, 77.4%, 23.1%)",
+  blue7: "hsl(211, 85.1%, 27.4%)",
+  blue8: "hsl(211, 89.7%, 34.1%)",
+  blue9: "hsl(206, 100%, 50.0%)",
+  blue10: "hsl(209, 100%, 60.6%)",
+  blue11: "hsl(210, 100%, 66.1%)",
+  blue12: "hsl(206, 98.0%, 95.8%)"
+};
+
+// ../../node_modules/.pnpm/@tamagui+colors@1.136.2/node_modules/@tamagui/colors/dist/esm/dark/gray.mjs
+var gray = {
+  gray1: "hsl(0, 0%, 8.5%)",
+  gray2: "hsl(0, 0%, 11.0%)",
+  gray3: "hsl(0, 0%, 13.6%)",
+  gray4: "hsl(0, 0%, 15.8%)",
+  gray5: "hsl(0, 0%, 17.9%)",
+  gray6: "hsl(0, 0%, 20.5%)",
+  gray7: "hsl(0, 0%, 24.3%)",
+  gray8: "hsl(0, 0%, 31.2%)",
+  gray9: "hsl(0, 0%, 43.9%)",
+  gray10: "hsl(0, 0%, 49.4%)",
+  gray11: "hsl(0, 0%, 62.8%)",
+  gray12: "hsl(0, 0%, 93.0%)"
+};
+
 // ../../node_modules/.pnpm/@tamagui+colors@1.136.2/node_modules/@tamagui/colors/dist/esm/dark/green.mjs
 var green = {
   green1: "hsl(146, 30.0%, 7.4%)",
@@ -1276,6 +1308,38 @@ var yellow = {
   yellow10: "hsl(54, 100%, 68.0%)",
   yellow11: "hsl(48, 100%, 47.0%)",
   yellow12: "hsl(53, 100%, 91.0%)"
+};
+
+// ../../node_modules/.pnpm/@tamagui+colors@1.136.2/node_modules/@tamagui/colors/dist/esm/light/blue.mjs
+var blue2 = {
+  blue1: "hsl(206, 100%, 99.2%)",
+  blue2: "hsl(210, 100%, 98.0%)",
+  blue3: "hsl(209, 100%, 96.5%)",
+  blue4: "hsl(210, 98.8%, 94.0%)",
+  blue5: "hsl(209, 95.0%, 90.1%)",
+  blue6: "hsl(209, 81.2%, 84.5%)",
+  blue7: "hsl(208, 77.5%, 76.9%)",
+  blue8: "hsl(206, 81.9%, 65.3%)",
+  blue9: "hsl(206, 100%, 50.0%)",
+  blue10: "hsl(208, 100%, 47.3%)",
+  blue11: "hsl(211, 100%, 43.2%)",
+  blue12: "hsl(211, 100%, 15.0%)"
+};
+
+// ../../node_modules/.pnpm/@tamagui+colors@1.136.2/node_modules/@tamagui/colors/dist/esm/light/gray.mjs
+var gray2 = {
+  gray1: "hsl(0, 0%, 99.0%)",
+  gray2: "hsl(0, 0%, 97.3%)",
+  gray3: "hsl(0, 0%, 95.1%)",
+  gray4: "hsl(0, 0%, 93.0%)",
+  gray5: "hsl(0, 0%, 90.9%)",
+  gray6: "hsl(0, 0%, 88.7%)",
+  gray7: "hsl(0, 0%, 85.8%)",
+  gray8: "hsl(0, 0%, 78.0%)",
+  gray9: "hsl(0, 0%, 56.1%)",
+  gray10: "hsl(0, 0%, 52.3%)",
+  gray11: "hsl(0, 0%, 43.5%)",
+  gray12: "hsl(0, 0%, 9.0%)"
 };
 
 // ../../node_modules/.pnpm/@tamagui+colors@1.136.2/node_modules/@tamagui/colors/dist/esm/light/green.mjs
@@ -1416,7 +1480,7 @@ shorthands.ox = "overflowX";
 shorthands.oy = "overflowY";
 
 // ../../node_modules/.pnpm/@tamagui+colors@1.136.1/node_modules/@tamagui/colors/dist/esm/dark/blue.mjs
-var blue = {
+var blue3 = {
   blue1: "hsl(212, 35.0%, 9.2%)",
   blue2: "hsl(216, 50.0%, 11.8%)",
   blue3: "hsl(214, 59.4%, 15.3%)",
@@ -1432,7 +1496,7 @@ var blue = {
 };
 
 // ../../node_modules/.pnpm/@tamagui+colors@1.136.1/node_modules/@tamagui/colors/dist/esm/dark/gray.mjs
-var gray = {
+var gray3 = {
   gray1: "hsl(0, 0%, 8.5%)",
   gray2: "hsl(0, 0%, 11.0%)",
   gray3: "hsl(0, 0%, 13.6%)",
@@ -1544,7 +1608,7 @@ var yellow3 = {
 };
 
 // ../../node_modules/.pnpm/@tamagui+colors@1.136.1/node_modules/@tamagui/colors/dist/esm/light/blue.mjs
-var blue2 = {
+var blue4 = {
   blue1: "hsl(206, 100%, 99.2%)",
   blue2: "hsl(210, 100%, 98.0%)",
   blue3: "hsl(209, 100%, 96.5%)",
@@ -1560,7 +1624,7 @@ var blue2 = {
 };
 
 // ../../node_modules/.pnpm/@tamagui+colors@1.136.1/node_modules/@tamagui/colors/dist/esm/light/gray.mjs
-var gray2 = {
+var gray4 = {
   gray1: "hsl(0, 0%, 99.0%)",
   gray2: "hsl(0, 0%, 97.3%)",
   gray3: "hsl(0, 0%, 95.1%)",
@@ -2648,8 +2712,8 @@ var tokens = {
 // ../../node_modules/.pnpm/@tamagui+themes@1.136.1_react-dom@19.2.0_react@19.2.0__react-native@0.82.1_@babel+core@_0d0e179dc78f1e23eff9c060438db37f/node_modules/@tamagui/themes/dist/esm/v3-themes.mjs
 var colorTokens = {
   light: {
-    blue: blue2,
-    gray: gray2,
+    blue: blue4,
+    gray: gray4,
     green: green4,
     orange: orange2,
     pink: pink2,
@@ -2658,8 +2722,8 @@ var colorTokens = {
     yellow: yellow4
   },
   dark: {
-    blue,
-    gray,
+    blue: blue3,
+    gray: gray3,
     green: green3,
     orange,
     pink,
@@ -3556,6 +3620,8 @@ var builtThemes = createThemes({
         ...green2,
         ...red2,
         ...yellow2,
+        ...gray2,
+        ...blue2,
         ...lightShadows,
         shadowColor: lightShadows.shadow1
       },
@@ -3563,6 +3629,8 @@ var builtThemes = createThemes({
         ...green,
         ...red,
         ...yellow,
+        ...gray,
+        ...blue,
         ...darkShadows,
         shadowColor: darkShadows.shadow1
       }

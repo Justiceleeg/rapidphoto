@@ -48,7 +48,6 @@ export default function RegisterPage() {
             <Label htmlFor="name">Name</Label>
             <Input
               id="name"
-              type="text"
               value={name}
               onChange={(e) => setName(e.target.value)}
               placeholder="Enter your name"
@@ -59,7 +58,6 @@ export default function RegisterPage() {
             <Label htmlFor="email">Email</Label>
             <Input
               id="email"
-              type="email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               placeholder="Enter your email"
@@ -70,7 +68,6 @@ export default function RegisterPage() {
             <Label htmlFor="password">Password</Label>
             <Input
               id="password"
-              type="password"
               secureTextEntry
               value={password}
               onChange={(e) => setPassword(e.target.value)}

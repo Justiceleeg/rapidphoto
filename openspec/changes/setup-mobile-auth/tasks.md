@@ -20,5 +20,5 @@
 - [x] 5.1 Can register new user on mobile
 - [x] 5.2 Can login on mobile
 - [x] 5.3 Navigates to tabs after login
-- [ ] 5.4 Session persists across app restarts
+- [x] 5.4 Session persists across app restarts
 

@@ -19,21 +19,23 @@
   - [x] Test: Visit web URL, test login/register
 
 ## 3. Mobile Configuration
-- [ ] 3.1 Update mobile to use production API (S1-48)
-  - [ ] Update `apps/mobile/.env`
-  - [ ] Set `EXPO_PUBLIC_API_URL` to production API URL
+- [x] 3.1 Update mobile to use production API (S1-48)
+  - [x] Update `apps/mobile/app.json` (using `extra.apiUrl`)
+  - [x] Set API URL to production API URL: `https://api-production-18fb.up.railway.app`
 
 ## 4. Production Testing
 - [x] 4.1 Test authentication in production (S1-49)
   - [x] Register new user on web
   - [x] Login on web
-  - [ ] Register new user on mobile (pending mobile app)
-  - [ ] Login on mobile (pending mobile app)
+  - [x] Register new user on mobile
+  - [x] Login on mobile
   - [x] Verify sessions persist (web)
+  - [x] Verify sessions persist (mobile)
 
 ## 5. Verification
 - [x] 5.1 Authentication works in production on web
-- [ ] 5.2 Authentication works in production on mobile (pending mobile app)
+- [x] 5.2 Authentication works in production on mobile
 - [x] 5.3 Sessions persist across requests (web)
 - [x] 5.4 Protected routes require authentication (web)
+- [x] 5.5 Protected routes require authentication (mobile)
 

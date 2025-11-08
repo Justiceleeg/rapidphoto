@@ -109,4 +109,25 @@ export const authClient = {
       console.error("Sign out error:", error);
     }
   },
+  getSession: async () => {
+    try {
+      const response = await fetch(`${apiUrl}/api/auth/get-session`, {
+        method: "GET",
+        headers: {
+          Origin: requestOrigin,
+        },
+        credentials: "include",
+      });
+
+      if (!response.ok) {
+        return { data: null, error: null };
+      }
+
+      const data = await response.json();
+      return { data, error: null };
+    } catch (error) {
+      console.error("Get session error:", error);
+      return { data: null, error: null };
+    }
+  },
 };

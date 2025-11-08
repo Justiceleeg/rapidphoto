@@ -42,16 +42,15 @@ export default function RegisterPage() {
       space="$4"
     >
       <H1 textAlign="center" marginBottom="$2">Register</H1>
-      <form onSubmit={handleSubmit}>
+      <form onSubmit={handleSubmit} id="register-form">
         <YStack space="$4">
           <YStack space="$2">
             <Label htmlFor="name">Name</Label>
             <Input
               id="name"
               value={name}
-              onChange={(e) => setName(e.target.value)}
+              onChangeText={setName}
               placeholder="Enter your name"
-              required
             />
           </YStack>
           <YStack space="$2">
@@ -59,9 +58,8 @@ export default function RegisterPage() {
             <Input
               id="email"
               value={email}
-              onChange={(e) => setEmail(e.target.value)}
+              onChangeText={setEmail}
               placeholder="Enter your email"
-              required
             />
           </YStack>
           <YStack space="$2">
@@ -70,16 +68,18 @@ export default function RegisterPage() {
               id="password"
               secureTextEntry
               value={password}
-              onChange={(e) => setPassword(e.target.value)}
+              onChangeText={setPassword}
               placeholder="Enter your password"
-              required
             />
           </YStack>
           <Button
-            type="submit"
             disabled={isLoading}
-            theme="blue"
+            backgroundColor="$blue9"
             size="$4"
+            onPress={(e) => {
+              e.preventDefault?.();
+              handleSubmit(e as any);
+            }}
           >
             {isLoading ? "Registering..." : "Register"}
           </Button>

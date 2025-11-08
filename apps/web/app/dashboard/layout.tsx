@@ -62,7 +62,6 @@ export default function DashboardLayout({
         </XStack>
       </YStack>
       <YStack
-        as="main"
         maxWidth={1280}
         width="100%"
         marginHorizontal="auto"

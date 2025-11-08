@@ -8,7 +8,7 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { useState } from "react";
 import { Toaster } from "sonner";
 import { ReactNode } from "react";
-import { StyleSheet } from "react-native";
+import { StyleSheet as RNStyleSheet } from "react-native-web";
 import { useServerInsertedHTML } from "next/navigation";
 import { NextThemeProvider, useRootTheme } from "@tamagui/next-theme";
 import { TamaguiProvider } from "tamagui";
@@ -19,7 +19,7 @@ function NextTamaguiProvider({ children }: { children: ReactNode }) {
 
   useServerInsertedHTML(() => {
     // @ts-ignore
-    const rnwStyle = StyleSheet.getSheet();
+    const rnwStyle = RNStyleSheet.getSheet();
     return (
       <>
         <style

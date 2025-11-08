@@ -36,8 +36,8 @@ export default function DashboardPage() {
           You are logged in as {user?.name || user?.email}
         </Text>
         <Button
-          onClick={handleSignOut}
-          theme="red"
+          onPress={handleSignOut}
+          backgroundColor="$red9"
           size="$4"
         >
           Sign Out

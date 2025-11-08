@@ -2,11 +2,22 @@
   "$schema": "https://schema.railpack.com",
   "steps": {
     "install": {
+      "inputs": [
+        {
+          "local": true,
+          "include": ["."]
+        }
+      ],
       "commands": [
         "pnpm install"
       ]
     },
     "build": {
+      "inputs": [
+        {
+          "step": "install"
+        }
+      ],
       "commands": [
         "pnpm --filter @rapidphoto/api-client build",
         "pnpm --filter @rapidphoto/web build"

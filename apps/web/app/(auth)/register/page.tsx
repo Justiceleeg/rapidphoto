@@ -41,7 +41,9 @@ export default function RegisterPage() {
       elevation={4}
       space="$4"
     >
-      <H1 textAlign="center" marginBottom="$2">Register</H1>
+      <H1 textAlign="center" marginBottom="$2">
+        Register
+      </H1>
       <form onSubmit={handleSubmit} id="register-form">
         <YStack space="$4">
           <YStack space="$2">
@@ -96,4 +98,3 @@ export default function RegisterPage() {
     </YStack>
   );
 }
-

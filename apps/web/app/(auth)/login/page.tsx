@@ -40,7 +40,9 @@ export default function LoginPage() {
       elevation={4}
       space="$4"
     >
-      <H1 textAlign="center" marginBottom="$2">Login</H1>
+      <H1 textAlign="center" marginBottom="$2">
+        Login
+      </H1>
       <form onSubmit={handleSubmit} id="login-form">
         <YStack space="$4">
           <YStack space="$2">
@@ -86,4 +88,3 @@ export default function LoginPage() {
     </YStack>
   );
 }
-

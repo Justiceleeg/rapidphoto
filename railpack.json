@@ -1,0 +1,20 @@
+{
+  "$schema": "https://schema.railpack.com",
+  "steps": {
+    "install": {
+      "commands": [
+        "pnpm install"
+      ]
+    },
+    "build": {
+      "commands": [
+        "pnpm --filter @rapidphoto/api-client build",
+        "pnpm --filter @rapidphoto/web build"
+      ]
+    }
+  },
+  "deploy": {
+    "startCommand": "pnpm --filter @rapidphoto/web start"
+  }
+}
+

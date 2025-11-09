@@ -1,7 +1,11 @@
 import { useState } from "react";
 import { useRouter } from "expo-router";
-import { YStack, XStack, Input, Button, Label, Text, H1 } from "tamagui";
+import { View } from "@/components/ui/view";
+import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
+import { Text } from "@/components/ui/text";
 import { authClient } from "@/lib/auth-client";
+import { StyleSheet, TouchableOpacity } from "react-native";
 
 export default function RegisterScreen() {
   const router = useRouter();
@@ -29,30 +33,24 @@ export default function RegisterScreen() {
   };
 
   return (
-    <YStack
-      flex={1}
-      backgroundColor="$background"
-      padding="$4"
-      justifyContent="center"
-      space="$4"
-    >
-      <H1 textAlign="center" marginBottom="$2">
+    <View style={styles.container}>
+      <Text variant="heading" style={styles.title}>
         Register
-      </H1>
-      <YStack space="$4">
-        <YStack space="$2">
-          <Label>Name</Label>
+      </Text>
+      <View style={styles.form}>
+        <View style={styles.inputGroup}>
           <Input
+            label="Name"
             value={name}
             onChangeText={setName}
             placeholder="Enter your name"
             autoCapitalize="words"
             autoComplete="name"
           />
-        </YStack>
-        <YStack space="$2">
-          <Label>Email</Label>
+        </View>
+        <View style={styles.inputGroup}>
           <Input
+            label="Email"
             value={email}
             onChangeText={setEmail}
             placeholder="Enter your email"
@@ -60,10 +58,10 @@ export default function RegisterScreen() {
             autoCapitalize="none"
             autoComplete="email"
           />
-        </YStack>
-        <YStack space="$2">
-          <Label>Password</Label>
+        </View>
+        <View style={styles.inputGroup}>
           <Input
+            label="Password"
             secureTextEntry
             value={password}
             onChangeText={setPassword}
@@ -71,28 +69,60 @@ export default function RegisterScreen() {
             autoCapitalize="none"
             autoComplete="password"
           />
-        </YStack>
+        </View>
         <Button
           disabled={isLoading}
-          backgroundColor="$blue9"
-          size="$4"
+          loading={isLoading}
           onPress={handleSubmit}
+          style={styles.button}
+          animation={false}
         >
           {isLoading ? "Registering..." : "Register"}
         </Button>
-      </YStack>
-      <XStack justifyContent="center" marginTop="$4">
-        <Text fontSize="$3" color="$gray10">
+      </View>
+      <View style={styles.footer}>
+        <Text variant="body" style={styles.footerText}>
           Already have an account?{" "}
-          <Text
-            color="$blue10"
-            onPress={() => router.push("/(auth)/login")}
-            textDecorationLine="underline"
-          >
+        </Text>
+        <TouchableOpacity onPress={() => router.push("/(auth)/login")}>
+          <Text variant="link" style={styles.linkText}>
             Login
           </Text>
-        </Text>
-      </XStack>
-    </YStack>
+        </TouchableOpacity>
+      </View>
+    </View>
   );
 }
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    padding: 16,
+    justifyContent: "center",
+  },
+  title: {
+    textAlign: "center",
+    marginBottom: 32,
+  },
+  form: {
+    gap: 16,
+  },
+  inputGroup: {
+    gap: 8,
+  },
+  button: {
+    marginTop: 8,
+  },
+  footer: {
+    flexDirection: "row",
+    justifyContent: "center",
+    marginTop: 24,
+    alignItems: "center",
+  },
+  footerText: {
+    color: "#71717a",
+  },
+  linkText: {
+    textDecorationLine: "underline",
+  },
+});

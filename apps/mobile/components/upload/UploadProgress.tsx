@@ -1,9 +1,11 @@
 import { useEffect, useRef, useState } from "react";
-import { YStack, XStack, Text, Card } from "tamagui";
+import { View } from "@/components/ui/view";
+import { Text } from "@/components/ui/text";
+import { Card } from "@/components/ui/card";
+import { Progress } from "@/components/ui/progress-simple";
 import { useUploadStore } from "@/lib/stores/upload-store";
 import { API_URL } from "@/lib/api-client";
-import { ScrollView, View } from "react-native";
-import * as Progress from "react-native-progress";
+import { ScrollView, StyleSheet } from "react-native";
 
 interface ProgressEvent {
   jobId: string;
@@ -169,112 +171,174 @@ export function UploadProgress() {
   const overallProgress = Math.min(100, Math.max(0, Math.round(overallProgressRaw)));
 
   return (
-    <YStack space="$4" marginTop="$4">
+    <View style={styles.container}>
       {/* Overall Progress */}
-      <Card padding="$4" backgroundColor="$gray2" borderRadius="$4">
-        <YStack space="$3">
-          <XStack justifyContent="space-between" alignItems="center">
-            <Text fontSize="$6" fontWeight="bold">
+      <Card style={styles.card}>
+        <View style={styles.cardContent}>
+          <View style={styles.header}>
+            <Text variant="title" style={styles.title}>
               Upload Progress
             </Text>
-            <Text fontSize="$5" color="$gray11">
+            <Text variant="body" style={styles.percentage}>
               {overallProgress}%
             </Text>
-          </XStack>
+          </View>
           
-          <Progress.Bar 
-            progress={overallProgress / 100} 
-            width={null}
-            height={12}
-            color="#3b82f6"
-            unfilledColor="#e5e7eb"
-            borderRadius={6}
-            borderWidth={0}
-          />
+          <Progress value={overallProgress} style={styles.progressBar} />
 
-          <XStack justifyContent="space-between">
-            <Text fontSize="$3" color="$gray11">
+          <View style={styles.stats}>
+            <Text variant="caption" style={styles.statText}>
               Total: {totalPhotos}
             </Text>
-            <Text fontSize="$3" color="$green10">
+            <Text variant="caption" style={[styles.statText, styles.statSuccess]}>
               Completed: {completedPhotos}
             </Text>
-            <Text fontSize="$3" color="$red10">
+            <Text variant="caption" style={[styles.statText, styles.statError]}>
               Failed: {failedPhotos}
             </Text>
-          </XStack>
+          </View>
 
           {connectionStatus !== "connected" && (
-            <Text fontSize="$2" color="$orange10">
+            <Text variant="caption" style={styles.connectionStatus}>
               {connectionStatus === "connecting" ? "Connecting..." : "Disconnected"}
             </Text>
           )}
-        </YStack>
+        </View>
       </Card>
 
       {/* Individual Photo Progress */}
       {photoProgressArray.length > 0 && (
-        <Card padding="$4" backgroundColor="$gray2" borderRadius="$4">
-          <YStack space="$3">
-            <Text fontSize="$5" fontWeight="bold" marginBottom="$2">
+        <Card style={styles.card}>
+          <View style={styles.cardContent}>
+            <Text variant="body" style={styles.sectionTitle}>
               Photo Details
             </Text>
-            <ScrollView style={{ maxHeight: 300 }}>
-              <YStack space="$2">
+            <ScrollView style={styles.scrollView}>
+              <View style={styles.photoList}>
                 {photoProgressArray.map((photo) => (
-                  <Card
-                    key={photo.photoId}
-                    padding="$3"
-                    backgroundColor="$background"
-                    borderRadius="$3"
-                  >
-                    <YStack space="$2">
-                      <XStack justifyContent="space-between" alignItems="center">
-                        <Text fontSize="$3" flex={1} numberOfLines={1}>
+                  <Card key={photo.photoId} style={styles.photoCard}>
+                    <View style={styles.photoContent}>
+                      <View style={styles.photoHeader}>
+                        <Text variant="caption" style={styles.photoFilename} numberOfLines={1}>
                           {photo.filename}
                         </Text>
                         <Text
-                          fontSize="$2"
-                          fontWeight="bold"
-                          color={
-                            photo.status === "completed"
-                              ? "$green10"
-                              : photo.status === "failed"
-                              ? "$red10"
-                              : photo.status === "uploading"
-                              ? "$blue10"
-                              : "$gray10"
-                          }
+                          variant="caption"
+                          style={[
+                            styles.photoStatus,
+                            photo.status === "completed" && styles.statusSuccess,
+                            photo.status === "failed" && styles.statusError,
+                            photo.status === "uploading" && styles.statusUploading,
+                          ]}
                         >
                           {photo.status.toUpperCase()}
                         </Text>
-                      </XStack>
+                      </View>
                       
                       {photo.status === "uploading" && (
-                        <Progress.Bar 
-                          progress={Math.round(photo.progress) / 100} 
-                          width={null}
-                          height={6}
-                          color="#3b82f6"
-                          unfilledColor="#e5e7eb"
-                          borderRadius={3}
-                          borderWidth={0}
-                        />
+                        <Progress value={photo.progress} style={styles.photoProgress} />
                       )}
                       
                       {photo.error && (
-                        <Text fontSize="$2" color="$red10">
+                        <Text variant="caption" style={styles.photoError}>
                           {photo.error}
                         </Text>
                       )}
-                    </YStack>
+                    </View>
                   </Card>
                 ))}
-              </YStack>
+              </View>
             </ScrollView>
-          </YStack>
+          </View>
         </Card>
       )}
-    </YStack>
+    </View>
   );
 }
+
+const styles = StyleSheet.create({
+  container: {
+    gap: 16,
+    marginTop: 16,
+  },
+  card: {
+    marginBottom: 0,
+  },
+  cardContent: {
+    gap: 12,
+  },
+  header: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+  },
+  title: {
+    fontWeight: "bold",
+  },
+  percentage: {
+    color: "#71717a",
+  },
+  progressBar: {
+    height: 12,
+  },
+  stats: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+  },
+  statText: {
+    color: "#71717a",
+  },
+  statSuccess: {
+    color: "#22c55e",
+  },
+  statError: {
+    color: "#ef4444",
+  },
+  connectionStatus: {
+    color: "#f97316",
+  },
+  sectionTitle: {
+    fontWeight: "bold",
+    marginBottom: 8,
+  },
+  scrollView: {
+    maxHeight: 300,
+  },
+  photoList: {
+    gap: 8,
+  },
+  photoCard: {
+    padding: 12,
+    backgroundColor: "#fff",
+  },
+  photoContent: {
+    gap: 8,
+  },
+  photoHeader: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+  },
+  photoFilename: {
+    flex: 1,
+  },
+  photoStatus: {
+    fontWeight: "bold",
+    color: "#71717a",
+  },
+  statusSuccess: {
+    color: "#22c55e",
+  },
+  statusError: {
+    color: "#ef4444",
+  },
+  statusUploading: {
+    color: "#3b82f6",
+  },
+  photoProgress: {
+    height: 6,
+  },
+  photoError: {
+    color: "#ef4444",
+  },
+});

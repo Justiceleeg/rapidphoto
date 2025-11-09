@@ -29,44 +29,44 @@ export function ImagePreview() {
     <Card>
       <CardContent className="p-4">
         <div className="flex items-center gap-4">
-          {previewUrl && (
+        {previewUrl && (
             <img
               src={previewUrl}
               alt="Preview"
               className="w-30 h-30 rounded-md object-cover"
               style={{ width: 120, height: 120 }}
-            />
-          )}
+          />
+        )}
           <div className="flex-1 space-y-2">
             <p className="text-lg font-semibold">
-              {selectedFile.name}
+            {selectedFile.name}
             </p>
             <p className="text-sm text-muted-foreground">
-              {formatFileSize(selectedFile.size)}
+            {formatFileSize(selectedFile.size)}
             </p>
-            {uploadState === "pending" && (
+          {uploadState === "pending" && (
               <p className="text-sm text-primary">
-                Preparing upload...
+              Preparing upload...
               </p>
-            )}
-            {uploadState === "uploading" && (
+          )}
+          {uploadState === "uploading" && (
               <div className="space-y-2">
                 <p className="text-sm text-primary">
-                  Uploading... {progress}%
+                Uploading... {progress}%
                 </p>
                 <Progress value={progress} className="h-1" />
               </div>
-            )}
-            {uploadState === "completed" && (
+          )}
+          {uploadState === "completed" && (
               <p className="text-sm text-green-600">
-                Upload completed successfully!
+              Upload completed successfully!
               </p>
-            )}
-            {uploadState === "error" && error && (
+          )}
+          {uploadState === "error" && error && (
               <p className="text-sm text-destructive">
-                Error: {error}
+              Error: {error}
               </p>
-            )}
+          )}
           </div>
         </div>
       </CardContent>

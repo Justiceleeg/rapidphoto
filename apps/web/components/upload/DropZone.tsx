@@ -118,13 +118,13 @@ export function DropZone() {
             "text-base",
             isDragActive ? "text-primary" : "text-muted-foreground"
           )}>
-            {isDragActive
-              ? "Drop the photos here"
-              : "Drag and drop photos here, or click to select (up to 100)"}
+          {isDragActive
+            ? "Drop the photos here"
+            : "Drag and drop photos here, or click to select (up to 100)"}
           </p>
         </div>
         <p className="text-sm text-muted-foreground text-center mt-2">
-          Supported formats: JPG, PNG, GIF, WEBP (max 10MB per file, up to 100 files)
+        Supported formats: JPG, PNG, GIF, WEBP (max 10MB per file, up to 100 files)
         </p>
       </div>
     </div>

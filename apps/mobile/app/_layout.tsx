@@ -1,10 +1,9 @@
 import { Slot } from "expo-router";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { SafeAreaProvider } from "react-native-safe-area-context";
-import { TamaguiProvider } from "tamagui";
 import { ErrorBoundary } from "react-error-boundary";
 import { View, Text, StyleSheet } from "react-native";
-import tamaguiConfig from "../tamagui.config";
+import { ThemeProvider } from "@/theme/theme-provider";
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -53,11 +52,11 @@ export default function RootLayout() {
   return (
     <SafeAreaProvider>
       <ErrorBoundary FallbackComponent={ErrorFallback}>
-        <TamaguiProvider config={tamaguiConfig} defaultTheme="light">
+        <ThemeProvider>
           <QueryClientProvider client={queryClient}>
             <Slot />
           </QueryClientProvider>
-        </TamaguiProvider>
+        </ThemeProvider>
       </ErrorBoundary>
     </SafeAreaProvider>
   );

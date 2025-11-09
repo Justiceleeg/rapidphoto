@@ -41,55 +41,55 @@ export default function RegisterPage() {
         </CardDescription>
       </CardHeader>
       <CardContent>
-        <form onSubmit={handleSubmit} id="register-form">
+      <form onSubmit={handleSubmit} id="register-form">
           <div className="space-y-4">
             <div className="space-y-2">
-              <Label htmlFor="name">Name</Label>
-              <Input
-                id="name"
+            <Label htmlFor="name">Name</Label>
+            <Input
+              id="name"
                 type="text"
-                value={name}
+              value={name}
                 onChange={(e) => setName(e.target.value)}
-                placeholder="Enter your name"
+              placeholder="Enter your name"
                 required
-              />
+            />
             </div>
             <div className="space-y-2">
-              <Label htmlFor="email">Email</Label>
-              <Input
-                id="email"
+            <Label htmlFor="email">Email</Label>
+            <Input
+              id="email"
                 type="email"
-                value={email}
+              value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                placeholder="Enter your email"
+              placeholder="Enter your email"
                 required
-              />
+            />
             </div>
             <div className="space-y-2">
-              <Label htmlFor="password">Password</Label>
-              <Input
-                id="password"
+            <Label htmlFor="password">Password</Label>
+            <Input
+              id="password"
                 type="password"
-                value={password}
+              value={password}
                 onChange={(e) => setPassword(e.target.value)}
-                placeholder="Enter your password"
+              placeholder="Enter your password"
                 required
-              />
+            />
             </div>
-            <Button
+          <Button
               type="submit"
-              disabled={isLoading}
+            disabled={isLoading}
               className="w-full"
-            >
-              {isLoading ? "Registering..." : "Register"}
-            </Button>
+          >
+            {isLoading ? "Registering..." : "Register"}
+          </Button>
           </div>
-        </form>
+      </form>
         <div className="mt-4 text-center text-sm text-muted-foreground">
           Already have an account?{" "}
           <Link href="/login" className="text-primary hover:underline">
-            Login
-          </Link>
+              Login
+            </Link>
         </div>
       </CardContent>
     </Card>

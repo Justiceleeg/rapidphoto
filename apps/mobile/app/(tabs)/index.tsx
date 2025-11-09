@@ -1,12 +1,14 @@
 import { useRouter } from "expo-router";
-import { YStack, Text, H1, Button, XStack } from "tamagui";
+import { View } from "@/components/ui/view";
+import { Text } from "@/components/ui/text";
+import { Button } from "@/components/ui/button";
 import { authClient } from "@/lib/auth-client";
 import { useUploadStore } from "@/lib/stores/upload-store";
 import { ImagePickerComponent } from "@/components/upload/ImagePicker";
 import { ImagePreview } from "@/components/upload/ImagePreview";
 import { UploadProgress } from "@/components/upload/UploadProgress";
 import { useState, useEffect } from "react";
-import { Alert } from "react-native";
+import { Alert, StyleSheet } from "react-native";
 
 export default function HomeScreen() {
   const router = useRouter();
@@ -90,22 +92,31 @@ export default function HomeScreen() {
   const hasFiles = isBatchMode ? selectedFiles.length > 0 : selectedFile !== null;
 
   return (
-    <YStack flex={1} padding="$4" backgroundColor="$background">
-      <H1 fontSize="$9" fontWeight="bold" marginBottom="$4">
-        Upload Photo{isBatchMode ? "s" : ""}
-      </H1>
+    <View style={styles.container}>
+      <View style={styles.header}>
+        <Text variant="heading" style={styles.title}>
+          Upload Photo{isBatchMode ? "s" : ""}
+        </Text>
+        <Button
+          onPress={handleSignOut}
+          variant="ghost"
+          size="sm"
+          animation={false}
+        >
+          Logout
+        </Button>
+      </View>
 
       {/* Mode Toggle */}
-      <XStack space="$3" marginBottom="$4">
+      <View style={styles.modeToggle}>
         <Button
           onPress={() => {
             setIsBatchMode(false);
             reset();
           }}
-          backgroundColor={!isBatchMode ? "$blue9" : "$gray5"}
-          color={!isBatchMode ? "$white" : "$gray11"}
-          flex={1}
-          size="$4"
+          variant={!isBatchMode ? "default" : "secondary"}
+          style={[styles.modeButton, !isBatchMode && styles.modeButtonActive]}
+          animation={false}
         >
           Single Upload
         </Button>
@@ -114,14 +125,13 @@ export default function HomeScreen() {
             setIsBatchMode(true);
             reset();
           }}
-          backgroundColor={isBatchMode ? "$blue9" : "$gray5"}
-          color={isBatchMode ? "$white" : "$gray11"}
-          flex={1}
-          size="$4"
+          variant={isBatchMode ? "default" : "secondary"}
+          style={[styles.modeButton, isBatchMode && styles.modeButtonActive]}
+          animation={false}
         >
           Batch Upload
         </Button>
-      </XStack>
+      </View>
 
       {/* Image Picker */}
       <ImagePickerComponent
@@ -132,11 +142,11 @@ export default function HomeScreen() {
 
       {/* Selected Files Info */}
       {isBatchMode && selectedFiles.length > 0 && (
-        <YStack marginTop="$4" padding="$3" backgroundColor="$gray2" borderRadius="$4">
-          <Text fontSize="$4" fontWeight="bold">
+        <View style={styles.selectedInfo}>
+          <Text variant="body" style={styles.selectedText}>
             {selectedFiles.length} photo{selectedFiles.length !== 1 ? "s" : ""} selected
           </Text>
-        </YStack>
+        </View>
       )}
 
       {/* Preview for single upload */}
@@ -146,7 +156,7 @@ export default function HomeScreen() {
 
       {/* Upload Controls */}
       {hasFiles && (
-        <YStack space="$3" marginTop="$4">
+        <View style={styles.uploadControls}>
           <Button
             onPress={handleUpload}
             disabled={
@@ -154,13 +164,12 @@ export default function HomeScreen() {
               uploadState === "pending" ||
               uploadState === "completed"
             }
-            backgroundColor="$blue9"
-            size="$4"
+            loading={uploadState === "uploading" || uploadState === "pending"}
+            style={styles.uploadButton}
+            animation={false}
           >
             {uploadState === "uploading"
-              ? isBatchMode
-                ? "Uploading..."
-                : "Uploading..."
+              ? "Uploading..."
               : uploadState === "pending"
               ? "Preparing..."
               : uploadState === "completed"
@@ -176,18 +185,65 @@ export default function HomeScreen() {
               onPress={() => {
                 reset();
               }}
-              variant="outlined"
-              borderColor="$gray8"
-              size="$4"
+              variant="outline"
+              style={styles.clearButton}
+              animation={false}
             >
               {uploadState === "completed" ? "Upload Another" : "Clear"}
             </Button>
           )}
-        </YStack>
+        </View>
       )}
 
       {/* Progress Display for Batch Uploads */}
       {isBatchMode && uploadState !== "idle" && <UploadProgress />}
-    </YStack>
+    </View>
   );
 }
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    padding: 16,
+    paddingTop: 60,
+  },
+  header: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    marginBottom: 24,
+  },
+  title: {
+    fontWeight: "bold",
+  },
+  modeToggle: {
+    flexDirection: "row",
+    gap: 12,
+    marginBottom: 24,
+  },
+  modeButton: {
+    flex: 1,
+  },
+  modeButtonActive: {
+    // Active state handled by variant
+  },
+  selectedInfo: {
+    marginTop: 16,
+    padding: 12,
+    backgroundColor: "#f2f2f7",
+    borderRadius: 8,
+  },
+  selectedText: {
+    fontWeight: "bold",
+  },
+  uploadControls: {
+    gap: 12,
+    marginTop: 16,
+  },
+  uploadButton: {
+    width: "100%",
+  },
+  clearButton: {
+    width: "100%",
+  },
+});

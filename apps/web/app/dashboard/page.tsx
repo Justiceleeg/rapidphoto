@@ -27,7 +27,7 @@ export default function DashboardPage() {
         <CardHeader>
           <CardTitle className="text-3xl">Welcome to RapidPhoto</CardTitle>
           <CardDescription>
-            You are logged in as {user?.name || user?.email}
+          You are logged in as {user?.name || user?.email}
           </CardDescription>
         </CardHeader>
         <CardContent className="flex gap-3">

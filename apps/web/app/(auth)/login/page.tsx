@@ -40,44 +40,44 @@ export default function LoginPage() {
         </CardDescription>
       </CardHeader>
       <CardContent>
-        <form onSubmit={handleSubmit} id="login-form">
+      <form onSubmit={handleSubmit} id="login-form">
           <div className="space-y-4">
             <div className="space-y-2">
-              <Label htmlFor="email">Email</Label>
-              <Input
-                id="email"
+            <Label htmlFor="email">Email</Label>
+            <Input
+              id="email"
                 type="email"
-                value={email}
+              value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                placeholder="Enter your email"
+              placeholder="Enter your email"
                 required
-              />
+            />
             </div>
             <div className="space-y-2">
-              <Label htmlFor="password">Password</Label>
-              <Input
-                id="password"
+            <Label htmlFor="password">Password</Label>
+            <Input
+              id="password"
                 type="password"
-                value={password}
+              value={password}
                 onChange={(e) => setPassword(e.target.value)}
-                placeholder="Enter your password"
+              placeholder="Enter your password"
                 required
-              />
+            />
             </div>
-            <Button
+          <Button
               type="submit"
-              disabled={isLoading}
+            disabled={isLoading}
               className="w-full"
-            >
-              {isLoading ? "Logging in..." : "Login"}
-            </Button>
+          >
+            {isLoading ? "Logging in..." : "Login"}
+          </Button>
           </div>
-        </form>
+      </form>
         <div className="mt-4 text-center text-sm text-muted-foreground">
           Don't have an account?{" "}
           <Link href="/register" className="text-primary hover:underline">
-            Register
-          </Link>
+              Register
+            </Link>
         </div>
       </CardContent>
     </Card>

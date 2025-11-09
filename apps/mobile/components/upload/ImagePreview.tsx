@@ -1,5 +1,8 @@
-import { YStack, XStack, Text, Image } from "tamagui";
+import { View } from "@/components/ui/view";
+import { Text } from "@/components/ui/text";
 import { useUploadStore } from "@/lib/stores/upload-store";
+import { Image, StyleSheet } from "react-native";
+import { Progress } from "@/components/ui/progress-simple";
 
 export function ImagePreview() {
   const { selectedFile, uploadState, progress, error } = useUploadStore();
@@ -17,69 +20,96 @@ export function ImagePreview() {
   };
 
   return (
-    <YStack
-      borderWidth={1}
-      borderColor="$gray8"
-      borderRadius="$4"
-      padding="$4"
-      space="$4"
-      backgroundColor="$background"
-    >
-      <XStack alignItems="center" space="$4">
+    <View style={styles.container}>
+      <View style={styles.content}>
         {selectedFile.uri && (
           <Image
             source={{ uri: selectedFile.uri }}
-            width={120}
-            height={120}
-            borderRadius="$3"
-            objectFit="cover"
+            style={styles.image}
+            resizeMode="cover"
           />
         )}
-        <YStack flex={1} space="$2">
-          <Text fontSize="$5" fontWeight="600">
+        <View style={styles.info}>
+          <Text variant="body" style={styles.filename}>
             {selectedFile.filename}
           </Text>
-          <Text fontSize="$3" color="$gray11">
+          <Text variant="caption" style={styles.fileSize}>
             {formatFileSize(selectedFile.fileSize)}
           </Text>
           {uploadState === "pending" && (
-            <Text fontSize="$3" color="$blue11">
+            <Text variant="caption" style={styles.statusPending}>
               Preparing upload...
             </Text>
           )}
           {uploadState === "uploading" && (
-            <YStack space="$2">
-              <Text fontSize="$3" color="$blue11">
+            <View style={styles.uploadingContainer}>
+              <Text variant="caption" style={styles.statusUploading}>
                 Uploading... {progress}%
               </Text>
-              <YStack
-                height={4}
-                backgroundColor="$gray4"
-                borderRadius="$2"
-                overflow="hidden"
-              >
-                <YStack
-                  height="100%"
-                  backgroundColor="$blue9"
-                  width={`${progress}%`}
-                  transition="width 0.3s"
-                />
-              </YStack>
-            </YStack>
+              <Progress value={progress} style={styles.progress} />
+            </View>
           )}
           {uploadState === "completed" && (
-            <Text fontSize="$3" color="$green11">
+            <Text variant="caption" style={styles.statusCompleted}>
               Upload completed successfully!
             </Text>
           )}
           {uploadState === "error" && error && (
-            <Text fontSize="$3" color="$red11">
+            <Text variant="caption" style={styles.statusError}>
               Error: {error}
             </Text>
           )}
-        </YStack>
-      </XStack>
-    </YStack>
+        </View>
+      </View>
+    </View>
   );
 }
 
+const styles = StyleSheet.create({
+  container: {
+    borderWidth: 1,
+    borderColor: "#c6c6c8",
+    borderRadius: 8,
+    padding: 16,
+    marginTop: 16,
+    backgroundColor: "#fff",
+  },
+  content: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 16,
+  },
+  image: {
+    width: 120,
+    height: 120,
+    borderRadius: 8,
+  },
+  info: {
+    flex: 1,
+    gap: 8,
+  },
+  filename: {
+    fontWeight: "600",
+  },
+  fileSize: {
+    color: "#71717a",
+  },
+  statusPending: {
+    color: "#3b82f6",
+  },
+  uploadingContainer: {
+    gap: 8,
+  },
+  statusUploading: {
+    color: "#3b82f6",
+  },
+  progress: {
+    height: 4,
+  },
+  statusCompleted: {
+    color: "#22c55e",
+  },
+  statusError: {
+    color: "#ef4444",
+  },
+});

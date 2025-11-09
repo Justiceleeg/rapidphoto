@@ -107,7 +107,7 @@ export function UploadProgress({ jobId }: UploadProgressProps) {
             "text-sm",
             isConnected ? "text-green-600" : "text-muted-foreground"
           )}>
-            {isConnected ? "● Connected" : "○ Disconnected"}
+              {isConnected ? "● Connected" : "○ Disconnected"}
           </p>
         </div>
       </CardHeader>

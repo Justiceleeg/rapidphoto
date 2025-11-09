@@ -1,7 +1,9 @@
 import { useState } from "react";
 import * as ImagePicker from "expo-image-picker";
-import { Button, YStack, Text, XStack } from "tamagui";
-import { Alert } from "react-native";
+import { View } from "@/components/ui/view";
+import { Text } from "@/components/ui/text";
+import { Button } from "@/components/ui/button";
+import { Alert, StyleSheet } from "react-native";
 
 interface ImagePickerProps {
   onImageSelected?: (uri: string, filename: string, mimeType: string, fileSize: number) => void;
@@ -108,12 +110,12 @@ export function ImagePickerComponent({
   };
 
   return (
-    <YStack space="$3">
+    <View style={styles.container}>
       <Button
         onPress={pickImage}
         disabled={isLoading}
-        backgroundColor="$blue9"
-        size="$4"
+        loading={isLoading}
+        style={styles.button}
       >
         {isLoading ? "Loading..." : allowMultiple ? "Choose Photos from Library" : "Choose from Library"}
       </Button>
@@ -121,14 +123,21 @@ export function ImagePickerComponent({
         <Button
           onPress={takePhoto}
           disabled={isLoading}
-          variant="outlined"
-          borderColor="$gray8"
-          size="$4"
+          variant="outline"
+          style={styles.button}
         >
           {isLoading ? "Loading..." : "Take Photo"}
         </Button>
       )}
-    </YStack>
+    </View>
   );
 }
 
+const styles = StyleSheet.create({
+  container: {
+    gap: 12,
+  },
+  button: {
+    width: "100%",
+  },
+});

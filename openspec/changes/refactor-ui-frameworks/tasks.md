@@ -80,22 +80,59 @@
 - [x] 3.5 Refactor layout components (`(auth)/layout.tsx`, `page.tsx`)
   - Auth layout already migrated (Task 3.1)
   - Migrated root page.tsx to Tailwind classes
-- [ ] 3.6 Test all web pages for visual consistency and functionality
+- [x] 3.6 Test all web pages for visual consistency and functionality
+  - Verified login/register pages work correctly
+  - Verified dashboard and upload pages work correctly
+  - Confirmed all shadcn/ui components render properly
 
 ## 4. Mobile App - BNA UI Setup
-- [ ] 4.1 Install BNA UI package (confirm exact package name)
-- [ ] 4.2 Configure BNA UI theme/provider
-- [ ] 4.3 Remove Tamagui dependencies from `apps/mobile/package.json`
-- [ ] 4.4 Remove Tamagui config files (`tamagui.config.ts`)
-- [ ] 4.5 Update `apps/mobile/app/_layout.tsx` to use BNA UI provider
-- [ ] 4.6 Update `babel.config.js` to remove Tamagui babel plugin if needed
+- [x] 4.1 Install BNA UI package (confirm exact package name)
+  - Installed theme-provider, button, input, card, progress components
+  - Installed useColorScheme hook and colors theme
+  - Installed dependencies: lucide-react-native, react-native-svg, expo-haptics, react-native-reanimated, react-native-gesture-handler
+  - Used manual installation instead of init (better for existing projects)
+- [x] 4.2 Configure BNA UI theme/provider
+  - Installed @react-navigation/native (required by ThemeProvider)
+  - Updated app/_layout.tsx to use BNA UI ThemeProvider instead of TamaguiProvider
+  - Removed TamaguiProvider import and tamaguiConfig reference
+- [x] 4.3 Remove Tamagui dependencies from `apps/mobile/package.json`
+  - Removed @tamagui/colors, @tamagui/config, @tamagui/core, @tamagui/theme-builder, tamagui from dependencies
+  - Removed @tamagui/babel-plugin, @tamagui/cli from devDependencies
+- [x] 4.4 Remove Tamagui config files (`tamagui.config.ts`)
+  - Deleted tamagui.config.ts file
+- [x] 4.5 Update `apps/mobile/app/_layout.tsx` to use BNA UI provider
+  - Completed as part of task 4.2
+- [x] 4.6 Update `babel.config.js` to remove Tamagui babel plugin if needed
+  - Removed @tamagui/babel-plugin from babel.config.js
+  - Simplified to just babel-preset-expo (no plugins needed)
 
 ## 5. Mobile App - Component Migration
-- [ ] 5.1 Refactor auth screens (`(auth)/login/index.tsx`, `(auth)/register/index.tsx`)
-- [ ] 5.2 Refactor home screen (`(tabs)/index.tsx`)
-- [ ] 5.3 Refactor upload components (`ImagePicker.tsx`, `ImagePreview.tsx`, `UploadProgress.tsx`)
-- [ ] 5.4 Refactor layout components (`(tabs)/_layout.tsx`, `(auth)/_layout.tsx`, `index.tsx`)
-- [ ] 5.5 Test all mobile screens for visual consistency and functionality
+- [x] 5.1 Refactor auth screens (`(auth)/login/index.tsx`, `(auth)/register/index.tsx`)
+  - Migrated login screen from Tamagui to BNA UI
+  - Migrated register screen from Tamagui to BNA UI
+  - Replaced YStack/XStack with View + StyleSheet
+  - Replaced Tamagui Input/Button/Label/Text/H1 with BNA UI components
+  - Updated event handlers and styling
+- [x] 5.2 Refactor home screen (`(tabs)/index.tsx`)
+  - Migrated home screen from Tamagui to BNA UI
+  - Replaced YStack/XStack with View + StyleSheet
+  - Replaced Tamagui Button/Text/H1 with BNA UI components
+  - Updated mode toggle and upload controls
+- [x] 5.3 Refactor upload components (`ImagePicker.tsx`, `ImagePreview.tsx`, `UploadProgress.tsx`)
+  - Migrated ImagePicker from Tamagui to BNA UI
+  - Migrated ImagePreview from Tamagui to BNA UI (using React Native Image)
+  - Migrated UploadProgress from Tamagui to BNA UI (using BNA UI Progress)
+  - Replaced YStack/XStack with View + StyleSheet
+  - Replaced Tamagui components with BNA UI equivalents
+- [x] 5.4 Refactor layout components (`(tabs)/_layout.tsx`, `(auth)/_layout.tsx`, `index.tsx`)
+  - Migrated root index.tsx from Tamagui to React Native View
+  - Migrated tabs layout from Tamagui to React Native View
+  - Auth layout already using standard React Native components
+- [x] 5.5 Test all mobile screens for visual consistency and functionality
+  - Tested authentication flows (login/register)
+  - Tested upload screen with logout button
+  - Fixed Worklets errors by replacing reanimated components with simple versions
+  - Verified all screens render correctly in Expo Go
 
 ## 6. Documentation and Cleanup
 - [ ] 6.1 Update `docs/STYLING.md` with new framework guidelines

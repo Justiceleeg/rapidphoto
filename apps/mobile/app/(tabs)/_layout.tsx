@@ -1,16 +1,15 @@
 import { Tabs, Redirect } from 'expo-router';
 import { useAuth } from '@/lib/hooks/use-auth';
-import { ActivityIndicator } from 'react-native';
-import { YStack } from 'tamagui';
+import { ActivityIndicator, View, StyleSheet } from 'react-native';
 
 export default function TabsLayout() {
   const { isAuthenticated, isLoading } = useAuth();
 
   if (isLoading) {
     return (
-      <YStack flex={1} alignItems="center" justifyContent="center" backgroundColor="$background">
+      <View style={styles.container}>
         <ActivityIndicator size="large" />
-      </YStack>
+      </View>
     );
   }
 
@@ -24,4 +23,13 @@ export default function TabsLayout() {
     </Tabs>
   );
 }
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: '#fff',
+  },
+});
 

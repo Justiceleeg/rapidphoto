@@ -32,6 +32,7 @@ export class InitUploadHandler {
         r2Key,
         r2Url: null,
         status: "pending",
+        tags: null,
       });
 
       // Generate presigned URL for upload
@@ -80,6 +81,7 @@ export class InitUploadHandler {
         r2Key,
         r2Url: null,
         status: "pending",
+        tags: null,
       });
 
       // Generate presigned URL for upload

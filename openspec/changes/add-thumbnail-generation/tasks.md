@@ -10,16 +10,16 @@
 - [x] 1.9 Create thumbnail generation worker (`apps/api/src/infrastructure/queue/workers/thumbnail-generation.worker.ts`)
 - [x] 1.10 Register thumbnail generation worker (`apps/api/src/infrastructure/queue/workers/index.ts`)
 - [x] 1.11 Queue thumbnail job after photo completion (`apps/api/src/application/commands/complete-photo/complete-photo.handler.ts`)
-- [ ] 1.12 Test thumbnail generation (upload photo, verify job queued, verify thumbnail generated and stored in R2, verify `thumbnail_key` updated)
+- [x] 1.12 Test thumbnail generation (upload photo, verify job queued, verify thumbnail generated and stored in R2, verify `thumbnail_key` updated)
 
 ## 2. Web Frontend - Display Thumbnails
 - [x] 2.1 Update PhotoGrid to show thumbnails (`apps/web/components/gallery/PhotoGrid.tsx` - use `thumbnail_key` with fallback, lazy load)
 - [x] 2.2 Update PhotoModal to show full image (`apps/web/components/gallery/PhotoModal.tsx` - use full `r2Url`)
-- [ ] 2.3 Test thumbnail display on web (verify thumbnails load in gallery, verify full image in modal, verify fallback works)
+- [x] 2.3 Test thumbnail display on web (verify thumbnails load in gallery, verify full image in modal, verify fallback works)
 
 ## 3. Mobile Frontend - Display Thumbnails
 - [x] 3.1 Update mobile PhotoGrid to use thumbnails (`apps/mobile/components/gallery/PhotoGrid.tsx` - use thumbnails in grid, full images in viewer)
-- [ ] 3.2 Test thumbnails on mobile (verify thumbnails load, verify full image in viewer, test on iOS and Android)
+- [x] 3.2 Test thumbnails on mobile (verify thumbnails load, verify full image in viewer, test on iOS and Android)
 
 ## 4. Deploy Thumbnail Generation
 - [x] 4.1 Deploy Redis to Railway (ensure service running and accessible)

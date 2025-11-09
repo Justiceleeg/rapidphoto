@@ -1,7 +1,7 @@
 "use client";
 
 import { useCallback } from "react";
-import { useDropzone } from "react-dropzone";
+import { useDropzone, type FileRejection, type DropEvent } from "react-dropzone";
 import { useUploadStore } from "@/lib/stores/upload-store";
 import { cn } from "@/lib/utils";
 
@@ -12,13 +12,7 @@ export function DropZone() {
   const { setSelectedFile, setSelectedFiles, uploadState } = useUploadStore();
 
   const onDrop = useCallback(
-    (
-      acceptedFiles: File[],
-      fileRejections: Array<{
-        file: File;
-        errors: Array<{ code: string; message: string }>;
-      }>
-    ) => {
+    (acceptedFiles: File[], fileRejections: FileRejection[], event: DropEvent) => {
       console.log("onDrop called:", {
         acceptedCount: acceptedFiles.length,
         rejectedCount: fileRejections.length,
@@ -65,12 +59,7 @@ export function DropZone() {
   );
 
   const onDropRejected = useCallback(
-    (
-      fileRejections: Array<{
-        file: File;
-        errors: Array<{ code: string; message: string }>;
-      }>
-    ) => {
+    (fileRejections: FileRejection[]) => {
       console.warn(
         "onDropRejected called:",
         fileRejections.length,

@@ -1,8 +1,9 @@
 import { useEffect, useRef, useState } from "react";
-import { YStack, XStack, Text, Progress, Card } from "tamagui";
+import { YStack, XStack, Text, Card } from "tamagui";
 import { useUploadStore } from "@/lib/stores/upload-store";
 import { API_URL } from "@/lib/api-client";
-import { ScrollView } from "react-native";
+import { ScrollView, View } from "react-native";
+import * as Progress from "react-native-progress";
 
 interface ProgressEvent {
   jobId: string;
@@ -14,14 +15,11 @@ interface ProgressEvent {
 }
 
 export function UploadProgress() {
-  const { 
-    jobId, 
-    totalPhotos, 
-    completedPhotos, 
-    failedPhotos,
-    photoProgresses,
-    updatePhotoProgress 
-  } = useUploadStore();
+  const jobId = useUploadStore((state) => state.jobId);
+  const totalPhotos = useUploadStore((state) => state.totalPhotos);
+  const completedPhotos = useUploadStore((state) => state.completedPhotos);
+  const failedPhotos = useUploadStore((state) => state.failedPhotos);
+  const photoProgresses = useUploadStore((state) => state.photoProgresses);
   
   const [connectionStatus, setConnectionStatus] = useState<"connecting" | "connected" | "disconnected">("disconnected");
   const abortControllerRef = useRef<AbortController | null>(null);
@@ -155,8 +153,20 @@ export function UploadProgress() {
     return null;
   }
 
-  const overallProgress = totalPhotos > 0 ? ((completedPhotos + failedPhotos) / totalPhotos) * 100 : 0;
+  // Calculate overall progress based on individual photo progress
   const photoProgressArray = Array.from(photoProgresses.values());
+  const overallProgressRaw = totalPhotos > 0 
+    ? photoProgressArray.reduce((sum, photo) => {
+        // Completed photos count as 100%, failed as 100% (done but failed), others use their progress
+        if (photo.status === "completed" || photo.status === "failed") {
+          return sum + 100;
+        }
+        return sum + photo.progress;
+      }, 0) / totalPhotos
+    : 0;
+  
+  // Round to nearest integer for iOS compatibility and clamp between 0-100
+  const overallProgress = Math.min(100, Math.max(0, Math.round(overallProgressRaw)));
 
   return (
     <YStack space="$4" marginTop="$4">
@@ -168,13 +178,19 @@ export function UploadProgress() {
               Upload Progress
             </Text>
             <Text fontSize="$5" color="$gray11">
-              {Math.round(overallProgress)}%
+              {overallProgress}%
             </Text>
           </XStack>
           
-          <Progress value={overallProgress} backgroundColor="$gray5">
-            <Progress.Indicator animation="bouncy" backgroundColor="$blue9" />
-          </Progress>
+          <Progress.Bar 
+            progress={overallProgress / 100} 
+            width={null}
+            height={12}
+            color="#3b82f6"
+            unfilledColor="#e5e7eb"
+            borderRadius={6}
+            borderWidth={0}
+          />
 
           <XStack justifyContent="space-between">
             <Text fontSize="$3" color="$gray11">
@@ -235,9 +251,15 @@ export function UploadProgress() {
                       </XStack>
                       
                       {photo.status === "uploading" && (
-                        <Progress value={photo.progress} backgroundColor="$gray5" height={4}>
-                          <Progress.Indicator animation="bouncy" backgroundColor="$blue9" />
-                        </Progress>
+                        <Progress.Bar 
+                          progress={Math.round(photo.progress) / 100} 
+                          width={null}
+                          height={6}
+                          color="#3b82f6"
+                          unfilledColor="#e5e7eb"
+                          borderRadius={3}
+                          borderWidth={0}
+                        />
                       )}
                       
                       {photo.error && (

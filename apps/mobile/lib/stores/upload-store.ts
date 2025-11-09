@@ -129,6 +129,8 @@ export const useUploadStore = create<UploadStore>((set, get) => ({
       if (p.status === "failed") failedPhotos++;
     });
 
+    console.log(`Progress update: ${photoId} -> ${status} (Completed: ${completedPhotos}/${state.totalPhotos}, Failed: ${failedPhotos})`);
+
     set({
       photoProgresses: newProgresses,
       completedPhotos,

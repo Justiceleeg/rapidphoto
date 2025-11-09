@@ -16,6 +16,9 @@ build/
 .expo/
 out/
 
+# Tamagui
+.tamagui/
+
 # Misc
 .DS_Store
 *.pem

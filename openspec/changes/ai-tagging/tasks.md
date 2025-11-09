@@ -25,8 +25,8 @@
 - [ ] 3.4 Test AI suggestions in PhotoModal (verify AI suggestions display, verify accept moves to tags, verify reject removes)
 
 ## 4. Mobile Frontend - AI Suggestions
-- [ ] 4.1 Update PhotoViewer to show AI suggestions (`apps/mobile/components/gallery/PhotoViewer.tsx` - display `suggested_tags` separately with different styling, add Accept/Reject buttons)
-- [ ] 4.2 Test mobile AI suggestions (verify display, verify accept/reject actions, test on iOS and Android)
+- [x] 4.1 Update PhotoViewer to show AI suggestions (`apps/mobile/components/gallery/PhotoViewer.tsx` - display `suggested_tags` separately with different styling, add Accept/Reject buttons)
+- [x] 4.2 Test mobile AI suggestions (verify display, verify accept/reject actions, test on iOS and Android)
 
 ## 5. Deploy AI Tagging
 - [ ] 5.1 Update API environment variables with AWS credentials (set `AWS_ACCESS_KEY_ID`, `AWS_SECRET_ACCESS_KEY`, `AWS_REGION` on Railway)

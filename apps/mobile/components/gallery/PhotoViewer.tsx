@@ -7,7 +7,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { useColor } from "@/hooks/useColor";
-import { X, Trash2, Download } from "lucide-react-native";
+import { X, Trash2, Download, Sparkles, Check } from "lucide-react-native";
 import { TagInput } from "./TagInput";
 
 interface PhotoViewerProps {
@@ -16,6 +16,8 @@ interface PhotoViewerProps {
   onClose: () => void;
   onDelete?: (photoId: string) => void;
   onUpdateTags?: (photoId: string, tags: string[]) => void;
+  onAcceptTag?: (photoId: string, tag: string) => void;
+  onRejectTag?: (photoId: string, tag: string) => void;
 }
 
 export function PhotoViewer({
@@ -24,6 +26,8 @@ export function PhotoViewer({
   onClose,
   onDelete,
   onUpdateTags,
+  onAcceptTag,
+  onRejectTag,
 }: PhotoViewerProps) {
   const [isEditingTags, setIsEditingTags] = useState(false);
   const backgroundColor = useColor("background");
@@ -34,6 +38,9 @@ export function PhotoViewer({
   const destructiveColor = useColor("destructive");
 
   if (!photo) return null;
+
+  // Get first 3 AI-suggested tags
+  const suggestedTags = photo.suggestedTags?.slice(0, 3) || [];
 
   const handleDownload = async () => {
     if (!photo.url) {
@@ -218,6 +225,40 @@ export function PhotoViewer({
               )}
             </CardContent>
           </Card>
+
+          {/* AI Suggestions Section */}
+          {suggestedTags.length > 0 && !isEditingTags && (
+            <Card style={styles.suggestionsCard}>
+              <CardHeader>
+                <View style={styles.suggestionsHeader}>
+                  <Sparkles size={16} color="#a855f7" strokeWidth={2} />
+                  <CardTitle>AI Suggestions</CardTitle>
+                </View>
+              </CardHeader>
+              <CardContent>
+                <View style={styles.suggestionsList}>
+                  {suggestedTags.map((tag) => (
+                    <View key={tag} style={styles.suggestionBadge}>
+                      <Sparkles size={12} color="#a855f7" strokeWidth={2} />
+                      <Text style={styles.suggestionText}>{tag}</Text>
+                      <TouchableOpacity
+                        onPress={() => onAcceptTag?.(photo.id, tag)}
+                        style={styles.suggestionButton}
+                      >
+                        <Check size={14} color="#16a34a" strokeWidth={2.5} />
+                      </TouchableOpacity>
+                      <TouchableOpacity
+                        onPress={() => onRejectTag?.(photo.id, tag)}
+                        style={styles.suggestionButton}
+                      >
+                        <X size={14} color="#dc2626" strokeWidth={2.5} />
+                      </TouchableOpacity>
+                    </View>
+                  ))}
+                </View>
+              </CardContent>
+            </Card>
+          )}
         </ScrollView>
 
         {/* Action Buttons */}
@@ -325,6 +366,37 @@ const styles = StyleSheet.create({
   },
   editTagsContainer: {
     gap: 12,
+  },
+  suggestionsCard: {
+    width: "100%",
+  },
+  suggestionsHeader: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 8,
+  },
+  suggestionsList: {
+    flexDirection: "row",
+    flexWrap: "wrap",
+    gap: 8,
+  },
+  suggestionBadge: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 6,
+    backgroundColor: "#faf5ff", // purple-50 equivalent
+    borderColor: "#e9d5ff", // purple-200 equivalent
+    borderWidth: 1,
+    borderRadius: 6,
+    paddingHorizontal: 8,
+    paddingVertical: 6,
+  },
+  suggestionText: {
+    fontSize: 14,
+    color: "#7c3aed", // purple-600 equivalent
+  },
+  suggestionButton: {
+    padding: 2,
   },
   actions: {
     flexDirection: "row",

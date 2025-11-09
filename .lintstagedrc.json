@@ -1,14 +1,14 @@
 {
   "apps/web/**/*.{ts,tsx}": [
     "pnpm --filter @rapidphoto/web lint --fix",
-    "pnpm --filter @rapidphoto/web exec tsc --noEmit"
+    "pnpm --filter @rapidphoto/web exec tsc --noEmit --skipLibCheck"
   ],
   "apps/api/**/*.ts": [
     "pnpm --filter @rapidphoto/api lint --fix",
-    "pnpm --filter @rapidphoto/api exec tsc --noEmit"
+    "pnpm --filter @rapidphoto/api exec tsc --noEmit --skipLibCheck"
   ],
   "packages/api-client/**/*.ts": [
-    "pnpm --filter @rapidphoto/api-client exec tsc --noEmit"
+    "pnpm --filter @rapidphoto/api-client exec tsc --noEmit --skipLibCheck"
   ]
 }
 

@@ -64,7 +64,7 @@ export class ApiClient {
     const response = await fetch(url, {
       method: "GET",
       headers: this.getHeaders(options?.headers as Record<string, string>),
-      credentials: options?.credentials || "same-origin",
+      credentials: options?.credentials || "include",
       ...options,
     });
 
@@ -84,7 +84,7 @@ export class ApiClient {
       method: "POST",
       headers: this.getHeaders(options?.headers as Record<string, string>),
       body: data ? JSON.stringify(data) : undefined,
-      credentials: options?.credentials || "same-origin",
+      credentials: options?.credentials || "include",
       ...options,
     });
 
@@ -108,6 +108,7 @@ export class ApiClient {
       method: "PUT",
       headers: this.getHeaders(options?.headers as Record<string, string>),
       body: data ? JSON.stringify(data) : undefined,
+      credentials: options?.credentials || "include",
       ...restOptions,
     });
 
@@ -127,6 +128,7 @@ export class ApiClient {
       method: "PATCH",
       headers: this.getHeaders(options?.headers as Record<string, string>),
       body: data ? JSON.stringify(data) : undefined,
+      credentials: options?.credentials || "include",
       ...options,
     });
 
@@ -141,6 +143,7 @@ export class ApiClient {
     const response = await fetch(url, {
       method: "DELETE",
       headers: this.getHeaders(options?.headers as Record<string, string>),
+      credentials: options?.credentials || "include",
       ...options,
     });
 

@@ -15,6 +15,10 @@ The web application SHALL provide client methods for interacting with photo API 
 - **WHEN** the photo client calls `deletePhoto(id)`
 - **THEN** it makes a DELETE request to `/api/photos/:id` and returns the result
 
+#### Scenario: Update photo tags
+- **WHEN** the photo client calls `updatePhotoTags(id, tags)`
+- **THEN** it makes a PUT request to `/api/photos/:id/tags` with the tags array and returns the updated photo
+
 ### Requirement: Photo Grid Component
 The web application SHALL provide a PhotoGrid component for displaying photos in a grid layout.
 
@@ -39,7 +43,7 @@ The web application SHALL provide a PhotoModal component for viewing individual 
 
 #### Scenario: Show photo metadata
 - **WHEN** the PhotoModal is opened
-- **THEN** it displays photo metadata such as filename, upload date, and status
+- **THEN** it displays photo metadata such as filename, upload date, status, and tags
 
 #### Scenario: Close modal
 - **WHEN** a user clicks the close button or outside the modal
@@ -93,4 +97,27 @@ The dashboard layout SHALL provide a navigation link to the gallery page.
 #### Scenario: Navigate to gallery
 - **WHEN** a user clicks the gallery navigation link
 - **THEN** they are navigated to the gallery page
+
+### Requirement: Photo Tagging
+The web application SHALL support adding and editing tags for photos.
+
+#### Scenario: Display tags in photo modal
+- **WHEN** the PhotoModal is opened with a photo that has tags
+- **THEN** it displays the photo's tags as chips/badges
+
+#### Scenario: Add tag to photo
+- **WHEN** a user types a tag in the TagInput component and presses Enter
+- **THEN** the tag is added to the photo and saved via the API
+
+#### Scenario: Remove tag from photo
+- **WHEN** a user clicks the remove button on a tag chip
+- **THEN** the tag is removed from the photo and saved via the API
+
+#### Scenario: Tag autocomplete
+- **WHEN** a user types in the TagInput component
+- **THEN** it shows autocomplete suggestions based on existing tags
+
+#### Scenario: Update photo tags
+- **WHEN** a user adds or removes tags in the PhotoModal
+- **THEN** the photo client calls `updatePhotoTags(id, tags)` to save the changes
 

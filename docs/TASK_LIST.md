@@ -5,7 +5,7 @@
 **Project**: High-performance photo upload system with web and mobile clients  
 **Timeline**: 5 days  
 **Approach**: Vertical development (end-to-end features)  
-**Status**: Not Started (0/325 tasks)
+**Status**: Not Started (0/391 tasks)
 
 ### Tech Stack Summary
 - **Backend**: Hono + TypeScript, PostgreSQL, Drizzle ORM, Better-Auth, Cloudflare R2
@@ -19,8 +19,9 @@
 - **Slice 1**: Authentication (Backend + Web + Mobile + Deploy) (4-5 hours) - 54 tasks
 - **Slice 2**: Single Photo Upload (Backend + Web + Mobile + Deploy) (6-7 hours) - 65 tasks
 - **Slice 3**: Multiple Photo Upload with Progress (Backend + Web + Mobile + Deploy) (6-7 hours) - 75 tasks
-- **Slice 4**: Gallery (Backend + Web + Mobile + Deploy) (4-5 hours) - 50 tasks
+- **Slice 4**: Gallery (Backend + Web + Mobile + Deploy) (5-6 hours) - 65 tasks
 - **Slice 5**: Polish, Testing & Optimization (4-5 hours) - 72 tasks
+- **Slice 6**: AI Tagging, Thumbnail Generation & Search (Post-MVP) (8-10 hours) - 59 tasks
 
 ---
 
@@ -1036,113 +1037,157 @@
   - **Time**: 30 min | **Complexity**: Medium
   - **Dependencies**: [S4-02], [S4-04]
   - **File**: `apps/api/src/infrastructure/http/routes/photo.routes.ts`
-  - **Endpoints**: `GET /api/photos`, `GET /api/photos/:id`, `DELETE /api/photos/:id`
+  - **Endpoints**: `GET /api/photos`, `GET /api/photos/:id`, `DELETE /api/photos/:id`, `PUT /api/photos/:id/tags`
 
 - **[S4-08]** Mount photo routes
   - **Time**: 5 min | **Complexity**: Low
   - **Dependencies**: [S4-07]
 
-- **[S4-09]** Test gallery endpoints
-  - **Time**: 20 min | **Complexity**: Low
-  - **Dependencies**: [S4-08]
+- **[S4-09]** Add tags field to photo schema
+  - **Time**: 15 min | **Complexity**: Low
+  - **Dependencies**: [S2-06]
+  - **File**: `apps/api/src/infrastructure/database/schema.ts`
+  - **Action**: Add `tags: text('tags').array()` to photo table
+  - **Note**: Generate and apply migration
 
-**Verification**: Can query photos via API, pagination works
+- **[S4-10]** Create UpdatePhotoTagsCommand DTO
+  - **Time**: 15 min | **Complexity**: Low
+  - **Dependencies**: [S4-09]
+  - **File**: `apps/api/src/application/commands/update-photo-tags/update-photo-tags.command.ts`
+
+- **[S4-11]** Create UpdatePhotoTagsHandler
+  - **Time**: 30 min | **Complexity**: Medium
+  - **Dependencies**: [S2-08], [S4-10]
+  - **File**: `apps/api/src/application/commands/update-photo-tags/update-photo-tags.handler.ts`
+  - **Note**: Validate tags, update photo record
+
+- **[S4-12]** Add update tags endpoint to photo routes
+  - **Time**: 15 min | **Complexity**: Low
+  - **Dependencies**: [S4-11]
+  - **File**: `apps/api/src/infrastructure/http/routes/photo.routes.ts`
+  - **Endpoint**: `PUT /api/photos/:id/tags`
+
+- **[S4-13]** Test gallery endpoints
+  - **Time**: 20 min | **Complexity**: Low
+  - **Dependencies**: [S4-08], [S4-12]
+
+**Verification**: Can query photos via API, pagination works, can update tags
 
 ### Chunk 4.2: Web Frontend - Gallery
 
-**Prerequisites**: [S4-09], [S1-31]
+**Prerequisites**: [S4-13], [S1-31]
 
-- **[S4-10]** Implement photo client methods
+- **[S4-14]** Implement photo client methods
   - **Time**: 20 min | **Complexity**: Medium
   - **Dependencies**: [S1-30]
   - **File**: `packages/api-client/src/photo.client.ts`
+  - **Note**: Include `updatePhotoTags` method
 
-- **[S4-11]** Create PhotoGrid component
+- **[S4-15]** Create PhotoGrid component
   - **Time**: 45 min | **Complexity**: Medium
-  - **Dependencies**: [S4-10]
+  - **Dependencies**: [S4-14]
   - **File**: `apps/web/components/gallery/PhotoGrid.tsx`
 
-- **[S4-12]** Create PhotoModal component
+- **[S4-16]** Create PhotoModal component
   - **Time**: 30 min | **Complexity**: Medium
-  - **Dependencies**: [S4-11]
+  - **Dependencies**: [S4-15]
   - **File**: `apps/web/components/gallery/PhotoModal.tsx`
 
-- **[S4-13]** Create gallery page
+- **[S4-17]** Create TagInput component
   - **Time**: 45 min | **Complexity**: Medium
-  - **Dependencies**: [S4-11], [S4-12]
+  - **Dependencies**: [S4-14]
+  - **File**: `apps/web/components/gallery/TagInput.tsx`
+  - **Note**: Allow adding/removing tags with autocomplete
+
+- **[S4-18]** Add tag display and editing to PhotoModal
+  - **Time**: 30 min | **Complexity**: Medium
+  - **Dependencies**: [S4-16], [S4-17]
+  - **File**: `apps/web/components/gallery/PhotoModal.tsx`
+  - **Note**: Display tags, allow editing via TagInput
+
+- **[S4-19]** Create gallery page
+  - **Time**: 45 min | **Complexity**: Medium
+  - **Dependencies**: [S4-15], [S4-16]
   - **File**: `apps/web/app/(dashboard)/gallery/page.tsx`
   - **Note**: Use React Query for data fetching
 
-- **[S4-14]** Add pagination to gallery
+- **[S4-20]** Add pagination to gallery
   - **Time**: 30 min | **Complexity**: Medium
-  - **Dependencies**: [S4-13]
+  - **Dependencies**: [S4-19]
 
-- **[S4-15]** Add navigation link to gallery
+- **[S4-21]** Add navigation link to gallery
   - **Time**: 5 min | **Complexity**: Low
   - **Dependencies**: [S1-35]
   - **File**: `apps/web/app/(dashboard)/layout.tsx`
 
-- **[S4-16]** Test gallery on web
+- **[S4-22]** Test gallery on web
   - **Time**: 15 min | **Complexity**: Low
-  - **Dependencies**: [S4-13]
+  - **Dependencies**: [S4-19]
 
-**Verification**: Can view all photos in gallery, pagination works, modal opens
+**Verification**: Can view all photos in gallery, pagination works, modal opens, can add/edit tags
 
 ### Chunk 4.3: Mobile Frontend - Gallery
 
-**Prerequisites**: [S4-09], [S1-43]
+**Prerequisites**: [S4-13], [S1-43]
 
-- **[S4-17]** Create PhotoGrid component (mobile)
+- **[S4-23]** Create PhotoGrid component (mobile)
   - **Time**: 45 min | **Complexity**: Medium
-  - **Dependencies**: [S4-10]
+  - **Dependencies**: [S4-14]
   - **File**: `apps/mobile/components/gallery/PhotoGrid.tsx`
   - **Note**: Use FlatList with 3 columns
 
-- **[S4-18]** Create PhotoViewer modal (mobile)
+- **[S4-24]** Create PhotoViewer modal (mobile)
   - **Time**: 30 min | **Complexity**: Medium
-  - **Dependencies**: [S4-17]
+  - **Dependencies**: [S4-23]
   - **File**: `apps/mobile/components/gallery/PhotoViewer.tsx`
 
-- **[S4-19]** Create gallery screen
+- **[S4-25]** Add tag display to PhotoViewer
+  - **Time**: 20 min | **Complexity**: Low
+  - **Dependencies**: [S4-24]
+  - **File**: `apps/mobile/components/gallery/PhotoViewer.tsx`
+  - **Note**: Display tags as chips/badges
+
+- **[S4-26]** Create gallery screen
   - **Time**: 45 min | **Complexity**: Medium
-  - **Dependencies**: [S4-17], [S4-18]
+  - **Dependencies**: [S4-23], [S4-24]
   - **File**: `apps/mobile/app/(tabs)/gallery.tsx`
 
-- **[S4-20]** Add pull-to-refresh
+- **[S4-27]** Add pull-to-refresh
   - **Time**: 15 min | **Complexity**: Low
-  - **Dependencies**: [S4-19]
+  - **Dependencies**: [S4-26]
 
-- **[S4-21]** Test gallery on mobile
+- **[S4-28]** Test gallery on mobile
   - **Time**: 15 min | **Complexity**: Low
-  - **Dependencies**: [S4-19]
+  - **Dependencies**: [S4-26]
 
-**Verification**: Can view all photos in gallery on mobile, modal works
+**Verification**: Can view all photos in gallery on mobile, modal works, tags displayed
 
 ### Chunk 4.4: Deploy Gallery
 
-**Prerequisites**: [S4-16], [S4-21]
+**Prerequisites**: [S4-22], [S4-28]
 
-- **[S4-22]** Redeploy API with gallery endpoints
+- **[S4-29]** Redeploy API with gallery endpoints and tagging
   - **Time**: 10 min | **Complexity**: Low
-  - **Dependencies**: [S4-09]
+  - **Dependencies**: [S4-13]
   - **Action**: Push changes, Railway auto-deploys
 
-- **[S4-23]** Redeploy web with gallery
+- **[S4-30]** Redeploy web with gallery and tagging
   - **Time**: 10 min | **Complexity**: Low
-  - **Dependencies**: [S4-16]
+  - **Dependencies**: [S4-22]
   - **Action**: Push changes, Railway auto-deploys
 
-- **[S4-24]** Test gallery in production
+- **[S4-31]** Test gallery in production
   - **Time**: 20 min | **Complexity**: Low
-  - **Dependencies**: [S4-23]
+  - **Dependencies**: [S4-30]
   - **Tests**:
     - View gallery on web
     - View gallery on mobile
     - Test pagination
     - Test photo modal/viewer
+    - Test adding/editing tags on web
     - Verify images load from R2
 
-**Verification**: ✅ Gallery works in production on web and mobile
+**Verification**: ✅ Gallery works in production on web and mobile, tagging functional
 
 ---
 
@@ -1376,6 +1421,535 @@
 
 ---
 
+## Slice 6: AI Tagging, Thumbnail Generation & Search (Post-MVP)
+
+**Goal**: Add AI-powered tagging, thumbnail generation, and tag-based search  
+**Time**: 8-10 hours  
+**Prerequisites**: [S5-39] (MVP complete)  
+**Status**: Post-MVP Enhancement  
+**Verification**: Photos automatically tagged, thumbnails generated, can search by tags with AI suggestions
+
+### Chunk 6.1: Backend - Job Queue Setup
+
+**Prerequisites**: [S5-39]
+
+- **[S6-01]** Setup Redis on Railway
+  - **Time**: 20 min | **Complexity**: Low
+  - **Dependencies**: None
+  - **Steps**:
+    1. Add Redis service to Railway project
+    2. Copy connection URL to `.env`
+    3. Test connection
+
+- **[S6-02]** Install BullMQ dependencies
+  - **Time**: 5 min | **Complexity**: Low
+  - **Dependencies**: [S6-01]
+  - **Commands**: `pnpm add bullmq ioredis`
+  - **File**: `apps/api/package.json`
+
+- **[S6-03]** Create queue infrastructure
+  - **Time**: 30 min | **Complexity**: Medium
+  - **Dependencies**: [S6-02]
+  - **Files**:
+    - `apps/api/src/infrastructure/queue/photo-queue.ts`
+    - `apps/api/src/infrastructure/queue/queue.config.ts`
+  - **Note**: Setup BullMQ queue with Redis connection
+
+- **[S6-04]** Create base worker structure
+  - **Time**: 20 min | **Complexity**: Low
+  - **Dependencies**: [S6-03]
+  - **File**: `apps/api/src/infrastructure/queue/workers/base.worker.ts`
+  - **Note**: Base worker class with error handling and retry logic
+
+**Verification**: Redis connected, queue infrastructure ready
+
+### Chunk 6.2: Backend - Database Schema Updates
+
+**Prerequisites**: [S4-13]
+
+- **[S6-05]** Add `suggested_tags` field to photo schema
+  - **Time**: 15 min | **Complexity**: Low
+  - **Dependencies**: [S4-09]
+  - **File**: `apps/api/src/infrastructure/database/schema.ts`
+  - **Action**: Add `suggestedTags: text('suggested_tags').array()` to photo table
+
+- **[S6-06]** Add `thumbnail_key` field to photo schema (if not exists)
+  - **Time**: 10 min | **Complexity**: Low
+  - **Dependencies**: [S6-05]
+  - **File**: `apps/api/src/infrastructure/database/schema.ts`
+  - **Note**: Check if already exists from architecture docs
+
+- **[S6-07]** Generate and apply migration
+  - **Time**: 10 min | **Complexity**: Low
+  - **Dependencies**: [S6-05], [S6-06]
+  - **Commands**: `pnpm db:generate && pnpm db:migrate`
+
+- **[S6-08]** Add GIN indexes for tag search
+  - **Time**: 15 min | **Complexity**: Low
+  - **Dependencies**: [S6-07]
+  - **File**: `apps/api/src/infrastructure/database/migrations/XXXX_add_tag_indexes.sql`
+  - **SQL**:
+    ```sql
+    CREATE INDEX idx_photos_tags ON photos USING GIN(tags);
+    CREATE INDEX idx_photos_suggested_tags ON photos USING GIN(suggested_tags);
+    ```
+
+- **[S6-09]** Update Photo entity interface
+  - **Time**: 10 min | **Complexity**: Low
+  - **Dependencies**: [S6-05]
+  - **File**: `apps/api/src/domain/photo/photo.entity.ts`
+  - **Note**: Add `suggestedTags?: string[]` and `thumbnailKey?: string`
+
+- **[S6-10]** Update PhotoRepository interface
+  - **Time**: 10 min | **Complexity**: Low
+  - **Dependencies**: [S6-09]
+  - **File**: `apps/api/src/domain/photo/photo.repository.ts`
+  - **Note**: Ensure update method supports new fields
+
+**Verification**: Schema updated, indexes created, entity interfaces updated
+
+### Chunk 6.3: Backend - AWS Rekognition Integration
+
+**Prerequisites**: [S6-04], [S6-10]
+
+- **[S6-11]** Setup AWS Rekognition client
+  - **Time**: 30 min | **Complexity**: Medium
+  - **Dependencies**: [S6-02]
+  - **Commands**: `pnpm add @aws-sdk/client-rekognition`
+  - **Files**:
+    - `apps/api/src/infrastructure/ai/rekognition.service.ts`
+    - `apps/api/src/infrastructure/ai/rekognition.config.ts`
+  - **Note**: Configure AWS credentials (from env vars)
+
+- **[S6-12]** Create AI tagging worker
+  - **Time**: 1 hour | **Complexity**: High
+  - **Dependencies**: [S6-11], [S6-04]
+  - **File**: `apps/api/src/infrastructure/queue/workers/ai-tagging.worker.ts`
+  - **Note**: 
+    - Process job with photoId and r2Url
+    - Call AWS Rekognition DetectLabels
+    - Filter tags by confidence (≥70%)
+    - Store in `suggested_tags` array
+    - Handle errors and retries
+
+- **[S6-13]** Register AI tagging worker
+  - **Time**: 15 min | **Complexity**: Low
+  - **Dependencies**: [S6-12]
+  - **File**: `apps/api/src/infrastructure/queue/workers/index.ts`
+  - **Note**: Register worker to process 'ai-tagging' jobs
+
+- **[S6-14]** Queue tagging job after photo completion
+  - **Time**: 20 min | **Complexity**: Medium
+  - **Dependencies**: [S6-13], [S2-12]
+  - **File**: `apps/api/src/application/commands/complete-photo/complete-photo.handler.ts`
+  - **Note**: After photo completion, queue AI tagging job
+
+- **[S6-15]** Test AI tagging worker
+  - **Time**: 30 min | **Complexity**: Medium
+  - **Dependencies**: [S6-14]
+  - **Tests**:
+    - Upload photo
+    - Verify job queued
+    - Verify tags generated (≥70% confidence)
+    - Verify stored in `suggested_tags`
+
+**Verification**: AI tagging works, tags stored in `suggested_tags` with ≥70% confidence
+
+### Chunk 6.4: Backend - AI Tag Acceptance/Rejection
+
+**Prerequisites**: [S6-15]
+
+- **[S6-16]** Create AcceptTagCommand DTO
+  - **Time**: 10 min | **Complexity**: Low
+  - **Dependencies**: [S6-09]
+  - **File**: `apps/api/src/application/commands/accept-tag/accept-tag.command.ts`
+
+- **[S6-17]** Create AcceptTagHandler
+  - **Time**: 30 min | **Complexity**: Medium
+  - **Dependencies**: [S6-16], [S6-10]
+  - **File**: `apps/api/src/application/commands/accept-tag/accept-tag.handler.ts`
+  - **Note**: 
+    - Move tag from `suggested_tags` to `tags` array
+    - Remove from `suggested_tags`
+    - Validate tag exists in `suggested_tags`
+
+- **[S6-18]** Create RejectTagCommand DTO
+  - **Time**: 10 min | **Complexity**: Low
+  - **Dependencies**: [S6-09]
+  - **File**: `apps/api/src/application/commands/reject-tag/reject-tag.command.ts`
+
+- **[S6-19]** Create RejectTagHandler
+  - **Time**: 20 min | **Complexity**: Low
+  - **Dependencies**: [S6-18], [S6-10]
+  - **File**: `apps/api/src/application/commands/reject-tag/reject-tag.handler.ts`
+  - **Note**: Remove tag from `suggested_tags` array
+
+- **[S6-20]** Add accept/reject endpoints to photo routes
+  - **Time**: 20 min | **Complexity**: Low
+  - **Dependencies**: [S6-17], [S6-19]
+  - **File**: `apps/api/src/infrastructure/http/routes/photo.routes.ts`
+  - **Endpoints**: 
+    - `POST /api/photos/:id/tags/accept`
+    - `POST /api/photos/:id/tags/reject`
+
+- **[S6-21]** Test accept/reject endpoints
+  - **Time**: 20 min | **Complexity**: Low
+  - **Dependencies**: [S6-20]
+  - **Tests**:
+    - Accept tag: verify moved from `suggested_tags` to `tags`
+    - Reject tag: verify removed from `suggested_tags`
+    - Verify authorization checks
+
+**Verification**: Can accept/reject AI-suggested tags via API
+
+### Chunk 6.5: Backend - Thumbnail Generation Worker
+
+**Prerequisites**: [S6-04]
+
+- **[S6-22]** Install Sharp for image processing
+  - **Time**: 5 min | **Complexity**: Low
+  - **Dependencies**: None
+  - **Commands**: `pnpm add sharp`
+  - **Note**: Image processing library
+
+- **[S6-23]** Create thumbnail generation worker
+  - **Time**: 1 hour | **Complexity**: High
+  - **Dependencies**: [S6-22], [S6-04], [S2-02]
+  - **File**: `apps/api/src/infrastructure/queue/workers/thumbnail-generation.worker.ts`
+  - **Note**:
+    - Download image from R2
+    - Resize to thumbnail size (e.g., 300x300)
+    - Compress/optimize
+    - Upload thumbnail to R2
+    - Update photo record with `thumbnail_key`
+
+- **[S6-24]** Register thumbnail generation worker
+  - **Time**: 10 min | **Complexity**: Low
+  - **Dependencies**: [S6-23]
+  - **File**: `apps/api/src/infrastructure/queue/workers/index.ts`
+  - **Note**: Register worker to process 'thumbnail-generation' jobs
+
+- **[S6-25]** Queue thumbnail job after photo completion
+  - **Time**: 15 min | **Complexity**: Low
+  - **Dependencies**: [S6-24], [S2-12]
+  - **File**: `apps/api/src/application/commands/complete-photo/complete-photo.handler.ts`
+  - **Note**: Queue thumbnail generation job alongside AI tagging
+
+- **[S6-26]** Test thumbnail generation
+  - **Time**: 30 min | **Complexity**: Medium
+  - **Dependencies**: [S6-25]
+  - **Tests**:
+    - Upload photo
+    - Verify thumbnail job queued
+    - Verify thumbnail generated and stored in R2
+    - Verify `thumbnail_key` updated in database
+
+**Verification**: Thumbnails generated and stored correctly
+
+### Chunk 6.6: Backend - Tag Search Enhancement
+
+**Prerequisites**: [S4-02], [S6-08]
+
+- **[S6-27]** Extend GetPhotosQuery to support tag filtering
+  - **Time**: 20 min | **Complexity**: Medium
+  - **Dependencies**: [S4-01]
+  - **File**: `apps/api/src/application/queries/get-photos/get-photos.query.ts`
+  - **Note**: Add `tags?: string[]` and `includeSuggested?: boolean` parameters
+
+- **[S6-28]** Update GetPhotosHandler with tag search logic
+  - **Time**: 1 hour | **Complexity**: High
+  - **Dependencies**: [S6-27], [S4-02]
+  - **File**: `apps/api/src/application/queries/get-photos/get-photos.handler.ts`
+  - **Note**:
+    - If `includeSuggested=false`: Search only `tags` array
+    - If `includeSuggested=true`: Search both `tags` and `suggested_tags` arrays
+    - Use PostgreSQL array operators (@>, &&) with AND logic
+    - Support multiple tags (all must match)
+
+- **[S6-29]** Update photo routes to accept search parameters
+  - **Time**: 15 min | **Complexity**: Low
+  - **Dependencies**: [S6-28]
+  - **File**: `apps/api/src/infrastructure/http/routes/photo.routes.ts`
+  - **Note**: Add query parameters to `GET /api/photos` endpoint
+
+- **[S6-30]** Test tag search
+  - **Time**: 30 min | **Complexity**: Medium
+  - **Dependencies**: [S6-29]
+  - **Tests**:
+    - Search by user-confirmed tags only
+    - Search including AI-suggested tags
+    - Multi-tag search (AND logic)
+    - Verify pagination still works
+
+**Verification**: Tag search works with both user and AI-suggested tags
+
+### Chunk 6.7: Backend - Tag Autocomplete API
+
+**Prerequisites**: [S4-02]
+
+- **[S6-31]** Create GetTagsQuery DTO
+  - **Time**: 10 min | **Complexity**: Low
+  - **Dependencies**: None
+  - **File**: `apps/api/src/application/queries/get-tags/get-tags.query.ts`
+  - **Note**: Support `prefix?: string` parameter
+
+- **[S6-32]** Create GetTagsHandler
+  - **Time**: 30 min | **Complexity**: Medium
+  - **Dependencies**: [S6-31], [S2-08]
+  - **File**: `apps/api/src/application/queries/get-tags/get-tags.handler.ts`
+  - **Note**:
+    - Return distinct tags from `tags` array (user-confirmed only)
+    - Support prefix matching (case-insensitive)
+    - Limit results (e.g., top 20)
+    - Filter by user's photos only
+
+- **[S6-33]** Add tag autocomplete endpoint
+  - **Time**: 15 min | **Complexity**: Low
+  - **Dependencies**: [S6-32]
+  - **File**: `apps/api/src/infrastructure/http/routes/photo.routes.ts`
+  - **Endpoint**: `GET /api/tags?prefix=bea`
+
+- **[S6-34]** Test tag autocomplete
+  - **Time**: 15 min | **Complexity**: Low
+  - **Dependencies**: [S6-33]
+  - **Tests**:
+    - Get all tags
+    - Get tags with prefix
+    - Verify only user-confirmed tags returned
+
+**Verification**: Tag autocomplete API works
+
+### Chunk 6.8: Frontend - Update PhotoModal for AI Suggestions
+
+**Prerequisites**: [S6-21], [S4-18]
+
+- **[S6-35]** Update photo client with accept/reject methods
+  - **Time**: 15 min | **Complexity**: Low
+  - **Dependencies**: [S6-20], [S4-14]
+  - **File**: `packages/api-client/src/photo.client.ts`
+  - **Methods**: `acceptTag(photoId, tag)`, `rejectTag(photoId, tag)`
+
+- **[S6-36]** Update PhotoModal to display AI suggestions
+  - **Time**: 45 min | **Complexity**: Medium
+  - **Dependencies**: [S6-35], [S4-16]
+  - **File**: `apps/web/components/gallery/PhotoModal.tsx`
+  - **Note**:
+    - Display `suggested_tags` separately from `tags`
+    - Show AI-suggested tags with different styling (badge/italic)
+    - Add Accept/Reject buttons for each suggestion
+
+- **[S6-37]** Add accept/reject handlers to PhotoModal
+  - **Time**: 30 min | **Complexity**: Medium
+  - **Dependencies**: [S6-36]
+  - **File**: `apps/web/components/gallery/PhotoModal.tsx`
+  - **Note**: Handle accept/reject actions, update UI optimistically
+
+- **[S6-38]** Test AI suggestions in PhotoModal
+  - **Time**: 20 min | **Complexity**: Low
+  - **Dependencies**: [S6-37]
+  - **Tests**:
+    - Display AI suggestions
+    - Accept suggestion: verify moved to tags
+    - Reject suggestion: verify removed
+
+**Verification**: AI suggestions displayed and can be accepted/rejected in PhotoModal
+
+### Chunk 6.9: Frontend - Update TagInput for Autocomplete API
+
+**Prerequisites**: [S6-34], [S4-17]
+
+- **[S6-39]** Update TagInput to use autocomplete API
+  - **Time**: 30 min | **Complexity**: Medium
+  - **Dependencies**: [S6-33], [S4-17]
+  - **File**: `apps/web/components/gallery/TagInput.tsx`
+  - **Note**: 
+    - Fetch suggestions from `GET /api/tags?prefix=...`
+    - Show dropdown with suggestions
+    - Debounce API calls
+
+- **[S6-40]** Test TagInput autocomplete
+  - **Time**: 15 min | **Complexity**: Low
+  - **Dependencies**: [S6-39]
+  - **Tests**:
+    - Type tag prefix
+    - Verify suggestions appear
+    - Select suggestion
+
+**Verification**: TagInput autocomplete works with API
+
+### Chunk 6.10: Frontend - Search by Tag
+
+**Prerequisites**: [S6-30], [S4-19]
+
+- **[S6-41]** Update photo client with search parameters
+  - **Time**: 15 min | **Complexity**: Low
+  - **Dependencies**: [S6-29], [S4-14]
+  - **File**: `packages/api-client/src/photo.client.ts`
+  - **Note**: Add `tags` and `includeSuggested` parameters to `getPhotos` method
+
+- **[S6-42]** Create TagSearch component
+  - **Time**: 1 hour | **Complexity**: High
+  - **Dependencies**: [S6-41], [S6-39]
+  - **File**: `apps/web/components/gallery/TagSearch.tsx`
+  - **Note**:
+    - Search input with TagInput component
+    - Multi-tag selection (chips)
+    - Checkbox: "Include AI-suggested tags"
+    - Clear search button
+
+- **[S6-43]** Add TagSearch to gallery page
+  - **Time**: 30 min | **Complexity**: Medium
+  - **Dependencies**: [S6-42], [S4-19]
+  - **File**: `apps/web/app/(dashboard)/gallery/page.tsx`
+  - **Note**: 
+    - Add TagSearch component above PhotoGrid
+    - Pass search parameters to photo query
+    - Update React Query when search changes
+
+- **[S6-44]** Test tag search in gallery
+  - **Time**: 30 min | **Complexity**: Medium
+  - **Dependencies**: [S6-43]
+  - **Tests**:
+    - Search by single tag
+    - Search by multiple tags (AND logic)
+    - Toggle "Include AI-suggested tags"
+    - Clear search
+
+**Verification**: Tag search works in gallery with AI suggestions toggle
+
+### Chunk 6.11: Frontend - Display Thumbnails
+
+**Prerequisites**: [S6-26], [S4-15]
+
+- **[S6-45]** Update PhotoGrid to show thumbnails
+  - **Time**: 30 min | **Complexity**: Medium
+  - **Dependencies**: [S6-26], [S4-15]
+  - **File**: `apps/web/components/gallery/PhotoGrid.tsx`
+  - **Note**:
+    - Use `thumbnail_key` to generate thumbnail URL
+    - Fallback to full image if thumbnail not available
+    - Lazy load thumbnails
+
+- **[S6-46]** Update PhotoModal to show full image
+  - **Time**: 15 min | **Complexity**: Low
+  - **Dependencies**: [S4-16]
+  - **File**: `apps/web/components/gallery/PhotoModal.tsx`
+  - **Note**: Use full `r2Url` for modal view
+
+- **[S6-47]** Test thumbnail display
+  - **Time**: 20 min | **Complexity**: Low
+  - **Dependencies**: [S6-45]
+  - **Tests**:
+    - Verify thumbnails load in gallery
+    - Verify full image in modal
+    - Verify fallback works
+
+**Verification**: Thumbnails displayed in gallery, full images in modal
+
+### Chunk 6.12: Mobile - AI Suggestions & Search
+
+**Prerequisites**: [S6-21], [S4-28]
+
+- **[S6-48]** Update mobile photo client with accept/reject methods
+  - **Time**: 15 min | **Complexity**: Low
+  - **Dependencies**: [S6-20], [S4-14]
+  - **File**: `packages/api-client/src/photo.client.ts`
+  - **Note**: Same methods as web (shared client)
+
+- **[S6-49]** Update PhotoViewer to show AI suggestions
+  - **Time**: 45 min | **Complexity**: Medium
+  - **Dependencies**: [S6-48], [S4-24]
+  - **File**: `apps/mobile/components/gallery/PhotoViewer.tsx`
+  - **Note**:
+    - Display `suggested_tags` separately
+    - Show with different styling
+    - Add Accept/Reject buttons
+
+- **[S6-50]** Add search input to gallery screen
+  - **Time**: 45 min | **Complexity**: Medium
+  - **Dependencies**: [S6-42], [S4-26]
+  - **File**: `apps/mobile/app/(tabs)/gallery.tsx`
+  - **Note**:
+    - Add search input at top
+    - Tag autocomplete
+    - "Include AI-suggested tags" toggle
+
+- **[S6-51]** Update mobile gallery to use thumbnails
+  - **Time**: 30 min | **Complexity**: Medium
+  - **Dependencies**: [S6-26], [S4-23]
+  - **File**: `apps/mobile/components/gallery/PhotoGrid.tsx`
+  - **Note**: Use thumbnails in grid, full images in viewer
+
+- **[S6-52]** Test mobile AI suggestions and search
+  - **Time**: 30 min | **Complexity**: Low
+  - **Dependencies**: [S6-50], [S6-51]
+  - **Tests**:
+    - Display AI suggestions
+    - Accept/reject suggestions
+    - Search by tags
+    - Toggle AI suggestions in search
+
+**Verification**: AI suggestions and search work on mobile
+
+### Chunk 6.13: Deploy Job Queue & Search
+
+**Prerequisites**: [S6-52]
+
+- **[S6-53]** Deploy Redis to Railway
+  - **Time**: 15 min | **Complexity**: Low
+  - **Dependencies**: [S6-01]
+  - **Action**: Ensure Redis service is running and accessible
+
+- **[S6-54]** Update API environment variables
+  - **Time**: 10 min | **Complexity**: Low
+  - **Dependencies**: [S6-53]
+  - **Variables**: 
+    - `REDIS_URL` (from Railway)
+    - `AWS_ACCESS_KEY_ID`
+    - `AWS_SECRET_ACCESS_KEY`
+    - `AWS_REGION`
+
+- **[S6-55]** Redeploy API with workers
+  - **Time**: 15 min | **Complexity**: Low
+  - **Dependencies**: [S6-54]
+  - **Action**: Push changes, Railway auto-deploys
+
+- **[S6-56]** Start workers in production
+  - **Time**: 10 min | **Complexity**: Low
+  - **Dependencies**: [S6-55]
+  - **Note**: Ensure workers are running (may need separate process or Railway service)
+
+- **[S6-57]** Test AI tagging in production
+  - **Time**: 30 min | **Complexity**: Medium
+  - **Dependencies**: [S6-56]
+  - **Tests**:
+    - Upload photo
+    - Verify AI tagging job runs
+    - Verify tags generated (≥70% confidence)
+    - Verify stored in `suggested_tags`
+
+- **[S6-58]** Test thumbnail generation in production
+  - **Time**: 30 min | **Complexity**: Medium
+  - **Dependencies**: [S6-56]
+  - **Tests**:
+    - Upload photo
+    - Verify thumbnail job runs
+    - Verify thumbnail generated
+    - Verify accessible via URL
+
+- **[S6-59]** Test tag search in production
+  - **Time**: 30 min | **Complexity**: Medium
+  - **Dependencies**: [S6-55]
+  - **Tests**:
+    - Search by user tags
+    - Search including AI suggestions
+    - Multi-tag search
+    - Verify on web and mobile
+
+**Verification**: ✅ AI tagging, thumbnails, and search work in production
+
+---
+
 ## Verification Checklist
 
 ### Slice 0: Foundation
@@ -1405,6 +1979,7 @@
 - ✅ Gallery displays all photos
 - ✅ Pagination works
 - ✅ Photo modal/viewer works
+- ✅ Tagging functional (add/edit tags on web, display on mobile)
 - ✅ Gallery deployed and working
 
 ### Slice 5: Polish & Testing
@@ -1412,6 +1987,17 @@
 - ✅ Performance benchmarks met
 - ✅ Documentation complete
 - ✅ Production deployment successful
+
+### Slice 6: AI Tagging, Thumbnail Generation & Search (Post-MVP)
+- ✅ Redis queue infrastructure working
+- ✅ AI tagging generates suggestions (≥70% confidence)
+- ✅ Can accept/reject AI suggestions
+- ✅ Thumbnails generated and displayed
+- ✅ Tag search works (user tags only)
+- ✅ Tag search works (including AI suggestions)
+- ✅ Tag autocomplete works
+- ✅ All features work on web and mobile
+- ✅ All features deployed and working in production
 
 ---
 

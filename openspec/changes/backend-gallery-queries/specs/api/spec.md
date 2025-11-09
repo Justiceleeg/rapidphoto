@@ -5,7 +5,7 @@ The API SHALL provide an endpoint to retrieve a paginated list of photos for the
 
 #### Scenario: List photos with pagination
 - **WHEN** a GET request is made to `/api/photos` with query parameters `page` and `limit`
-- **THEN** the API returns a paginated list of photos belonging to the authenticated user
+- **THEN** the API returns a paginated list of photos belonging to the authenticated user, each including tags
 
 #### Scenario: List photos default pagination
 - **WHEN** a GET request is made to `/api/photos` without pagination parameters
@@ -24,7 +24,7 @@ The API SHALL provide an endpoint to retrieve details of a single photo by ID.
 
 #### Scenario: Get photo by ID
 - **WHEN** a GET request is made to `/api/photos/:id` with a valid photo ID
-- **THEN** the API returns the photo details including id, filename, r2Url, status, createdAt, updatedAt
+- **THEN** the API returns the photo details including id, filename, r2Url, status, tags, createdAt, updatedAt
 
 #### Scenario: Get photo requires authentication
 - **WHEN** a GET request is made to `/api/photos/:id` without authentication
@@ -75,4 +75,27 @@ The API SHALL provide an endpoint to delete a photo by ID.
 #### Scenario: Delete photo for another user's photo
 - **WHEN** a DELETE request is made to `/api/photos/:id` for a photo belonging to another user
 - **THEN** the API returns a 404 Not Found error (or 403 Forbidden)
+
+### Requirement: Photo Tagging
+The API SHALL provide an endpoint to update tags for a photo.
+
+#### Scenario: Update photo tags
+- **WHEN** a PUT request is made to `/api/photos/:id/tags` with a valid photo ID and tags array
+- **THEN** the API updates the photo's tags in the database and returns the updated photo
+
+#### Scenario: Update photo tags requires authentication
+- **WHEN** a PUT request is made to `/api/photos/:id/tags` without authentication
+- **THEN** the API returns a 401 Unauthorized error
+
+#### Scenario: Update photo tags for non-existent photo
+- **WHEN** a PUT request is made to `/api/photos/:id/tags` with an invalid photo ID
+- **THEN** the API returns a 404 Not Found error
+
+#### Scenario: Update photo tags for another user's photo
+- **WHEN** a PUT request is made to `/api/photos/:id/tags` for a photo belonging to another user
+- **THEN** the API returns a 404 Not Found error (or 403 Forbidden)
+
+#### Scenario: Update photo tags validates tags array
+- **WHEN** a PUT request is made to `/api/photos/:id/tags` with invalid tags (e.g., empty strings, too long)
+- **THEN** the API returns a 400 Bad Request error with validation details
 

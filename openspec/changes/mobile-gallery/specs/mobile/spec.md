@@ -24,7 +24,11 @@ The mobile application SHALL provide a PhotoViewer component for viewing individ
 
 #### Scenario: Show photo metadata
 - **WHEN** the PhotoViewer is opened
-- **THEN** it displays photo metadata such as filename, upload date, and status
+- **THEN** it displays photo metadata such as filename, upload date, status, and tags
+
+#### Scenario: Display tags in photo viewer
+- **WHEN** the PhotoViewer is opened with a photo that has tags
+- **THEN** it displays the photo's tags as chips/badges below the photo metadata
 
 #### Scenario: Close viewer
 - **WHEN** a user presses the close button or swipes down

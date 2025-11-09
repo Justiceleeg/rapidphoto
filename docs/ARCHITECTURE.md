@@ -104,6 +104,8 @@ RapidPhotoUpload is a high-performance photo upload system designed to handle up
 │   │   │  - Storage (R2 Service)                                │   │   │
 │   │   │  - Auth (Better-Auth)                                  │   │   │
 │   │   │  - SSE (Progress Service)                              │   │   │
+│   │   │  - Queue (BullMQ + Redis) [Post-MVP]                   │   │   │
+│   │   │  - AI (AWS Rekognition) [Post-MVP]                     │   │   │
 │   │   └─────────────────────────────────────────────────────────┘   │   │
 │   └─────────────────────────────────────────────────────────────────┘   │
 │                                                                         │
@@ -115,10 +117,19 @@ RapidPhotoUpload is a high-performance photo upload system designed to handle up
          │   (Railway)           │  │   (Object Storage)     │
          │                       │  │                        │
          │   - Users             │  │   - Photo Files        │
-         │   - Photos            │  │   - Direct Upload      │
-         │   - Upload Jobs       │  │   - Presigned URLs     │
-         │   - Sessions          │  │                        │
+         │   - Photos            │  │   - Thumbnails         │
+         │   - Upload Jobs       │  │   - Direct Upload      │
+         │   - Sessions          │  │   - Presigned URLs     │
          └───────────────────────┘  └────────────────────────┘
+                      │
+                      │
+         ┌────────────▼──────────┐
+         │   Redis (Railway)     │ [Post-MVP]
+         │   (Job Queue)         │
+         │                       │
+         │   - AI Tagging Jobs   │
+         │   - Thumbnail Jobs    │
+         └───────────────────────┘
 ```
 
 ---
@@ -507,6 +518,18 @@ apps/api/src/
     │           publishProgress(jobId, data)
     │       }
     │
+    ├── queue/                        # Job Queue [Post-MVP]
+    │   ├── photo-queue.ts           # BullMQ queue setup
+    │   ├── queue.config.ts           # Queue configuration
+    │   └── workers/
+    │       ├── base.worker.ts        # Base worker class
+    │       ├── ai-tagging.worker.ts  # AI tagging worker
+    │       └── thumbnail-generation.worker.ts # Thumbnail worker
+    │
+    ├── ai/                           # AI Services [Post-MVP]
+    │   ├── rekognition.service.ts    # AWS Rekognition client
+    │   └── rekognition.config.ts     # AWS configuration
+    │
     └── http/                        # HTTP layer
         ├── routes/
         │   ├── auth.routes.ts       # Auth endpoints
@@ -646,6 +669,7 @@ Feature: Upload Photo
 │ thumbnail_key    TEXT    │
 │ status           VARCHAR │
 │ tags             TEXT[]  │
+│ suggested_tags   TEXT[]  │ [Post-MVP]
 │ uploaded_at      TIMESTAMP│
 │ created_at       TIMESTAMP│
 └──────────────────────────┘
@@ -706,7 +730,8 @@ CREATE TABLE photos (
     r2_url TEXT,
     thumbnail_key TEXT,
     status VARCHAR(50) NOT NULL, -- 'pending', 'uploading', 'complete', 'failed'
-    tags TEXT[],
+    tags TEXT[], -- User-confirmed tags
+    suggested_tags TEXT[], -- AI-suggested tags (Post-MVP)
     uploaded_at TIMESTAMP,
     created_at TIMESTAMP DEFAULT NOW()
 );
@@ -716,6 +741,8 @@ CREATE INDEX idx_photos_upload_job_id ON photos(upload_job_id);
 CREATE INDEX idx_photos_status ON photos(status);
 CREATE INDEX idx_photos_created_at ON photos(created_at DESC);
 CREATE INDEX idx_photos_r2_key ON photos(r2_key);
+CREATE INDEX idx_photos_tags ON photos USING GIN(tags); -- [Post-MVP]
+CREATE INDEX idx_photos_suggested_tags ON photos USING GIN(suggested_tags); -- [Post-MVP]
 ```
 
 ### Data Flow
@@ -1551,14 +1578,125 @@ Storage:
 ✅ Production-ready patterns
 ✅ Cost-effective infrastructure
 
+### Post-MVP Enhancements (Slice 6)
+
+- [x] Job queue (BullMQ + Redis) - **Implemented in Slice 6**
+- [x] Thumbnail generation - **Implemented in Slice 6**
+- [x] AI tagging (AWS Rekognition) - **Implemented in Slice 6**
+- [x] Tag-based search - **Implemented in Slice 6**
+
 ### Future Enhancements
 
-- [ ] Job queue (BullMQ + Redis)
-- [ ] Thumbnail generation
 - [ ] Image optimization
-- [ ] Advanced search
 - [ ] Collaboration features
 - [ ] Analytics dashboard
+- [ ] HEIC format support
+
+---
+
+---
+
+## Post-MVP Architecture: AI Tagging, Thumbnails & Search (Slice 6)
+
+### Job Queue Architecture
+
+The post-MVP enhancement adds a job queue system using BullMQ and Redis for background processing of AI tagging and thumbnail generation.
+
+```
+Photo Upload Complete
+        ↓
+Queue Multiple Jobs (parallel)
+        ├─→ AI Tagging Job
+        └─→ Thumbnail Generation Job
+        ↓
+Workers Process Independently
+        ├─→ AI Tagging: 1-3 seconds per photo
+        └─→ Thumbnail: 0.5-2 seconds per photo
+        ↓
+Update Photo Record
+        ├─→ suggested_tags (AI suggestions)
+        └─→ thumbnail_key (thumbnail URL)
+```
+
+### AWS Rekognition Integration
+
+**Configuration:**
+- Service: AWS Rekognition DetectLabels
+- Cost: ~$1.00 per 1,000 images
+- Response Time: 1-2 seconds per image
+- Confidence Threshold: ≥70%
+
+**Flow:**
+1. Photo upload completes
+2. AI tagging job queued
+3. Worker calls AWS Rekognition with R2 URL
+4. Filter tags by confidence (≥70%)
+5. Store in `suggested_tags` array
+6. User can accept/reject suggestions
+
+### Tag Management Architecture
+
+**Tag States:**
+- **User-Confirmed Tags** (`tags` array): Tags manually added or accepted from AI suggestions
+- **AI-Suggested Tags** (`suggested_tags` array): Tags generated by AI (≥70% confidence), pending user acceptance
+
+**Tag Flow:**
+```
+AI Tagging → suggested_tags (pending)
+        ↓
+User Accepts → tags (confirmed)
+User Rejects → removed from suggested_tags
+```
+
+**Search Options:**
+- **User Tags Only**: Search only `tags` array (default)
+- **Include AI Suggestions**: Search both `tags` and `suggested_tags` arrays
+- **Multi-Tag Search**: AND logic (all tags must match)
+
+### Thumbnail Generation Architecture
+
+**Processing:**
+- Library: Sharp (image processing)
+- Size: 300x300 pixels (configurable)
+- Format: JPEG (optimized)
+- Storage: R2 (separate from full images)
+
+**Flow:**
+1. Photo upload completes
+2. Thumbnail generation job queued
+3. Worker downloads image from R2
+4. Resize and compress with Sharp
+5. Upload thumbnail to R2
+6. Update photo record with `thumbnail_key`
+
+**Performance:**
+- Processing Time: 0.5-2 seconds per photo
+- Storage Overhead: ~50-200KB per thumbnail
+- Cost: Negligible (local CPU processing)
+
+### Tag Search Architecture
+
+**Query Logic:**
+```sql
+-- User tags only (includeSuggested=false)
+WHERE tags @> ARRAY['beach', 'sunset']
+
+-- Include AI suggestions (includeSuggested=true)
+WHERE (
+  tags @> ARRAY['beach', 'sunset'] OR
+  suggested_tags @> ARRAY['beach', 'sunset']
+)
+```
+
+**Indexes:**
+- GIN indexes on both `tags` and `suggested_tags` arrays
+- Fast array containment queries
+- Supports multi-tag AND logic
+
+**Autocomplete:**
+- Endpoint: `GET /api/tags?prefix=bea`
+- Returns: Distinct user-confirmed tags only
+- Use Case: TagInput component suggestions
 
 ---
 

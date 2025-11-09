@@ -91,6 +91,7 @@ export const photo = pgTable("photo", {
   r2Key: text("r2_key").notNull(),
   r2Url: text("r2_url"),
   status: text("status").notNull().default("pending"),
+  tags: text("tags").array(),
   createdAt: timestamp("created_at").defaultNow().notNull(),
   updatedAt: timestamp("updated_at")
     .defaultNow()

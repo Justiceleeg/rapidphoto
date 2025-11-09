@@ -1,6 +1,9 @@
-export type PhotoStatus = "pending" | "completed" | "failed";
+export interface GetPhotoQuery {
+  photoId: string;
+  userId: string;
+}
 
-export interface Photo {
+export interface GetPhotoResult {
   id: string;
   userId: string;
   jobId: string | null;
@@ -9,7 +12,7 @@ export interface Photo {
   mimeType: string;
   r2Key: string;
   r2Url: string | null;
-  status: PhotoStatus;
+  status: string;
   tags: string[] | null;
   createdAt: Date;
   updatedAt: Date;

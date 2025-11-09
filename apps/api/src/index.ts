@@ -7,6 +7,8 @@ import { serve } from "@hono/node-server";
 import { env } from "./config/env.js";
 import authRoutes from "./infrastructure/http/routes/auth.routes.js";
 import uploadRoutes, { completePhotoRoute } from "./infrastructure/http/routes/upload.routes.js";
+import photoRoutes from "./infrastructure/http/routes/photo.routes.js";
+import uploadJobRoutes from "./infrastructure/http/routes/upload-job.routes.js";
 import sseRoutes from "./infrastructure/http/routes/sse.routes.js";
 import { authMiddleware } from "./infrastructure/auth/auth.middleware.js";
 import { auth } from "./infrastructure/auth/better-auth.js";
@@ -42,6 +44,12 @@ app.route("/api/upload", uploadRoutes);
 
 // Mount photo complete route
 app.route("/api/photos", completePhotoRoute);
+
+// Mount photo routes
+app.route("/api/photos", photoRoutes);
+
+// Mount upload job routes
+app.route("/api/upload-jobs", uploadJobRoutes);
 
 // Mount SSE routes
 app.route("/api", sseRoutes);

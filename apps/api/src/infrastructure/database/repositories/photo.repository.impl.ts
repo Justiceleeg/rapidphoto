@@ -1,4 +1,4 @@
-import { eq } from "drizzle-orm";
+import { eq, count, desc } from "drizzle-orm";
 import { db } from "../connection.js";
 import { photo } from "../schema.js";
 import { Photo, PhotoStatus } from "../../../domain/photo/photo.entity.js";
@@ -24,6 +24,7 @@ export class PhotoRepositoryImpl implements PhotoRepository {
         r2Key: photoData.r2Key,
         r2Url: photoData.r2Url,
         status: photoData.status,
+        tags: photoData.tags ?? null,
         createdAt: now,
         updatedAt: now,
       })
@@ -51,6 +52,32 @@ export class PhotoRepositoryImpl implements PhotoRepository {
     return results.map((r) => this.mapToEntity(r));
   }
 
+  async findByUserIdPaginated(userId: string, page: number, limit: number): Promise<{ photos: Photo[]; total: number }> {
+    const offset = (page - 1) * limit;
+
+    // Get total count
+    const [totalResult] = await db
+      .select({ count: count() })
+      .from(photo)
+      .where(eq(photo.userId, userId));
+
+    const total = totalResult?.count ?? 0;
+
+    // Get paginated results
+    const results = await db
+      .select()
+      .from(photo)
+      .where(eq(photo.userId, userId))
+      .orderBy(desc(photo.createdAt))
+      .limit(limit)
+      .offset(offset);
+
+    return {
+      photos: results.map((r) => this.mapToEntity(r)),
+      total,
+    };
+  }
+
   async update(id: string, updates: Partial<Photo>): Promise<Photo> {
     const updateData: any = {
       ...(updates.filename !== undefined && { filename: updates.filename }),
@@ -59,6 +86,7 @@ export class PhotoRepositoryImpl implements PhotoRepository {
       ...(updates.r2Key !== undefined && { r2Key: updates.r2Key }),
       ...(updates.r2Url !== undefined && { r2Url: updates.r2Url }),
       ...(updates.status !== undefined && { status: updates.status }),
+      ...(updates.tags !== undefined && { tags: updates.tags }),
       updatedAt: new Date(),
     };
 
@@ -90,6 +118,7 @@ export class PhotoRepositoryImpl implements PhotoRepository {
       r2Key: row.r2Key,
       r2Url: row.r2Url,
       status: row.status as PhotoStatus,
+      tags: row.tags ?? null,
       createdAt: row.createdAt,
       updatedAt: row.updatedAt,
     };

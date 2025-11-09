@@ -6,6 +6,7 @@
 - [ ] 1.2 Create PhotoViewer modal component (`apps/mobile/components/gallery/PhotoViewer.tsx`)
   - Display full-size photo
   - Show photo metadata
+  - Display tags as chips/badges
   - Close button
 
 ## 2. Gallery Screen
@@ -19,4 +20,5 @@
 
 ## 3. Testing
 - [ ] 3.1 Test gallery on mobile (view photos, pull-to-refresh, modal viewer)
+- [ ] 3.2 Test tag display in PhotoViewer (tags shown as chips/badges)
 

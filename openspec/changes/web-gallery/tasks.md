@@ -3,6 +3,7 @@
   - `getPhotos(page, limit)` - List photos with pagination
   - `getPhoto(id)` - Get single photo
   - `deletePhoto(id)` - Delete photo
+  - `updatePhotoTags(id, tags)` - Update photo tags
 
 ## 2. Gallery Components
 - [ ] 2.1 Create PhotoGrid component (`apps/web/components/gallery/PhotoGrid.tsx`)
@@ -12,6 +13,12 @@
   - Display full-size photo
   - Show photo metadata
   - Close button
+- [ ] 2.3 Create TagInput component (`apps/web/components/gallery/TagInput.tsx`)
+  - Allow adding/removing tags
+  - Autocomplete functionality
+- [ ] 2.4 Add tag display and editing to PhotoModal (`apps/web/components/gallery/PhotoModal.tsx`)
+  - Display tags as chips/badges
+  - Allow editing via TagInput component
 
 ## 3. Gallery Page
 - [ ] 3.1 Create gallery page (`apps/web/app/(dashboard)/gallery/page.tsx`)
@@ -28,4 +35,5 @@
 
 ## 5. Testing
 - [ ] 5.1 Test gallery on web (view photos, pagination, modal, navigation)
+- [ ] 5.2 Test tag functionality (add tags, remove tags, autocomplete, save changes)
 

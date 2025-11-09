@@ -4,6 +4,7 @@ import { authMiddleware } from "../../auth/auth.middleware.js";
 import { GetPhotosHandler } from "../../../application/queries/get-photos/get-photos.handler.js";
 import { GetPhotoHandler } from "../../../application/queries/get-photo/get-photo.handler.js";
 import { GetUploadJobHandler } from "../../../application/queries/get-upload-job/get-upload-job.handler.js";
+import { GetTagsHandler } from "../../../application/queries/get-tags/get-tags.handler.js";
 import { UpdatePhotoTagsHandler } from "../../../application/commands/update-photo-tags/update-photo-tags.handler.js";
 import { AcceptTagHandler } from "../../../application/commands/accept-tag/accept-tag.handler.js";
 import { RejectTagHandler } from "../../../application/commands/reject-tag/reject-tag.handler.js";
@@ -11,7 +12,7 @@ import { PhotoRepositoryImpl } from "../../database/repositories/photo.repositor
 import { UploadJobRepositoryImpl } from "../../database/repositories/upload-job.repository.impl.js";
 import { R2Service } from "../../storage/r2.service.js";
 import { validateQuery, validateParams, validateBody } from "../middleware/validation.middleware.js";
-import { getPhotosQuerySchema, photoIdParamSchema, updatePhotoTagsSchema, tagActionSchema } from "../validation/schemas.js";
+import { getPhotosQuerySchema, getTagsQuerySchema, photoIdParamSchema, updatePhotoTagsSchema, tagActionSchema } from "../validation/schemas.js";
 import { AppError, createNotFoundError, createForbiddenError } from "../middleware/error.middleware.js";
 
 /**
@@ -27,6 +28,7 @@ const r2Service = new R2Service();
 const getPhotosHandler = new GetPhotosHandler(photoRepository, r2Service);
 const getPhotoHandler = new GetPhotoHandler(photoRepository, r2Service);
 const getUploadJobHandler = new GetUploadJobHandler(uploadJobRepository);
+const getTagsHandler = new GetTagsHandler(photoRepository);
 const updatePhotoTagsHandler = new UpdatePhotoTagsHandler(photoRepository);
 const acceptTagHandler = new AcceptTagHandler(photoRepository);
 const rejectTagHandler = new RejectTagHandler(photoRepository);
@@ -57,7 +59,37 @@ photoRoutes.get(
       userId: user.id,
       page: query?.page,
       limit: query?.limit,
-      // tags and includeSuggested will be added in Slice 6
+      tags: query?.tags,
+      includeSuggested: query?.includeSuggested,
+    });
+
+    return c.json(result, 200);
+  }
+);
+
+/**
+ * GET /api/tags
+ * Get distinct tags for the authenticated user
+ * Supports optional prefix filtering for autocomplete
+ * Returns only user-confirmed tags (not AI-suggested tags)
+ */
+photoRoutes.get(
+  "/tags",
+  authMiddleware,
+  validateQuery(getTagsQuerySchema),
+  async (c) => {
+    const user = c.get("user");
+    if (!user) {
+      throw new AppError(401, "Unauthorized", "AUTH_ERROR");
+    }
+
+    const query = c.get("validatedQuery") as {
+      prefix?: string;
+    };
+
+    const result = await getTagsHandler.handle({
+      userId: user.id,
+      prefix: query?.prefix,
     });
 
     return c.json(result, 200);

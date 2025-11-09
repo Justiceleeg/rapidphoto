@@ -32,7 +32,9 @@ export class GetPhotosHandler {
     const { photos, total } = await this.photoRepository.findByUserIdPaginated(
       query.userId,
       page,
-      limit
+      limit,
+      query.tags,
+      query.includeSuggested
     );
 
     const totalPages = Math.ceil(total / limit);

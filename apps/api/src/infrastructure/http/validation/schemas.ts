@@ -110,3 +110,11 @@ export const tagActionSchema = z.object({
   tag: z.string().min(1, "Tag cannot be empty").max(50, "Tag cannot exceed 50 characters"),
 });
 
+/**
+ * Get tags query parameters validation schema
+ * Supports optional prefix filtering for tag autocomplete
+ */
+export const getTagsQuerySchema = z.object({
+  prefix: z.string().min(1).max(50).optional(),
+});
+

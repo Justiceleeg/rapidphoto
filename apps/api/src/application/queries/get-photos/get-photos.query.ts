@@ -8,6 +8,10 @@ export interface GetPhotosQuery {
   page?: number;
   /** Number of photos per page (default: 20, max: 100) */
   limit?: number;
+  /** Array of tags to filter by (AND logic - photo must have all tags) */
+  tags?: string[];
+  /** Whether to include AI-suggested tags in search (default: false) */
+  includeSuggested?: boolean;
 }
 
 /**

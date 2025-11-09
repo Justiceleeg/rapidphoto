@@ -31,9 +31,17 @@ export interface PhotoRepository {
    * @param userId - User ID
    * @param page - Page number (1-indexed)
    * @param limit - Number of photos per page
+   * @param tags - Optional array of tags to filter by (AND logic - photo must have all tags)
+   * @param includeSuggested - Whether to include AI-suggested tags in search (default: false)
    * @returns Paginated photos and total count
    */
-  findByUserIdPaginated(userId: string, page: number, limit: number): Promise<{ photos: Photo[]; total: number }>;
+  findByUserIdPaginated(
+    userId: string,
+    page: number,
+    limit: number,
+    tags?: string[],
+    includeSuggested?: boolean
+  ): Promise<{ photos: Photo[]; total: number }>;
   
   /**
    * Update a photo by ID
@@ -48,5 +56,13 @@ export interface PhotoRepository {
    * @param id - Photo ID
    */
   delete(id: string): Promise<void>;
+
+  /**
+   * Find distinct tags for a user
+   * @param userId - User ID
+   * @param prefix - Optional prefix to filter tags by (case-insensitive)
+   * @returns Array of distinct tags (only from user-confirmed tags, not suggestedTags)
+   */
+  findDistinctTagsByUserId(userId: string, prefix?: string): Promise<string[]>;
 }
 

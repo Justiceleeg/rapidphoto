@@ -1,0 +1,89 @@
+// Export the Hono app for testing purposes
+// This file contains the app setup without the server startup
+
+import { Hono } from "hono";
+import { cors } from "hono/cors";
+import { logger } from "hono/logger";
+import authRoutes from "./infrastructure/http/routes/auth.routes.js";
+import uploadRoutes, { completePhotoRoute } from "./infrastructure/http/routes/upload.routes.js";
+import photoRoutes from "./infrastructure/http/routes/photo.routes.js";
+import uploadJobRoutes from "./infrastructure/http/routes/upload-job.routes.js";
+import sseRoutes from "./infrastructure/http/routes/sse.routes.js";
+import { authMiddleware } from "./infrastructure/auth/auth.middleware.js";
+import { auth } from "./infrastructure/auth/better-auth.js";
+import { errorHandler } from "./infrastructure/http/middleware/error.middleware.js";
+import { env } from "./config/env.js";
+
+export type Variables = {
+  user: typeof auth.$Infer.Session.user | null;
+  session: typeof auth.$Infer.Session.session | null;
+  validatedBody?: unknown;
+  validatedQuery?: unknown;
+  validatedParams?: unknown;
+};
+
+export function createApp() {
+  const app = new Hono<{ Variables: Variables }>();
+
+  // Error handler (catches all errors)
+  app.onError(errorHandler);
+
+  // Logger middleware (logs requests and responses)
+  app.use(
+    "*",
+    logger((message, ...rest) => {
+      if (env.nodeEnv === "development") {
+        console.log(message, ...rest);
+      } else {
+        // In production, only log errors
+        if (message.includes("error") || message.includes("Error")) {
+          console.error(message, ...rest);
+        }
+      }
+    })
+  );
+
+  // CORS middleware
+  app.use(
+    "*",
+    cors({
+      origin: env.allowedOrigins,
+      credentials: true,
+      allowMethods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+      allowHeaders: ["Content-Type", "Authorization", "Cookie"],
+    })
+  );
+
+  // Health check endpoint
+  app.get("/health", (c) => {
+    return c.json({ status: "ok" });
+  });
+
+  // Mount auth routes
+  app.route("/api/auth", authRoutes);
+
+  // Mount upload routes
+  app.route("/api/upload", uploadRoutes);
+
+  // Mount photo complete route
+  app.route("/api/photos", completePhotoRoute);
+
+  // Mount photo routes
+  app.route("/api/photos", photoRoutes);
+
+  // Mount upload job routes
+  app.route("/api/upload-jobs", uploadJobRoutes);
+
+  // Mount SSE routes
+  app.route("/api", sseRoutes);
+
+  // Protected route example
+  app.get("/api/me", authMiddleware, async (c) => {
+    const user = c.get("user");
+    const session = c.get("session");
+    return c.json({ user, session });
+  });
+
+  return app;
+}
+

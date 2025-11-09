@@ -36,7 +36,9 @@ export class InitUploadHandler {
     if (photosArray.length === 1) {
       const photoMeta = photosArray[0];
       const photoId = randomUUID();
-      const r2Key = `${command.userId}/${photoId}/${photoMeta.filename}`;
+      // Use test/ prefix in test environment for easy cleanup
+      const prefix = process.env.NODE_ENV === "test" ? "test/" : "";
+      const r2Key = `${prefix}${command.userId}/${photoId}/${photoMeta.filename}`;
 
       // Create photo record with status "pending" (no jobId for single uploads)
       const photo = await this.photoRepository.create({
@@ -85,7 +87,9 @@ export class InitUploadHandler {
     // Process each photo
     for (const photoMeta of photosArray) {
       const photoId = randomUUID();
-      const r2Key = `${command.userId}/${photoId}/${photoMeta.filename}`;
+      // Use test/ prefix in test environment for easy cleanup
+      const prefix = process.env.NODE_ENV === "test" ? "test/" : "";
+      const r2Key = `${prefix}${command.userId}/${photoId}/${photoMeta.filename}`;
 
       // Create photo record with status "pending" and link to job
       const photo = await this.photoRepository.create({

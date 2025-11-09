@@ -10,6 +10,9 @@
     "start": "node dist/index.js",
     "start:prod": "pnpm db:migrate && node dist/index.js",
     "lint": "eslint .",
+    "test": "vitest run",
+    "test:watch": "vitest watch",
+    "test:integration": "vitest run tests/integration",
     "db:generate": "drizzle-kit generate",
     "db:migrate": "drizzle-kit migrate",
     "db:studio": "drizzle-kit studio",
@@ -36,9 +39,12 @@
     "@types/node": "^24.10.0",
     "@typescript-eslint/eslint-plugin": "^8.46.3",
     "@typescript-eslint/parser": "^8.46.3",
+    "@vitest/ui": "^4.0.8",
     "drizzle-kit": "^0.31.6",
     "eslint": "^9.39.1",
     "tsx": "^4.20.6",
-    "typescript": "^5.9.3"
+    "typescript": "^5.9.3",
+    "undici": "^7.16.0",
+    "vitest": "^4.0.8"
   }
 }

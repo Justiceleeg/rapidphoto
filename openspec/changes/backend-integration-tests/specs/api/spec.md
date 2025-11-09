@@ -1,30 +1,69 @@
 ## ADDED Requirements
 
-### Requirement: Testing Infrastructure
-The API SHALL provide a testing framework with test database setup for integration testing.
+### Requirement: End-to-End Integration Testing Infrastructure
+The API SHALL provide integration testing infrastructure that validates the complete upload process from simulated client requests through backend services to successful persistent storage in cloud object store (R2).
 
-#### Scenario: Vitest configuration
-- **WHEN** a developer runs `pnpm test`
-- **THEN** Vitest executes all integration tests with proper configuration
+#### Scenario: Test server setup
+- **WHEN** integration tests run
+- **THEN** a test server is started with the actual Hono application and test database/R2 configuration
 
 #### Scenario: Test database setup
 - **WHEN** integration tests run
-- **THEN** a test database is created/configured with the schema applied
+- **THEN** a test database is created/configured with the schema applied via migrations
 
 #### Scenario: Test database teardown
 - **WHEN** integration tests complete
 - **THEN** test data is cleaned up and the database is reset
 
-#### Scenario: Test data seeding
-- **WHEN** integration tests need test data
-- **THEN** utilities are available to seed test users, photos, and upload jobs
-
-### Requirement: Authentication Integration Tests
-The API SHALL have integration tests that validate the complete authentication flow including signup, signin, signout, and session management.
-
-#### Scenario: User signup test
+#### Scenario: Test R2 bucket setup
 - **WHEN** integration tests run
-- **THEN** tests verify that valid signup creates a user and establishes a session
+- **THEN** a test R2 bucket is configured (or test bucket is used) for file storage verification
+
+#### Scenario: Test R2 bucket cleanup
+- **WHEN** integration tests complete
+- **THEN** test files are removed from the R2 bucket
+
+#### Scenario: Client simulation helpers
+- **WHEN** integration tests need to simulate client requests
+- **THEN** utilities are available to make authenticated HTTP requests, upload files to presigned URLs, and manage session cookies
+
+### Requirement: End-to-End Upload Flow Integration Tests
+The API SHALL have integration tests that validate the complete upload process from simulated client (mobile/web) through backend services to successful persistent storage in cloud object store.
+
+#### Scenario: Single photo upload end-to-end test
+- **WHEN** integration tests run
+- **THEN** tests simulate client authentication, initialize upload, actually upload a file to R2 using presigned URL, verify file exists in R2, complete upload, and verify database state matches R2 state
+
+#### Scenario: Batch photo upload end-to-end test
+- **WHEN** integration tests run
+- **THEN** tests simulate client authentication, initialize batch upload, actually upload multiple files to R2 using presigned URLs, verify all files exist in R2, complete all uploads, and verify upload job progress and database state match R2 state
+
+#### Scenario: Upload flow with R2 storage verification
+- **WHEN** integration tests run
+- **THEN** tests verify that files uploaded to presigned URLs are actually stored in the R2 bucket and are accessible
+
+#### Scenario: Upload flow with database verification
+- **WHEN** integration tests run
+- **THEN** tests verify that photo records, upload jobs, and status updates in the database match the actual upload state and R2 storage state
+
+#### Scenario: Upload failure flow test
+- **WHEN** integration tests run
+- **THEN** tests simulate upload failure, verify photo status is updated to "failed" in database, and verify upload job progress tracks failed photos correctly
+
+#### Scenario: Concurrent uploads test
+- **WHEN** integration tests run
+- **THEN** tests simulate multiple concurrent upload requests and verify all uploads are handled correctly, database state is consistent, and all files are stored correctly in R2
+
+#### Scenario: Upload validation test
+- **WHEN** integration tests run
+- **THEN** tests verify that invalid file count, invalid file size, and unauthenticated requests return appropriate errors
+
+### Requirement: Authentication Flow Integration Tests
+The API SHALL have integration tests that validate the complete authentication flow including signup, signin, signout, and session management through simulated client requests.
+
+#### Scenario: User signup flow test
+- **WHEN** integration tests run
+- **THEN** tests simulate client POST to `/api/auth/sign-up`, verify user is created in database, verify session is established, and verify cookies are returned
 
 #### Scenario: Duplicate email signup test
 - **WHEN** integration tests run
@@ -34,17 +73,13 @@ The API SHALL have integration tests that validate the complete authentication f
 - **WHEN** integration tests run
 - **THEN** tests verify that signup with invalid email or password returns validation errors
 
-#### Scenario: User signin test
+#### Scenario: User signin flow test
 - **WHEN** integration tests run
-- **THEN** tests verify that valid credentials establish a session
-
-#### Scenario: Invalid signin test
-- **WHEN** integration tests run
-- **THEN** tests verify that invalid credentials return an authentication error
+- **THEN** tests simulate client POST to `/api/auth/sign-in`, verify session is established, verify cookies are returned, and verify invalid credentials return error
 
 #### Scenario: Session management test
 - **WHEN** integration tests run
-- **THEN** tests verify that session endpoints return correct user information
+- **THEN** tests simulate client GET to `/api/me` with session cookies, verify user data is returned, and verify session persists across requests
 
 #### Scenario: Signout test
 - **WHEN** integration tests run
@@ -54,72 +89,32 @@ The API SHALL have integration tests that validate the complete authentication f
 - **WHEN** integration tests run
 - **THEN** tests verify that unauthenticated requests to protected routes return 401 errors
 
-### Requirement: Upload Integration Tests
-The API SHALL have integration tests that validate the complete upload flow including init upload, complete photo, fail photo, and upload job tracking.
-
-#### Scenario: Init upload test
-- **WHEN** integration tests run
-- **THEN** tests verify that valid init upload creates an upload job and photos with presigned URLs
-
-#### Scenario: Init upload authentication test
-- **WHEN** integration tests run
-- **THEN** tests verify that init upload requires authentication
-
-#### Scenario: Init upload validation test
-- **WHEN** integration tests run
-- **THEN** tests verify that init upload validates file count and size
-
-#### Scenario: Complete photo test
-- **WHEN** integration tests run
-- **THEN** tests verify that valid photo completion updates photo status and job progress
-
-#### Scenario: Complete photo authentication test
-- **WHEN** integration tests run
-- **THEN** tests verify that complete photo requires authentication and validates photo ownership
-
-#### Scenario: Fail photo test
-- **WHEN** integration tests run
-- **THEN** tests verify that valid photo failure updates photo status and job progress
-
-#### Scenario: Upload job completion test
-- **WHEN** integration tests run
-- **THEN** tests verify that upload job status updates correctly when all photos complete or fail
-
-### Requirement: SSE Integration Tests
-The API SHALL have integration tests that validate Server-Sent Events for real-time upload progress updates.
+### Requirement: SSE Progress Updates Integration Tests
+The API SHALL have integration tests that validate Server-Sent Events for real-time upload progress updates during the upload flow.
 
 #### Scenario: SSE connection test
 - **WHEN** integration tests run
-- **THEN** tests verify that SSE endpoint connects successfully and returns proper headers
+- **THEN** tests simulate client GET to `/api/upload-progress/:jobId` with authentication, verify SSE connection is established, and verify proper content-type headers are returned
 
-#### Scenario: SSE authentication test
+#### Scenario: SSE progress updates during upload test
 - **WHEN** integration tests run
-- **THEN** tests verify that SSE endpoint requires authentication
-
-#### Scenario: SSE progress updates test
-- **WHEN** integration tests run
-- **THEN** tests verify that progress events are emitted when photos complete with correct data format
+- **THEN** tests start SSE connection for upload job, simulate photo completions, verify progress events are received via SSE, verify event data format is correct, and verify job status updates are reflected in events
 
 #### Scenario: SSE error handling test
 - **WHEN** integration tests run
-- **THEN** tests verify that invalid job IDs and unauthorized access return appropriate errors
+- **THEN** tests verify that invalid job IDs, non-existent jobs, and unauthorized access return appropriate errors
 
 ### Requirement: Test Scripts
-The API package.json SHALL provide scripts for running tests in different modes.
+The API package.json SHALL provide scripts for running integration tests in different modes.
 
-#### Scenario: Run all tests
+#### Scenario: Run all integration tests
 - **WHEN** a developer runs `pnpm test`
-- **THEN** all integration tests execute and results are displayed
+- **THEN** all end-to-end integration tests execute and results are displayed
 
 #### Scenario: Run tests in watch mode
 - **WHEN** a developer runs `pnpm test:watch`
 - **THEN** tests run in watch mode and re-execute on file changes
 
-#### Scenario: Run tests with UI
-- **WHEN** a developer runs `pnpm test:ui`
-- **THEN** Vitest UI opens with test results and coverage
-
-#### Scenario: Run tests with coverage
-- **WHEN** a developer runs `pnpm test:coverage`
-- **THEN** tests execute and coverage report is generated
-
+#### Scenario: Run integration tests only
+- **WHEN** a developer runs `pnpm test:integration`
+- **THEN** only integration tests execute

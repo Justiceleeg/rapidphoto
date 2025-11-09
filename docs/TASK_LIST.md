@@ -1233,45 +1233,79 @@
 
 **Verification**: API has proper error handling, validation, logging
 
-### Chunk 5.2: Integration Tests
+### Chunk 5.2: End-to-End Integration Tests
 
 **Prerequisites**: [S5-06]
+
+**Note**: Integration tests MUST validate the complete upload process from simulated client (mobile/web) through backend services to successful persistent storage in cloud object store (R2).
 
 - **[S5-07]** Install testing dependencies
   - **Time**: 10 min | **Complexity**: Low
   - **Dependencies**: [S1-01]
-  - **Commands**: `pnpm add -D vitest @vitest/ui`
+  - **Commands**: Install test framework (e.g., `vitest` or `node:test`), HTTP client (e.g., `undici` or `node-fetch`), test utilities
+  - **Note**: Choose framework that supports end-to-end integration testing
 
-- **[S5-08]** Configure Vitest
-  - **Time**: 20 min | **Complexity**: Low
+- **[S5-08]** Create test server setup
+  - **Time**: 30 min | **Complexity**: Medium
   - **Dependencies**: [S5-07]
-  - **File**: `apps/api/vitest.config.ts`
+  - **File**: `apps/api/tests/setup/test-server.ts`
+  - **Note**: Start actual Hono app with test database/R2 configuration
 
 - **[S5-09]** Create test database setup
   - **Time**: 30 min | **Complexity**: Medium
   - **Dependencies**: [S5-08]
+  - **File**: `apps/api/tests/setup/test-database.ts`
+  - **Note**: Separate test database, run migrations, cleanup utilities
 
-- **[S5-10]** Create integration test for auth flow
-  - **Time**: 45 min | **Complexity**: High
-  - **Dependencies**: [S5-09]
-  - **File**: `apps/api/tests/integration/auth.test.ts`
-
-- **[S5-11]** Create integration test for upload flow
-  - **Time**: 1 hour | **Complexity**: High
-  - **Dependencies**: [S5-09]
-  - **File**: `apps/api/tests/integration/upload.test.ts`
-
-- **[S5-12]** Create integration test for SSE
-  - **Time**: 45 min | **Complexity**: High
-  - **Dependencies**: [S5-09]
-  - **File**: `apps/api/tests/integration/sse.test.ts`
-
-- **[S5-13]** Run all tests and fix failures
+- **[S5-10]** Create test R2 bucket utilities
   - **Time**: 30 min | **Complexity**: Medium
-  - **Dependencies**: [S5-12]
-  - **Command**: `pnpm test`
+  - **Dependencies**: [S5-08]
+  - **File**: `apps/api/tests/setup/test-r2.ts`
+  - **Note**: Configure test R2 bucket, upload/verify/cleanup utilities
 
-**Verification**: All integration tests pass
+- **[S5-11]** Create client simulation helpers
+  - **Time**: 30 min | **Complexity**: Medium
+  - **Dependencies**: [S5-08]
+  - **File**: `apps/api/tests/setup/test-client.ts`
+  - **Note**: Authenticated HTTP requests, file uploads to presigned URLs, session management
+
+- **[S5-12]** Create end-to-end integration test for auth flow
+  - **Time**: 45 min | **Complexity**: High
+  - **Dependencies**: [S5-11]
+  - **File**: `apps/api/tests/integration/auth-flow.test.ts`
+  - **Note**: Simulate client requests (signup, signin, session), verify database state
+
+- **[S5-13]** Create end-to-end integration test for upload flow
+  - **Time**: 2 hours | **Complexity**: High
+  - **Dependencies**: [S5-11], [S5-10]
+  - **File**: `apps/api/tests/integration/upload-flow.test.ts`
+  - **Note**: 
+    - Simulate client authentication
+    - Initialize upload, actually upload files to R2 using presigned URLs
+    - Verify files exist in R2 bucket
+    - Complete upload, verify database state matches R2 state
+    - Test single and batch uploads
+    - Test concurrent uploads
+
+- **[S5-14]** Create integration test for SSE progress updates
+  - **Time**: 45 min | **Complexity**: High
+  - **Dependencies**: [S5-13]
+  - **File**: `apps/api/tests/integration/sse-flow.test.ts`
+  - **Note**: Test SSE connection, progress events during upload flow
+
+- **[S5-15]** Add test scripts to package.json
+  - **Time**: 10 min | **Complexity**: Low
+  - **Dependencies**: [S5-07]
+  - **File**: `apps/api/package.json`
+  - **Scripts**: `test`, `test:watch`, `test:integration`
+
+- **[S5-16]** Run all tests and fix failures
+  - **Time**: 1 hour | **Complexity**: Medium
+  - **Dependencies**: [S5-14]
+  - **Command**: `pnpm test`
+  - **Note**: Verify all end-to-end tests pass, verify R2 storage verification works
+
+**Verification**: All end-to-end integration tests pass, tests validate complete flow from client → API → database → R2 storage
 
 ### Chunk 5.3: Frontend Polish (Web)
 
@@ -1346,7 +1380,7 @@
 
 ### Chunk 5.5: Documentation
 
-**Prerequisites**: [S5-13]
+**Prerequisites**: [S5-16]
 
 - **[S5-27]** Write comprehensive README.md
   - **Time**: 1 hour | **Complexity**: Medium
@@ -1985,7 +2019,9 @@
 - ✅ Gallery deployed and working
 
 ### Slice 5: Polish & Testing
-- ✅ All integration tests pass
+- ✅ All end-to-end integration tests pass
+- ✅ Tests validate complete flow: client → API → database → R2 storage
+- ✅ Tests actually upload files to R2 and verify storage
 - ✅ Performance benchmarks met
 - ✅ Documentation complete
 - ✅ Production deployment successful

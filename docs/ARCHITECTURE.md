@@ -13,7 +13,8 @@
 10. [Mobile Architecture](#mobile-architecture)
 11. [Deployment Architecture](#deployment-architecture)
 12. [Security Architecture](#security-architecture)
-13. [Scalability Considerations](#scalability-considerations)
+13. [Testing Architecture](#testing-architecture)
+14. [Scalability Considerations](#scalability-considerations)
 
 ---
 
@@ -145,8 +146,10 @@ Database: PostgreSQL (Railway)
 Authentication: Better-Auth
 Storage: Cloudflare R2 (S3-compatible)
 Real-time: Server-Sent Events (SSE)
-Testing: Vitest
+Testing: End-to-end integration tests (test framework + HTTP client)
 ```
+<｜tool▁calls▁begin｜><｜tool▁call▁begin｜>
+grep
 
 ### Frontend Web
 ```yaml
@@ -1583,6 +1586,71 @@ Storage:
 - Direct upload to R2: Limited by user bandwidth
 - Global edge network ensures low latency
 ✅ Target: < 100ms URL generation
+```
+
+---
+
+## Testing Architecture
+
+### End-to-End Integration Testing
+
+The system implements comprehensive end-to-end integration tests that validate the complete upload process from simulated client requests through backend services to successful persistent storage in cloud object store (R2).
+
+**Testing Requirements:**
+- **MUST** validate the complete upload process from client (simulated mobile/web) through backend services to successful persistent storage in cloud object store
+- Tests simulate actual client behavior (HTTP requests, file uploads)
+- Tests verify database state matches R2 storage state
+- Tests validate the full flow: client → API → database → R2 storage
+
+### Test Infrastructure
+
+```
+apps/api/tests/
+├── setup/
+│   ├── test-server.ts          # Start actual Hono app
+│   ├── test-database.ts        # Test database setup/teardown
+│   ├── test-r2.ts              # Test R2 bucket utilities
+│   └── test-client.ts          # Client simulation helpers
+│
+└── integration/
+    ├── auth-flow.test.ts       # Authentication flow tests
+    ├── upload-flow.test.ts     # End-to-end upload tests
+    └── sse-flow.test.ts        # SSE progress update tests
+```
+
+### Test Flow
+
+**End-to-End Upload Test:**
+1. Simulate client authentication (signup/signin)
+2. Simulate client POST to `/api/upload/init` with photo metadata
+3. Verify upload job and photo records created in database
+4. Verify presigned URLs returned
+5. **Actually upload test files to R2 using presigned URLs**
+6. **Verify files exist in R2 bucket**
+7. Simulate client POST to `/api/photos/:id/complete`
+8. Verify photo status updated in database
+9. Verify upload job progress updated
+10. Verify database state matches R2 storage state
+
+**Key Testing Principles:**
+- ✅ Tests use actual Hono application (not mocked)
+- ✅ Tests use separate test database (migrations applied)
+- ✅ Tests use test R2 bucket (or separate test bucket)
+- ✅ Tests actually upload files to R2 (not mocked)
+- ✅ Tests verify files are stored correctly in R2
+- ✅ Tests verify database state matches R2 state
+- ✅ Tests simulate client behavior (HTTP requests, cookies, file uploads)
+
+### Test Scripts
+
+```json
+{
+  "scripts": {
+    "test": "Run all integration tests",
+    "test:watch": "Run tests in watch mode",
+    "test:integration": "Run only integration tests"
+  }
+}
 ```
 
 ---

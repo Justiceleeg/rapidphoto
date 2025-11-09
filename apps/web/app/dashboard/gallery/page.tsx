@@ -77,6 +77,83 @@ export default function GalleryPage() {
     },
   });
 
+  // Accept AI tag mutation
+  const acceptTagMutation = useMutation({
+    mutationFn: ({ photoId, tag }: { photoId: string; tag: string }) =>
+      photoClient.acceptTag(photoId, tag),
+    onMutate: async ({ photoId, tag }) => {
+      // Optimistically update the UI
+      if (selectedPhoto && selectedPhoto.id === photoId) {
+        const updatedPhoto = {
+          ...selectedPhoto,
+          tags: [...(selectedPhoto.tags || []), tag],
+          suggestedTags: (selectedPhoto.suggestedTags || []).filter((t) => t !== tag),
+        };
+        setSelectedPhoto(updatedPhoto);
+
+        // Update cache
+        queryClient.setQueryData(
+          ["photos", page, limit],
+          (oldData: { photos: Photo[]; pagination: unknown } | undefined) => {
+            if (!oldData) return oldData;
+            return {
+              ...oldData,
+              photos: oldData.photos.map((photo: Photo) =>
+                photo.id === photoId ? updatedPhoto : photo
+              ),
+            };
+          }
+        );
+      }
+    },
+    onSuccess: () => {
+      toast.success("Tag accepted");
+    },
+    onError: (error: Error) => {
+      toast.error(error.message || "Failed to accept tag");
+      // Refetch on error to sync state
+      queryClient.invalidateQueries({ queryKey: ["photos"] });
+    },
+  });
+
+  // Reject AI tag mutation
+  const rejectTagMutation = useMutation({
+    mutationFn: ({ photoId, tag }: { photoId: string; tag: string }) =>
+      photoClient.rejectTag(photoId, tag),
+    onMutate: async ({ photoId, tag }) => {
+      // Optimistically update the UI
+      if (selectedPhoto && selectedPhoto.id === photoId) {
+        const updatedPhoto = {
+          ...selectedPhoto,
+          suggestedTags: (selectedPhoto.suggestedTags || []).filter((t) => t !== tag),
+        };
+        setSelectedPhoto(updatedPhoto);
+
+        // Update cache
+        queryClient.setQueryData(
+          ["photos", page, limit],
+          (oldData: { photos: Photo[]; pagination: unknown } | undefined) => {
+            if (!oldData) return oldData;
+            return {
+              ...oldData,
+              photos: oldData.photos.map((photo: Photo) =>
+                photo.id === photoId ? updatedPhoto : photo
+              ),
+            };
+          }
+        );
+      }
+    },
+    onSuccess: () => {
+      toast.success("Tag rejected");
+    },
+    onError: (error: Error) => {
+      toast.error(error.message || "Failed to reject tag");
+      // Refetch on error to sync state
+      queryClient.invalidateQueries({ queryKey: ["photos"] });
+    },
+  });
+
   const handlePhotoClick = (photo: Photo) => {
     setSelectedPhoto(photo);
     setIsModalOpen(true);
@@ -98,6 +175,14 @@ export default function GalleryPage() {
       return;
     }
     updateTagsMutation.mutate({ photoId, tags });
+  };
+
+  const handleAcceptTag = (photoId: string, tag: string) => {
+    acceptTagMutation.mutate({ photoId, tag });
+  };
+
+  const handleRejectTag = (photoId: string, tag: string) => {
+    rejectTagMutation.mutate({ photoId, tag });
   };
 
   const handlePreviousPage = () => {
@@ -193,6 +278,8 @@ export default function GalleryPage() {
         onClose={handleCloseModal}
         onDelete={handleDelete}
         onUpdateTags={handleUpdateTags}
+        onAcceptTag={handleAcceptTag}
+        onRejectTag={handleRejectTag}
       />
     </div>
   );

@@ -12,7 +12,7 @@ import {
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Download, Trash2 } from "lucide-react";
+import { Download, Trash2, Check, X, Sparkles } from "lucide-react";
 import { TagInput } from "./TagInput";
 
 interface PhotoModalProps {
@@ -21,6 +21,8 @@ interface PhotoModalProps {
   onClose: () => void;
   onDelete?: (photoId: string) => void;
   onUpdateTags?: (photoId: string, tags: string[]) => void;
+  onAcceptTag?: (photoId: string, tag: string) => void;
+  onRejectTag?: (photoId: string, tag: string) => void;
 }
 
 export function PhotoModal({
@@ -29,6 +31,8 @@ export function PhotoModal({
   onClose,
   onDelete,
   onUpdateTags,
+  onAcceptTag,
+  onRejectTag,
 }: PhotoModalProps) {
   const [isEditingTags, setIsEditingTags] = useState(false);
 
@@ -41,6 +45,9 @@ export function PhotoModal({
   };
 
   if (!photo) return null;
+
+  // Get first 3 AI-suggested tags
+  const suggestedTags = photo.suggestedTags?.slice(0, 3) || [];
 
   const handleDownload = () => {
     if (photo.url) {
@@ -167,6 +174,43 @@ export function PhotoModal({
               </div>
             )}
           </div>
+
+          {/* AI Suggestions Section */}
+          {suggestedTags.length > 0 && !isEditingTags && (
+            <div className="space-y-2">
+              <div className="flex items-center gap-2">
+                <Sparkles className="size-4 text-purple-500" />
+                <span className="text-sm font-medium">AI Suggestions</span>
+              </div>
+              <div className="flex flex-wrap gap-2">
+                {suggestedTags.map((tag) => (
+                  <div
+                    key={tag}
+                    className="group flex items-center gap-1 rounded-md border border-purple-200 bg-purple-50 px-2 py-1 text-sm dark:border-purple-800 dark:bg-purple-950"
+                  >
+                    <Sparkles className="size-3 text-purple-500" />
+                    <span className="text-purple-700 dark:text-purple-300">{tag}</span>
+                    <div className="ml-1 flex gap-0.5">
+                      <button
+                        onClick={() => onAcceptTag?.(photo.id, tag)}
+                        className="rounded p-0.5 hover:bg-green-100 dark:hover:bg-green-900"
+                        title="Accept tag"
+                      >
+                        <Check className="size-3 text-green-600 dark:text-green-400" />
+                      </button>
+                      <button
+                        onClick={() => onRejectTag?.(photo.id, tag)}
+                        className="rounded p-0.5 hover:bg-red-100 dark:hover:bg-red-900"
+                        title="Reject tag"
+                      >
+                        <X className="size-3 text-red-600 dark:text-red-400" />
+                      </button>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
 
           {/* Action Buttons */}
           <div className="flex justify-between border-t pt-4">

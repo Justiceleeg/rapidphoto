@@ -12,6 +12,7 @@ export interface Photo {
   thumbnailUrl: string | null; // Presigned URL for thumbnail (temporary, expires in 1 hour)
   status: string;
   tags: string[] | null;
+  suggestedTags: string[] | null; // AI-generated tag suggestions (≥70% confidence)
   createdAt: Date;
   updatedAt: Date;
 }
@@ -74,6 +75,20 @@ export class PhotoClient {
     
     // Always send as { tags: [...] }
     return this.client.put<Photo>(`/api/photos/${id}/tags`, { tags });
+  }
+
+  /**
+   * Accept an AI-suggested tag (moves from suggestedTags to tags)
+   */
+  async acceptTag(id: string, tag: string): Promise<void> {
+    return this.client.post<void>(`/api/photos/${id}/tags/accept`, { tag });
+  }
+
+  /**
+   * Reject an AI-suggested tag (removes from suggestedTags)
+   */
+  async rejectTag(id: string, tag: string): Promise<void> {
+    return this.client.post<void>(`/api/photos/${id}/tags/reject`, { tag });
   }
 }
 

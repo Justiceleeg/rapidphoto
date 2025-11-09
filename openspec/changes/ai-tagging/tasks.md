@@ -19,9 +19,9 @@
 - [x] 2.6 Test accept/reject endpoints (verify accept moves tag to `tags`, verify reject removes from `suggested_tags`, verify authorization)
 
 ## 3. Web Frontend - AI Suggestions
-- [ ] 3.1 Update photo client with accept/reject methods (`packages/api-client/src/photo.client.ts` - add `acceptTag(photoId, tag)` and `rejectTag(photoId, tag)`)
-- [ ] 3.2 Update PhotoModal to display AI suggestions (`apps/web/components/gallery/PhotoModal.tsx` - show `suggested_tags` separately with different styling, add Accept/Reject buttons)
-- [ ] 3.3 Add accept/reject handlers (`apps/web/components/gallery/PhotoModal.tsx` - handle accept/reject actions, update UI optimistically)
+- [x] 3.1 Update photo client with accept/reject methods (`packages/api-client/src/photo.client.ts` - add `acceptTag(photoId, tag)` and `rejectTag(photoId, tag)`)
+- [x] 3.2 Update PhotoModal to display AI suggestions (`apps/web/components/gallery/PhotoModal.tsx` - show `suggested_tags` separately with different styling, add Accept/Reject buttons)
+- [x] 3.3 Add accept/reject handlers (`apps/web/components/gallery/PhotoModal.tsx` - handle accept/reject actions, update UI optimistically)
 - [ ] 3.4 Test AI suggestions in PhotoModal (verify AI suggestions display, verify accept moves to tags, verify reject removes)
 
 ## 4. Mobile Frontend - AI Suggestions

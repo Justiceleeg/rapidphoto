@@ -57,6 +57,7 @@ export class GetPhotosHandler {
           thumbnailUrl, // Presigned URL for thumbnail
           status: photo.status,
           tags: photo.tags,
+          suggestedTags: photo.suggestedTags, // AI-generated tag suggestions
           createdAt: photo.createdAt,
           updatedAt: photo.updatedAt,
         };

@@ -34,6 +34,8 @@ export interface GetPhotoResult {
   status: string;
   /** User-defined tags */
   tags: string[] | null;
+  /** AI-generated tag suggestions (≥70% confidence) */
+  suggestedTags: string[] | null;
   /** Creation timestamp */
   createdAt: Date;
   /** Last update timestamp */

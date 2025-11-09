@@ -132,6 +132,11 @@ photoRoutes.put("/:id/tags", authMiddleware, async (c) => {
     }
 
     const body = await c.req.json();
+    
+    if (!body || typeof body !== "object") {
+      return c.json({ error: "Request body must be an object" }, 400);
+    }
+    
     if (!body.tags || !Array.isArray(body.tags)) {
       return c.json({ error: "Tags must be an array" }, 400);
     }

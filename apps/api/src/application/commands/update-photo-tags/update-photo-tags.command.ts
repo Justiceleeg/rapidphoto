@@ -7,7 +7,6 @@ export interface UpdatePhotoTagsCommand {
 export interface UpdatePhotoTagsResult {
   id: string;
   filename: string;
-  r2Url: string | null;
   status: string;
   tags: string[] | null;
   createdAt: Date;

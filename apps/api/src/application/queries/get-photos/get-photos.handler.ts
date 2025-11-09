@@ -36,14 +36,14 @@ export class GetPhotosHandler {
           ? await this.r2Service.generatePresignedGetUrl(photo.r2Key)
           : null;
 
-        return {
-          id: photo.id,
-          filename: photo.filename,
+    return {
+        id: photo.id,
+        filename: photo.filename,
           url, // Presigned URL for viewing/downloading
-          status: photo.status,
-          tags: photo.tags,
-          createdAt: photo.createdAt,
-          updatedAt: photo.updatedAt,
+        status: photo.status,
+        tags: photo.tags,
+        createdAt: photo.createdAt,
+        updatedAt: photo.updatedAt,
         };
       })
     );

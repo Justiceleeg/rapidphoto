@@ -45,10 +45,11 @@ export class UpdatePhotoTagsHandler {
       tags: normalizedTags.length > 0 ? normalizedTags : null,
     });
 
+    // Return minimal data - no need to regenerate presigned URL for tag updates
+    // The client will keep using the existing URL from the photo they already have
     return {
       id: updated.id,
       filename: updated.filename,
-      r2Url: updated.r2Url,
       status: updated.status,
       tags: updated.tags,
       createdAt: updated.createdAt,

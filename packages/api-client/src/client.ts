@@ -16,9 +16,9 @@ export class ApiClient {
   private defaultHeaders: Record<string, string>;
 
   constructor(config: ApiClientConfig) {
-    this.baseURL = config.baseURL.replace(/\/$/, ''); // Remove trailing slash
+    this.baseURL = config.baseURL.replace(/\/$/, ""); // Remove trailing slash
     this.defaultHeaders = {
-      'Content-Type': 'application/json',
+      "Content-Type": "application/json",
       ...config.headers,
     };
   }
@@ -26,9 +26,14 @@ export class ApiClient {
   /**
    * Build URL with query parameters
    */
-  private buildURL(endpoint: string, params?: Record<string, string | number | boolean>): string {
-    const url = `${this.baseURL}${endpoint.startsWith('/') ? endpoint : `/${endpoint}`}`;
-    
+  private buildURL(
+    endpoint: string,
+    params?: Record<string, string | number | boolean>
+  ): string {
+    const url = `${this.baseURL}${
+      endpoint.startsWith("/") ? endpoint : `/${endpoint}`
+    }`;
+
     if (!params || Object.keys(params).length === 0) {
       return url;
     }
@@ -57,9 +62,9 @@ export class ApiClient {
   async get<T>(endpoint: string, options?: RequestOptions): Promise<T> {
     const url = this.buildURL(endpoint, options?.params);
     const response = await fetch(url, {
-      method: 'GET',
+      method: "GET",
       headers: this.getHeaders(options?.headers as Record<string, string>),
-      credentials: options?.credentials || 'same-origin',
+      credentials: options?.credentials || "same-origin",
       ...options,
     });
 
@@ -69,13 +74,17 @@ export class ApiClient {
   /**
    * Make a POST request
    */
-  async post<T>(endpoint: string, data?: unknown, options?: RequestOptions): Promise<T> {
+  async post<T>(
+    endpoint: string,
+    data?: unknown,
+    options?: RequestOptions
+  ): Promise<T> {
     const url = this.buildURL(endpoint, options?.params);
     const response = await fetch(url, {
-      method: 'POST',
+      method: "POST",
       headers: this.getHeaders(options?.headers as Record<string, string>),
       body: data ? JSON.stringify(data) : undefined,
-      credentials: options?.credentials || 'same-origin',
+      credentials: options?.credentials || "same-origin",
       ...options,
     });
 
@@ -85,13 +94,21 @@ export class ApiClient {
   /**
    * Make a PUT request
    */
-  async put<T>(endpoint: string, data?: unknown, options?: RequestOptions): Promise<T> {
+  async put<T>(
+    endpoint: string,
+    data?: unknown,
+    options?: RequestOptions
+  ): Promise<T> {
     const url = this.buildURL(endpoint, options?.params);
+
+    // Extract body from options if present to avoid overriding our data
+    const { body: _optionsBody, ...restOptions } = options || {};
+
     const response = await fetch(url, {
-      method: 'PUT',
+      method: "PUT",
       headers: this.getHeaders(options?.headers as Record<string, string>),
       body: data ? JSON.stringify(data) : undefined,
-      ...options,
+      ...restOptions,
     });
 
     return this.handleResponse<T>(response);
@@ -100,10 +117,14 @@ export class ApiClient {
   /**
    * Make a PATCH request
    */
-  async patch<T>(endpoint: string, data?: unknown, options?: RequestOptions): Promise<T> {
+  async patch<T>(
+    endpoint: string,
+    data?: unknown,
+    options?: RequestOptions
+  ): Promise<T> {
     const url = this.buildURL(endpoint, options?.params);
     const response = await fetch(url, {
-      method: 'PATCH',
+      method: "PATCH",
       headers: this.getHeaders(options?.headers as Record<string, string>),
       body: data ? JSON.stringify(data) : undefined,
       ...options,
@@ -118,7 +139,7 @@ export class ApiClient {
   async delete<T>(endpoint: string, options?: RequestOptions): Promise<T> {
     const url = this.buildURL(endpoint, options?.params);
     const response = await fetch(url, {
-      method: 'DELETE',
+      method: "DELETE",
       headers: this.getHeaders(options?.headers as Record<string, string>),
       ...options,
     });
@@ -136,7 +157,11 @@ export class ApiClient {
         const errorText = await response.text();
         if (errorText) {
           try {
-            const error = JSON.parse(errorText) as { message?: string; error?: string; status?: number };
+            const error = JSON.parse(errorText) as {
+              message?: string;
+              error?: string;
+              status?: number;
+            };
             errorMessage = error.message || error.error || errorMessage;
           } catch {
             errorMessage = errorText || errorMessage;
@@ -150,8 +175,8 @@ export class ApiClient {
     }
 
     // Handle empty responses
-    const contentType = response.headers.get('content-type');
-    if (!contentType || !contentType.includes('application/json')) {
+    const contentType = response.headers.get("content-type");
+    if (!contentType || !contentType.includes("application/json")) {
       return {} as T;
     }
 
@@ -165,4 +190,3 @@ export class ApiClient {
 export function createApiClient(config: ApiClientConfig): ApiClient {
   return new ApiClient(config);
 }
-

@@ -1,6 +1,6 @@
 "use client";
 
-import { createApiClient, UploadClient } from "@rapidphoto/api-client";
+import { createApiClient, UploadClient, PhotoClient } from "@rapidphoto/api-client";
 
 const apiUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:4000";
 
@@ -11,4 +11,7 @@ const apiClient = createApiClient({
 
 // Create upload client
 export const uploadClient = new UploadClient(apiClient);
+
+// Create photo client
+export const photoClient = new PhotoClient(apiClient);
 

@@ -8,7 +8,7 @@
 - [x] 1.7 Create AI tagging worker (`apps/api/src/infrastructure/queue/workers/ai-tagging.worker.ts` - download image, call Rekognition DetectLabels, filter ≥70% confidence, store in `suggested_tags`)
 - [x] 1.8 Register AI tagging worker (`apps/api/src/infrastructure/queue/workers/index.ts`)
 - [x] 1.9 Queue tagging job after photo completion (`apps/api/src/application/commands/complete-photo/complete-photo.handler.ts` - queue AI tagging job alongside thumbnail job)
-- [ ] 1.10 Test AI tagging worker (upload photo, verify job queued, verify tags generated with ≥70% confidence, verify stored in `suggested_tags`)
+- [x] 1.10 Test AI tagging worker (upload photo, verify job queued, verify tags generated with ≥70% confidence, verify stored in `suggested_tags`)
 
 ## 2. Backend - AI Tag Acceptance/Rejection
 - [x] 2.1 Create AcceptTagCommand DTO (`apps/api/src/application/commands/accept-tag/accept-tag.command.ts`)
@@ -22,14 +22,14 @@
 - [x] 3.1 Update photo client with accept/reject methods (`packages/api-client/src/photo.client.ts` - add `acceptTag(photoId, tag)` and `rejectTag(photoId, tag)`)
 - [x] 3.2 Update PhotoModal to display AI suggestions (`apps/web/components/gallery/PhotoModal.tsx` - show `suggested_tags` separately with different styling, add Accept/Reject buttons)
 - [x] 3.3 Add accept/reject handlers (`apps/web/components/gallery/PhotoModal.tsx` - handle accept/reject actions, update UI optimistically)
-- [ ] 3.4 Test AI suggestions in PhotoModal (verify AI suggestions display, verify accept moves to tags, verify reject removes)
+- [x] 3.4 Test AI suggestions in PhotoModal (verify AI suggestions display, verify accept moves to tags, verify reject removes)
 
 ## 4. Mobile Frontend - AI Suggestions
 - [x] 4.1 Update PhotoViewer to show AI suggestions (`apps/mobile/components/gallery/PhotoViewer.tsx` - display `suggested_tags` separately with different styling, add Accept/Reject buttons)
 - [x] 4.2 Test mobile AI suggestions (verify display, verify accept/reject actions, test on iOS and Android)
 
 ## 5. Deploy AI Tagging
-- [ ] 5.1 Update API environment variables with AWS credentials (set `AWS_ACCESS_KEY_ID`, `AWS_SECRET_ACCESS_KEY`, `AWS_REGION` on Railway)
-- [ ] 5.2 Redeploy API with AI tagging (push changes, verify Railway auto-deploys)
-- [ ] 5.3 Test AI tagging in production (upload photo, verify AI tagging job runs, verify tags generated with ≥70% confidence, verify accept/reject works on web and mobile)
+- [x] 5.1 Update API environment variables with AWS credentials (set `AWS_ACCESS_KEY_ID`, `AWS_SECRET_ACCESS_KEY`, `AWS_REGION` on Railway)
+- [x] 5.2 Redeploy API with AI tagging (push changes, verify Railway auto-deploys)
+- [x] 5.3 Test AI tagging in production (upload photo, verify AI tagging job runs, verify tags generated with ≥70% confidence, verify accept/reject works on web and mobile)
 

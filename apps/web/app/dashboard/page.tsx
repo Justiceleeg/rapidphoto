@@ -4,7 +4,8 @@ import { useAuth } from "@/lib/hooks/use-auth";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 import Link from "next/link";
-import { YStack, Text, H1, Button, XStack } from "tamagui";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 
 export default function DashboardPage() {
   const { user, signOut } = useAuth();
@@ -21,42 +22,29 @@ export default function DashboardPage() {
   };
 
   return (
-    <YStack padding="$4" space="$4">
-      <YStack
-        borderWidth={4}
-        borderStyle="dashed"
-        borderColor="$gray6"
-        borderRadius="$4"
-        padding="$4"
-        space="$4"
-      >
-        <H1 fontSize="$9" fontWeight="bold" marginBottom="$2">
-          Welcome to RapidPhoto
-        </H1>
-        <Text fontSize="$4" color="$gray11" marginBottom="$3">
-          You are logged in as {user?.name || user?.email}
-        </Text>
-        <XStack space="$3">
-          <Button
-            asChild
-            backgroundColor="$blue9"
-            size="$4"
-            flex={1}
-          >
+    <div className="space-y-4">
+      <Card className="border-dashed border-4">
+        <CardHeader>
+          <CardTitle className="text-3xl">Welcome to RapidPhoto</CardTitle>
+          <CardDescription>
+            You are logged in as {user?.name || user?.email}
+          </CardDescription>
+        </CardHeader>
+        <CardContent className="flex gap-3">
+          <Button asChild className="flex-1">
             <Link href="/upload">
               Upload Photo
             </Link>
           </Button>
           <Button
-            onPress={handleSignOut}
-            backgroundColor="$red9"
-            size="$4"
+            onClick={handleSignOut}
+            variant="destructive"
           >
             Sign Out
           </Button>
-        </XStack>
-      </YStack>
-    </YStack>
+        </CardContent>
+      </Card>
+    </div>
   );
 }
 

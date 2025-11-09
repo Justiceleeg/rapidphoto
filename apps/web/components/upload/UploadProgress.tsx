@@ -1,8 +1,10 @@
 "use client";
 
 import { useEffect, useState, useRef } from "react";
-import { YStack, XStack, Text, Progress, Card } from "tamagui";
 import { useUploadStore } from "@/lib/stores/upload-store";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Progress } from "@/components/ui/progress";
+import { cn } from "@/lib/utils";
 
 interface ProgressEvent {
   jobId: string;
@@ -97,95 +99,66 @@ export function UploadProgress({ jobId }: UploadProgressProps) {
   const photoUploadsArray = Object.values(photoUploads);
 
   return (
-    <Card
-      padding="$4"
-      backgroundColor="$gray2"
-      borderWidth={1}
-      borderColor="$gray8"
-      borderRadius="$4"
-    >
-      <YStack space="$4">
-        <XStack alignItems="center" justifyContent="space-between">
-          <Text fontSize="$6" fontWeight="bold">
-            Upload Progress
-          </Text>
-          <XStack alignItems="center" space="$2">
-            <Text
-              fontSize="$3"
-              color={isConnected ? "$green10" : "$gray10"}
-            >
-              {isConnected ? "● Connected" : "○ Disconnected"}
-            </Text>
-          </XStack>
-        </XStack>
-
-        <YStack space="$2">
-          <XStack alignItems="center" justifyContent="space-between">
-            <Text fontSize="$4" color="$gray11">
-              Overall Progress
-            </Text>
-            <Text fontSize="$4" fontWeight="bold">
+    <Card className="bg-muted/50">
+      <CardHeader>
+        <div className="flex items-center justify-between">
+          <CardTitle>Upload Progress</CardTitle>
+          <p className={cn(
+            "text-sm",
+            isConnected ? "text-green-600" : "text-muted-foreground"
+          )}>
+            {isConnected ? "● Connected" : "○ Disconnected"}
+          </p>
+        </div>
+      </CardHeader>
+      <CardContent className="space-y-4">
+        <div className="space-y-2">
+          <div className="flex items-center justify-between">
+            <p className="text-sm text-muted-foreground">Overall Progress</p>
+            <p className="text-sm font-semibold">
               {currentProgress.completedPhotos + currentProgress.failedPhotos} /{" "}
               {currentProgress.totalPhotos}
-            </Text>
-          </XStack>
-          <Progress
-            value={progressPercentage}
-            max={100}
-            backgroundColor="$gray6"
-            borderColor="$gray8"
-          >
-            <Progress.Indicator
-              animation="bouncy"
-              backgroundColor="$blue9"
-            />
-          </Progress>
-        </YStack>
+            </p>
+          </div>
+          <Progress value={progressPercentage} className="h-2" />
+        </div>
 
-        <XStack space="$4" justifyContent="space-around">
-          <YStack alignItems="center">
-            <Text fontSize="$5" fontWeight="bold" color="$green10">
+        <div className="flex justify-around gap-4">
+          <div className="text-center">
+            <p className="text-lg font-bold text-green-600">
               {currentProgress.completedPhotos}
-            </Text>
-            <Text fontSize="$3" color="$gray10">
-              Completed
-            </Text>
-          </YStack>
-          <YStack alignItems="center">
-            <Text fontSize="$5" fontWeight="bold" color="$red10">
+            </p>
+            <p className="text-xs text-muted-foreground">Completed</p>
+          </div>
+          <div className="text-center">
+            <p className="text-lg font-bold text-destructive">
               {currentProgress.failedPhotos}
-            </Text>
-            <Text fontSize="$3" color="$gray10">
-              Failed
-            </Text>
-          </YStack>
-          <YStack alignItems="center">
-            <Text fontSize="$5" fontWeight="bold" color="$gray11">
+            </p>
+            <p className="text-xs text-muted-foreground">Failed</p>
+          </div>
+          <div className="text-center">
+            <p className="text-lg font-bold text-muted-foreground">
               {currentProgress.totalPhotos -
                 currentProgress.completedPhotos -
                 currentProgress.failedPhotos}
-            </Text>
-            <Text fontSize="$3" color="$gray10">
-              Pending
-            </Text>
-          </YStack>
-        </XStack>
+            </p>
+            <p className="text-xs text-muted-foreground">Pending</p>
+          </div>
+        </div>
 
         {photoUploadsArray.length > 0 && (
-          <YStack space="$2">
-            <Text fontSize="$4" fontWeight="bold" marginTop="$2">
-              Individual Photos
-            </Text>
-            <YStack space="$2" maxHeight={300} overflow="scroll">
-              {photoUploadsArray.map((upload, index) => {
+          <div className="space-y-2">
+            <p className="text-sm font-semibold mt-2">Individual Photos</p>
+            <div className="space-y-2 max-h-[300px] overflow-y-auto">
+              {photoUploadsArray.map((upload) => {
                 const statusColor =
                   upload.status === "completed"
-                    ? "$green10"
+                    ? "text-green-600"
                     : upload.status === "failed"
-                    ? "$red10"
+                    ? "text-destructive"
                     : upload.status === "uploading"
-                    ? "$blue10"
-                    : "$gray10";
+                    ? "text-primary"
+                    : "text-muted-foreground";
 
                 const statusIcon =
                   upload.status === "completed"
@@ -197,39 +170,32 @@ export function UploadProgress({ jobId }: UploadProgressProps) {
                     : "○";
 
                 return (
-                  <Card
-                    key={upload.file.name}
-                    padding="$2"
-                    backgroundColor="$gray1"
-                    borderWidth={1}
-                    borderColor="$gray7"
-                    borderRadius="$2"
-                  >
-                    <XStack alignItems="center" space="$2">
-                      <Text fontSize="$4" color={statusColor}>
+                  <Card key={upload.file.name} className="p-2 bg-background">
+                    <div className="flex items-center gap-2">
+                      <p className={cn("text-sm", statusColor)}>
                         {statusIcon}
-                      </Text>
-                      <YStack flex={1} space="$1">
-                        <Text fontSize="$3" numberOfLines={1}>
+                      </p>
+                      <div className="flex-1 space-y-1 min-w-0">
+                        <p className="text-xs truncate">
                           {upload.file.name}
-                        </Text>
+                        </p>
                         {upload.error && (
-                          <Text fontSize="$2" color="$red10">
+                          <p className="text-xs text-destructive">
                             {upload.error}
-                          </Text>
+                          </p>
                         )}
-                      </YStack>
-                      <Text fontSize="$2" color="$gray10">
+                      </div>
+                      <p className="text-xs text-muted-foreground">
                         {upload.status}
-                      </Text>
-                    </XStack>
+                      </p>
+                    </div>
                   </Card>
                 );
               })}
-            </YStack>
-          </YStack>
+            </div>
+          </div>
         )}
-      </YStack>
+      </CardContent>
     </Card>
   );
 }

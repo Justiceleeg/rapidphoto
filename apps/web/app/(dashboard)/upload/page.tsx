@@ -7,7 +7,7 @@ import { useUploadStore } from "@/lib/stores/upload-store";
 import { DropZone } from "@/components/upload/DropZone";
 import { ImagePreview } from "@/components/upload/ImagePreview";
 import { UploadProgress } from "@/components/upload/UploadProgress";
-import { YStack, Button, Text, H1 } from "tamagui";
+import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
 
 export default function UploadPage() {
@@ -109,9 +109,9 @@ export default function UploadPage() {
 
   if (isLoading) {
     return (
-      <YStack minHeight="100vh" alignItems="center" justifyContent="center">
-        <Text fontSize="$6">Loading...</Text>
-      </YStack>
+      <div className="min-h-screen flex items-center justify-center">
+        <p className="text-lg">Loading...</p>
+      </div>
     );
   }
 
@@ -120,28 +120,27 @@ export default function UploadPage() {
   }
 
   return (
-    <YStack padding="$4" space="$4" maxWidth={800} width="100%">
-      <H1 fontSize="$9" fontWeight="bold" marginBottom="$2">
+    <div className="space-y-4 max-w-3xl w-full">
+      <h1 className="text-3xl font-bold mb-2">
         Upload {isBatchUpload ? "Photos" : "Photo"}
-      </H1>
+      </h1>
 
       <DropZone />
 
       {isBatchUpload && selectedFiles.length > 0 && (
-        <YStack space="$3">
-          <Text fontSize="$4" color="$gray11">
+        <div className="space-y-3">
+          <p className="text-sm text-muted-foreground">
             {selectedFiles.length} file{selectedFiles.length !== 1 ? "s" : ""}{" "}
             selected
-          </Text>
+          </p>
           <Button
-            onPress={handleUpload}
+            onClick={handleUpload}
             disabled={
               uploadState === "uploading" ||
               uploadState === "pending" ||
               uploadState === "completed"
             }
-            backgroundColor="$blue9"
-            size="$4"
+            className="w-full"
           >
             {uploadState === "uploading"
               ? "Uploading..."
@@ -155,15 +154,14 @@ export default function UploadPage() {
             uploadState === "error" ||
             uploadState === "completed") && (
             <Button
-              onPress={reset}
-              variant="outlined"
-              borderColor="$gray8"
-              size="$4"
+              onClick={reset}
+              variant="outline"
+              className="w-full"
             >
               {uploadState === "completed" ? "Upload More" : "Clear"}
             </Button>
           )}
-        </YStack>
+        </div>
       )}
 
       {isBatchUpload && jobId && <UploadProgress jobId={jobId} />}
@@ -171,16 +169,15 @@ export default function UploadPage() {
       {!isBatchUpload && selectedFile && (
         <>
           <ImagePreview />
-          <YStack space="$3">
+          <div className="space-y-3">
             <Button
-              onPress={handleUpload}
+              onClick={handleUpload}
               disabled={
                 uploadState === "uploading" ||
                 uploadState === "pending" ||
                 uploadState === "completed"
               }
-              backgroundColor="$blue9"
-              size="$4"
+              className="w-full"
             >
               {uploadState === "uploading"
                 ? "Uploading..."
@@ -194,17 +191,16 @@ export default function UploadPage() {
               uploadState === "error" ||
               uploadState === "completed") && (
               <Button
-                onPress={reset}
-                variant="outlined"
-                borderColor="$gray8"
-                size="$4"
+                onClick={reset}
+                variant="outline"
+                className="w-full"
               >
                 {uploadState === "completed" ? "Upload Another" : "Clear"}
               </Button>
             )}
-          </YStack>
+          </div>
         </>
       )}
-    </YStack>
+    </div>
   );
 }

@@ -1,23 +1,14 @@
-"use client";
-
-import { YStack } from "tamagui";
-
 export default function AuthLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
   return (
-    <YStack
-      minHeight="100vh"
-      alignItems="center"
-      justifyContent="center"
-      backgroundColor="$background"
-    >
-      <YStack maxWidth={400} width="100%" space="$4" padding="$4">
+    <div className="min-h-screen flex items-center justify-center bg-background p-4">
+      <div className="w-full max-w-md">
         {children}
-      </YStack>
-    </YStack>
+      </div>
+    </div>
   );
 }
 

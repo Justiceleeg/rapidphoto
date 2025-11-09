@@ -5,7 +5,10 @@ import { useRouter } from "next/navigation";
 import { useAuth } from "@/lib/hooks/use-auth";
 import { toast } from "sonner";
 import Link from "next/link";
-import { YStack, XStack, Input, Button, Label, Text, H1 } from "tamagui";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 
 export default function RegisterPage() {
   const router = useRouter();
@@ -30,73 +33,65 @@ export default function RegisterPage() {
   };
 
   return (
-    <YStack
-      backgroundColor="$background"
-      padding="$4"
-      borderRadius="$4"
-      shadowColor="$shadowColor"
-      shadowOffset={{ width: 0, height: 2 }}
-      shadowOpacity={0.1}
-      shadowRadius={8}
-      elevation={4}
-      space="$4"
-    >
-      <H1 textAlign="center" marginBottom="$2">
-        Register
-      </H1>
-      <form onSubmit={handleSubmit} id="register-form">
-        <YStack space="$4">
-          <YStack space="$2">
-            <Label htmlFor="name">Name</Label>
-            <Input
-              id="name"
-              value={name}
-              onChangeText={setName}
-              placeholder="Enter your name"
-            />
-          </YStack>
-          <YStack space="$2">
-            <Label htmlFor="email">Email</Label>
-            <Input
-              id="email"
-              value={email}
-              onChangeText={setEmail}
-              placeholder="Enter your email"
-            />
-          </YStack>
-          <YStack space="$2">
-            <Label htmlFor="password">Password</Label>
-            <Input
-              id="password"
-              secureTextEntry
-              value={password}
-              onChangeText={setPassword}
-              placeholder="Enter your password"
-            />
-          </YStack>
-          <Button
-            disabled={isLoading}
-            backgroundColor="$blue9"
-            size="$4"
-            onPress={(e) => {
-              e.preventDefault?.();
-              handleSubmit(e as any);
-            }}
-          >
-            {isLoading ? "Registering..." : "Register"}
-          </Button>
-        </YStack>
-      </form>
-      <XStack justifyContent="center" marginTop="$4">
-        <Text fontSize="$3" color="$gray10">
+    <Card className="w-full max-w-md">
+      <CardHeader>
+        <CardTitle className="text-2xl text-center">Register</CardTitle>
+        <CardDescription className="text-center">
+          Create a new account to get started
+        </CardDescription>
+      </CardHeader>
+      <CardContent>
+        <form onSubmit={handleSubmit} id="register-form">
+          <div className="space-y-4">
+            <div className="space-y-2">
+              <Label htmlFor="name">Name</Label>
+              <Input
+                id="name"
+                type="text"
+                value={name}
+                onChange={(e) => setName(e.target.value)}
+                placeholder="Enter your name"
+                required
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="email">Email</Label>
+              <Input
+                id="email"
+                type="email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                placeholder="Enter your email"
+                required
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="password">Password</Label>
+              <Input
+                id="password"
+                type="password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                placeholder="Enter your password"
+                required
+              />
+            </div>
+            <Button
+              type="submit"
+              disabled={isLoading}
+              className="w-full"
+            >
+              {isLoading ? "Registering..." : "Register"}
+            </Button>
+          </div>
+        </form>
+        <div className="mt-4 text-center text-sm text-muted-foreground">
           Already have an account?{" "}
-          <Text asChild>
-            <Link href="/login" style={{ color: "$blue10" }}>
-              Login
-            </Link>
-          </Text>
-        </Text>
-      </XStack>
-    </YStack>
+          <Link href="/login" className="text-primary hover:underline">
+            Login
+          </Link>
+        </div>
+      </CardContent>
+    </Card>
   );
 }

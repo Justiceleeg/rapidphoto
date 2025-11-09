@@ -2,8 +2,8 @@
 
 import { useCallback } from "react";
 import { useDropzone } from "react-dropzone";
-import { YStack, Text, XStack } from "tamagui";
 import { useUploadStore } from "@/lib/stores/upload-store";
+import { cn } from "@/lib/utils";
 
 const MAX_FILE_SIZE = 10 * 1024 * 1024; // 10MB
 const MAX_FILES = 100;
@@ -102,38 +102,31 @@ export function DropZone() {
 
   return (
     <div {...getRootProps()}>
-      <YStack
-        borderWidth={2}
-        borderStyle="dashed"
-        borderColor={isDragActive ? "$blue9" : "$gray8"}
-        borderRadius="$4"
-        padding="$6"
-        backgroundColor={isDragActive ? "$blue2" : "$gray2"}
-        cursor="pointer"
-        opacity={uploadState === "uploading" || uploadState === "pending" ? 0.5 : 1}
-        transition="all 0.2s"
-        hoverStyle={{
-          borderColor: "$blue9",
-          backgroundColor: "$blue2",
-        }}
+      <div
+        className={cn(
+          "border-2 border-dashed rounded-lg p-6 cursor-pointer transition-all",
+          isDragActive
+            ? "border-primary bg-primary/5"
+            : "border-border bg-muted/50",
+          (uploadState === "uploading" || uploadState === "pending") && "opacity-50",
+          "hover:border-primary hover:bg-primary/5"
+        )}
       >
         <input {...getInputProps()} />
-      <XStack alignItems="center" justifyContent="center" space="$3">
-        <Text fontSize="$6" color={isDragActive ? "$blue11" : "$gray11"}>
-          {isDragActive
-            ? "Drop the photos here"
-            : "Drag and drop photos here, or click to select (up to 100)"}
-        </Text>
-      </XStack>
-      <Text
-        fontSize="$3"
-        color="$gray10"
-        textAlign="center"
-        marginTop="$2"
-      >
-        Supported formats: JPG, PNG, GIF, WEBP (max 10MB per file, up to 100 files)
-      </Text>
-      </YStack>
+        <div className="flex items-center justify-center">
+          <p className={cn(
+            "text-base",
+            isDragActive ? "text-primary" : "text-muted-foreground"
+          )}>
+            {isDragActive
+              ? "Drop the photos here"
+              : "Drag and drop photos here, or click to select (up to 100)"}
+          </p>
+        </div>
+        <p className="text-sm text-muted-foreground text-center mt-2">
+          Supported formats: JPG, PNG, GIF, WEBP (max 10MB per file, up to 100 files)
+        </p>
+      </div>
     </div>
   );
 }

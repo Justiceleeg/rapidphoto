@@ -3,7 +3,6 @@
 import { useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/lib/hooks/use-auth";
-import { YStack, Text } from "tamagui";
 
 export default function Home() {
   const router = useRouter();
@@ -20,12 +19,8 @@ export default function Home() {
   }, [isAuthenticated, isLoading, router]);
 
   return (
-    <YStack
-      minHeight="100vh"
-      alignItems="center"
-      justifyContent="center"
-    >
-      <Text fontSize="$6">Loading...</Text>
-    </YStack>
+    <div className="min-h-screen flex items-center justify-center">
+      <p className="text-lg">Loading...</p>
+    </div>
   );
 }

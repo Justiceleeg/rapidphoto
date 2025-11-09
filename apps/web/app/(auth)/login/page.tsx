@@ -5,7 +5,10 @@ import { useRouter } from "next/navigation";
 import { useAuth } from "@/lib/hooks/use-auth";
 import { toast } from "sonner";
 import Link from "next/link";
-import { YStack, XStack, Input, Button, Label, Text, H1 } from "tamagui";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 
 export default function LoginPage() {
   const router = useRouter();
@@ -29,64 +32,54 @@ export default function LoginPage() {
   };
 
   return (
-    <YStack
-      backgroundColor="$background"
-      padding="$4"
-      borderRadius="$4"
-      shadowColor="$shadowColor"
-      shadowOffset={{ width: 0, height: 2 }}
-      shadowOpacity={0.1}
-      shadowRadius={8}
-      elevation={4}
-      space="$4"
-    >
-      <H1 textAlign="center" marginBottom="$2">
-        Login
-      </H1>
-      <form onSubmit={handleSubmit} id="login-form">
-        <YStack space="$4">
-          <YStack space="$2">
-            <Label htmlFor="email">Email</Label>
-            <Input
-              id="email"
-              value={email}
-              onChangeText={setEmail}
-              placeholder="Enter your email"
-            />
-          </YStack>
-          <YStack space="$2">
-            <Label htmlFor="password">Password</Label>
-            <Input
-              id="password"
-              secureTextEntry
-              value={password}
-              onChangeText={setPassword}
-              placeholder="Enter your password"
-            />
-          </YStack>
-          <Button
-            disabled={isLoading}
-            backgroundColor="$blue9"
-            size="$4"
-            onPress={(e) => {
-              e.preventDefault?.();
-              handleSubmit(e as any);
-            }}
-          >
-            {isLoading ? "Logging in..." : "Login"}
-          </Button>
-        </YStack>
-      </form>
-      <XStack justifyContent="center" marginTop="$4">
-        <Text fontSize="$3" color="$gray10">
+    <Card className="w-full max-w-md">
+      <CardHeader>
+        <CardTitle className="text-2xl text-center">Login</CardTitle>
+        <CardDescription className="text-center">
+          Enter your credentials to access your account
+        </CardDescription>
+      </CardHeader>
+      <CardContent>
+        <form onSubmit={handleSubmit} id="login-form">
+          <div className="space-y-4">
+            <div className="space-y-2">
+              <Label htmlFor="email">Email</Label>
+              <Input
+                id="email"
+                type="email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                placeholder="Enter your email"
+                required
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="password">Password</Label>
+              <Input
+                id="password"
+                type="password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                placeholder="Enter your password"
+                required
+              />
+            </div>
+            <Button
+              type="submit"
+              disabled={isLoading}
+              className="w-full"
+            >
+              {isLoading ? "Logging in..." : "Login"}
+            </Button>
+          </div>
+        </form>
+        <div className="mt-4 text-center text-sm text-muted-foreground">
           Don't have an account?{" "}
-          <Text asChild>
-            <Link href="/register" style={{ color: "$blue10" }}>
-              Register
-            </Link>
-          </Text>
-        </Text>
-      </XStack>
-    </YStack>
+          <Link href="/register" className="text-primary hover:underline">
+            Register
+          </Link>
+        </div>
+      </CardContent>
+    </Card>
   );
 }

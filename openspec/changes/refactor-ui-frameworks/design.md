@@ -27,21 +27,35 @@ Current implementation uses Tamagui across both web and mobile platforms. We wan
 - Components are copied into the project, giving full control
 - Excellent TypeScript support
 - Large ecosystem and community
+- Compatible with Next.js 16 and App Router
+- Installation: `npx shadcn@latest init`
+- Documentation: https://ui.shadcn.com
 
 **Alternatives considered**:
 - Keep Tamagui (rejected: want platform-specific solutions)
 - Material-UI/MUI (rejected: heavier, less customizable)
 - Chakra UI (rejected: similar to Tamagui, want Tailwind-based solution)
 
+**Setup Notes**:
+- Tailwind CSS v4.1.17 is already installed (may need to verify compatibility with shadcn/ui)
+- Path aliases already configured in `tsconfig.json` (`@/*` maps to `./*`)
+- PostCSS and autoprefixer already installed
+- Will need to create Tailwind config (v4 uses CSS-based config)
+- Will need to update `globals.css` with Tailwind directives
+
 ### Decision: Use BNA UI for Mobile
 **Rationale**: 
-- TBD - Need to confirm what BNA UI is and its benefits
-- Want React Native-focused design system
+- BNA UI is an Expo React Native UI components library inspired by shadcn
+- Beautiful, accessible components that work seamlessly across iOS and Android
+- Similar copy-paste approach as shadcn/ui, giving full control over components
+- Built specifically for Expo/React Native projects
+- Documentation: https://ui.ahmedbna.com/docs
+- Installation: `pnpm dlx bna-ui init` (CLI-based setup)
 
 **Alternatives considered**:
 - Keep Tamagui (rejected: want platform-specific solutions)
-- NativeBase (rejected: TBD based on BNA UI research)
-- React Native Paper (rejected: TBD based on BNA UI research)
+- NativeBase (rejected: prefer BNA UI's shadcn-inspired approach)
+- React Native Paper (rejected: prefer BNA UI's component ownership model)
 
 ### Decision: Incremental Migration Strategy
 **Rationale**:
@@ -108,8 +122,12 @@ Current implementation uses Tamagui across both web and mobile platforms. We wan
 3. Final testing
 
 ## Open Questions
-- [ ] What is BNA UI exactly? (package name, documentation URL)
+- [x] What is BNA UI exactly? (package name, documentation URL)
+  - **Answer**: BNA UI is an Expo React Native UI library (https://ui.ahmedbna.com). Installation via `pnpm dlx bna-ui init`. Documentation at https://ui.ahmedbna.com/docs
+- [x] shadcn/ui setup for Next.js 16 with App Router
+  - **Answer**: Compatible. Installation via `npx shadcn@latest init`. Tailwind v4 already installed - may need compatibility verification.
 - [ ] Should we maintain exact visual parity or allow platform-specific improvements?
 - [ ] Do we need to migrate theme tokens/colors, or start fresh?
 - [ ] Should we set up dark mode support in new frameworks?
+- [ ] Verify Tailwind CSS v4 compatibility with shadcn/ui (may need to downgrade to v3)
 

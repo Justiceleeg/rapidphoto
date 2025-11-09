@@ -48,7 +48,7 @@ export function PhotoGrid({ photos, loading = false, onPhotoClick }: PhotoGridPr
           {/* Photo Image */}
           {photo.url && photo.status === "completed" ? (
             <Image
-              src={photo.url}
+              src={photo.thumbnailUrl || photo.url} // Use thumbnail if available, fallback to full image
               alt={photo.filename}
               fill
               className="object-cover transition-transform group-hover:scale-105"

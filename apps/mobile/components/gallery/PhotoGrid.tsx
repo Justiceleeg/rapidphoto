@@ -68,7 +68,7 @@ export function PhotoGrid({ photos, loading = false, onPhotoClick, refreshing = 
         <Card style={styles.card}>
           {photo.url && photo.status === "completed" ? (
             <Image
-              source={{ uri: photo.url }}
+              source={{ uri: photo.thumbnailUrl || photo.url }} // Use thumbnail if available, fallback to full image
               style={styles.photoImage}
               resizeMode="cover"
             />

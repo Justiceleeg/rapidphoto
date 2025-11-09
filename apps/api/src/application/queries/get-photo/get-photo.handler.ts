@@ -42,6 +42,11 @@ export class GetPhotoHandler {
       ? await this.r2Service.generatePresignedGetUrl(photo.r2Key)
       : null;
 
+    // Generate thumbnail URL if thumbnail exists
+    const thumbnailUrl = photo.thumbnailKey
+      ? await this.r2Service.generatePresignedGetUrl(photo.thumbnailKey)
+      : null;
+
     return {
       id: photo.id,
       userId: photo.userId,
@@ -51,6 +56,7 @@ export class GetPhotoHandler {
       mimeType: photo.mimeType,
       r2Key: photo.r2Key,
       url, // Presigned URL for viewing/downloading
+      thumbnailUrl, // Presigned URL for thumbnail
       status: photo.status,
       tags: photo.tags,
       createdAt: photo.createdAt,

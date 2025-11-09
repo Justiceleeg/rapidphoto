@@ -8,6 +8,8 @@ export interface Photo {
   id: string;
   filename: string;
   url: string | null; // Presigned URL (temporary, expires in 1 hour)
+  thumbnailKey: string | null; // R2 key for thumbnail
+  thumbnailUrl: string | null; // Presigned URL for thumbnail (temporary, expires in 1 hour)
   status: string;
   tags: string[] | null;
   createdAt: Date;

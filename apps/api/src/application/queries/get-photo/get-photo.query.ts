@@ -28,6 +28,8 @@ export interface GetPhotoResult {
   r2Key: string;
   /** Presigned URL for viewing/downloading (temporary, expires in 1 hour, null if not completed) */
   url: string | null;
+  /** Presigned URL for thumbnail (temporary, expires in 1 hour, null if no thumbnail) */
+  thumbnailUrl: string | null;
   /** Current upload status */
   status: string;
   /** User-defined tags */

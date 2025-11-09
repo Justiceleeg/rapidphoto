@@ -32,7 +32,7 @@ export default function DashboardPage() {
         </CardHeader>
         <CardContent className="flex gap-3">
           <Button asChild className="flex-1">
-            <Link href="/upload">
+            <Link href="/dashboard/upload">
               Upload Photo
             </Link>
           </Button>

@@ -30,6 +30,14 @@ The mobile application SHALL provide a PhotoViewer component for viewing individ
 - **WHEN** the PhotoViewer is opened with a photo that has tags
 - **THEN** it displays the photo's tags as chips/badges below the photo metadata
 
+#### Scenario: Edit tags in photo viewer
+- **WHEN** a user presses the "Edit Tags" button in the PhotoViewer
+- **THEN** the tag editing interface is displayed with a TagInput component
+- **WHEN** a user adds a new tag and presses Enter
+- **THEN** the tag is added to the photo and saved automatically
+- **WHEN** a user removes a tag by pressing the X button on a tag badge
+- **THEN** the tag is removed from the photo and saved automatically
+
 #### Scenario: Close viewer
 - **WHEN** a user presses the close button or swipes down
 - **THEN** the PhotoViewer closes

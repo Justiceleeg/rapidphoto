@@ -1,5 +1,5 @@
 import Constants from "expo-constants";
-import { createApiClient, UploadClient } from "@rapidphoto/api-client";
+import { createApiClient, UploadClient, PhotoClient } from "@rapidphoto/api-client";
 
 const apiUrl =
   Constants.expoConfig?.extra?.apiUrl ||
@@ -21,6 +21,9 @@ const apiClient = createApiClient({
 
 // Create upload client
 export const uploadClient = new UploadClient(apiClient);
+
+// Create photo client
+export const photoClient = new PhotoClient(apiClient);
 
 // Export the API URL for direct fetch calls (e.g., SSE)
 export const API_URL = apiUrl;

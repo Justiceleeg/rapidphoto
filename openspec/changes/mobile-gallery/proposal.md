@@ -7,6 +7,8 @@ Enable users to view their uploaded photos in a gallery interface on the mobile 
 - Create PhotoGrid component for mobile using FlatList with 3 columns
 - Create PhotoViewer modal component for viewing individual photos
 - Add tag display to PhotoViewer (display tags as chips/badges)
+- Add tag editing functionality to PhotoViewer (add/remove tags with auto-save)
+- Create TagInput component for mobile tag editing
 - Create gallery screen in tabs navigation
 - Add pull-to-refresh functionality to gallery
 - Integrate with photo client methods from api-client package
@@ -15,6 +17,10 @@ Enable users to view their uploaded photos in a gallery interface on the mobile 
 - Affected specs: `mobile`
 - Affected code:
   - `apps/mobile/components/gallery/PhotoGrid.tsx` (new)
-  - `apps/mobile/components/gallery/PhotoViewer.tsx` (new - includes tag display)
+  - `apps/mobile/components/gallery/PhotoViewer.tsx` (new - includes tag display and editing)
+  - `apps/mobile/components/gallery/TagInput.tsx` (new)
+  - `apps/mobile/components/ui/badge.tsx` (new)
   - `apps/mobile/app/(tabs)/gallery.tsx` (new)
+  - `apps/mobile/app/(tabs)/_layout.tsx` (modified - added gallery tab)
+  - `apps/mobile/lib/api-client.ts` (modified - exported PhotoClient)
 

@@ -470,4 +470,28 @@ Key points:
 - Use `railpack.json` for custom build configurations
 - Build workspace packages in dependency order
 
+## Code Quality
+
+**All apps have ESLint configured** for code quality checks:
+
+- **Web app** (`apps/web/`): Uses Next.js ESLint config with TypeScript support
+- **Mobile app** (`apps/mobile/`): Uses TypeScript ESLint with React Native support
+- **API** (`apps/api/`): Uses TypeScript ESLint for backend code
+
+Run linting:
+```bash
+# Lint all apps
+pnpm lint
+
+# Lint specific app
+pnpm --filter @rapidphoto/web lint
+pnpm --filter @rapidphoto/mobile lint
+pnpm --filter @rapidphoto/api lint
+```
+
+All linting configs use simple, minimal rules focused on:
+- Unused variables (warnings only)
+- Explicit `any` types (warnings only)
+- Basic code quality checks
+
 Remember: Specs are truth. Changes are proposals. Keep them in sync.

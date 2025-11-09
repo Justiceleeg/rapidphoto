@@ -7,19 +7,18 @@ import { cn } from "@/lib/utils";
 
 const MAX_FILE_SIZE = 10 * 1024 * 1024; // 10MB
 const MAX_FILES = 100;
-const ACCEPTED_IMAGE_TYPES = [
-  "image/jpeg",
-  "image/jpg",
-  "image/png",
-  "image/gif",
-  "image/webp",
-];
 
 export function DropZone() {
   const { setSelectedFile, setSelectedFiles, uploadState } = useUploadStore();
 
   const onDrop = useCallback(
-    (acceptedFiles: File[], fileRejections: any[]) => {
+    (
+      acceptedFiles: File[],
+      fileRejections: Array<{
+        file: File;
+        errors: Array<{ code: string; message: string }>;
+      }>
+    ) => {
       console.log("onDrop called:", {
         acceptedCount: acceptedFiles.length,
         rejectedCount: fileRejections.length,
@@ -28,7 +27,7 @@ export function DropZone() {
       if (fileRejections.length > 0) {
         console.warn("Some files were rejected:", fileRejections);
         const rejectionMessages = fileRejections.map((rejection) => {
-          const errors = rejection.errors.map((e: any) => e.code).join(", ");
+          const errors = rejection.errors.map((e) => e.code).join(", ");
           return `${rejection.file.name}: ${errors}`;
         });
         console.warn("Rejection details:", rejectionMessages);
@@ -65,11 +64,26 @@ export function DropZone() {
     [setSelectedFile, setSelectedFiles]
   );
 
-  const onDropRejected = useCallback((fileRejections: any[]) => {
-    console.warn("onDropRejected called:", fileRejections.length, "rejections");
-    fileRejections.forEach((rejection) => {
-      console.warn("Rejected file:", rejection.file.name, "errors:", rejection.errors);
-    });
+  const onDropRejected = useCallback(
+    (
+      fileRejections: Array<{
+        file: File;
+        errors: Array<{ code: string; message: string }>;
+      }>
+    ) => {
+      console.warn(
+        "onDropRejected called:",
+        fileRejections.length,
+        "rejections"
+      );
+      fileRejections.forEach((rejection) => {
+        console.warn(
+          "Rejected file:",
+          rejection.file.name,
+          "errors:",
+          rejection.errors
+        );
+      });
 
     const firstRejection = fileRejections[0];
     if (!firstRejection) return;

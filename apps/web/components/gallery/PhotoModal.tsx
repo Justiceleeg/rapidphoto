@@ -1,6 +1,7 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState } from "react";
+import Image from "next/image";
 import { Photo } from "@rapidphoto/api-client";
 import {
   Dialog,
@@ -31,12 +32,13 @@ export function PhotoModal({
 }: PhotoModalProps) {
   const [isEditingTags, setIsEditingTags] = useState(false);
 
-  // Sync editing state when photo changes
-  useEffect(() => {
-    if (!photo) {
+  // Reset editing state when modal closes (wrapped in handler to avoid setState in effect)
+  const handleOpenChange = (newOpen: boolean) => {
+    if (!newOpen) {
       setIsEditingTags(false);
+      onClose();
     }
-  }, [photo]);
+  };
 
   if (!photo) return null;
 
@@ -52,7 +54,7 @@ export function PhotoModal({
   };
 
   return (
-    <Dialog open={open} onOpenChange={onClose}>
+    <Dialog open={open} onOpenChange={handleOpenChange}>
       <DialogContent className="max-w-4xl">
         <DialogHeader>
           <DialogTitle className="truncate">{photo.filename}</DialogTitle>
@@ -65,10 +67,12 @@ export function PhotoModal({
           {/* Photo Image */}
           {photo.url && photo.status === "completed" ? (
             <div className="relative aspect-video w-full overflow-hidden rounded-lg bg-muted">
-              <img
+              <Image
                 src={photo.url}
                 alt={photo.filename}
-                className="size-full object-contain"
+                fill
+                className="object-contain"
+                unoptimized
               />
             </div>
           ) : (

@@ -27,7 +27,7 @@ export default function RegisterPage() {
       } else {
         toast.error(result.error?.message || "Registration failed");
       }
-    } catch (error) {
+    } catch {
       toast.error("An error occurred during registration");
     }
   };

@@ -30,6 +30,7 @@ export function ImagePreview() {
       <CardContent className="p-4">
         <div className="flex items-center gap-4">
         {previewUrl && (
+            // eslint-disable-next-line @next/next/no-img-element
             <img
               src={previewUrl}
               alt="Preview"

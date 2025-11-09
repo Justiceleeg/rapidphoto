@@ -20,7 +20,6 @@ export default function UploadPage() {
     selectedFiles,
     uploadState,
     jobId,
-    totalPhotos,
     completedPhotos,
     failedPhotos,
     photoUploads,

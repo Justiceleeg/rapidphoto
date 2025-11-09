@@ -55,17 +55,20 @@ export default function GalleryPage() {
       }
 
       // Update the photo in the cache without refetching
-      queryClient.setQueryData(["photos", page, limit], (oldData: any) => {
-        if (!oldData) return oldData;
-        return {
-          ...oldData,
-          photos: oldData.photos.map((photo: Photo) =>
-            photo.id === updatedPhoto.id
-              ? { ...photo, ...updatedPhoto, url: photo.url } // Preserve existing URL
-              : photo
-          ),
-        };
-      });
+      queryClient.setQueryData(
+        ["photos", page, limit],
+        (oldData: { photos: Photo[]; pagination: unknown } | undefined) => {
+          if (!oldData) return oldData;
+          return {
+            ...oldData,
+            photos: oldData.photos.map((photo: Photo) =>
+              photo.id === updatedPhoto.id
+                ? { ...photo, ...updatedPhoto, url: photo.url } // Preserve existing URL
+                : photo
+            ),
+          };
+        }
+      );
 
       toast.success("Tags updated successfully");
     },

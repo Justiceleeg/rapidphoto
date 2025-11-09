@@ -26,7 +26,7 @@ export default function LoginPage() {
       } else {
         toast.error(result.error?.message || "Login failed");
       }
-    } catch (error) {
+    } catch {
       toast.error("An error occurred during login");
     }
   };
@@ -74,7 +74,7 @@ export default function LoginPage() {
           </div>
       </form>
         <div className="mt-4 text-center text-sm text-muted-foreground">
-          Don't have an account?{" "}
+          Don&apos;t have an account?{" "}
           <Link href="/register" className="text-primary hover:underline">
               Register
             </Link>

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import Image from "next/image";
 import { Photo } from "@rapidphoto/api-client";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -44,12 +44,15 @@ export function PhotoGrid({ photos, loading = false, onPhotoClick }: PhotoGridPr
           className="group relative aspect-square cursor-pointer overflow-hidden transition-all hover:shadow-lg"
           onClick={() => onPhotoClick(photo)}
         >
+          <div className="relative size-full">
           {/* Photo Image */}
           {photo.url && photo.status === "completed" ? (
-            <img
+            <Image
               src={photo.url}
               alt={photo.filename}
-              className="size-full object-cover transition-transform group-hover:scale-105"
+              fill
+              className="object-cover transition-transform group-hover:scale-105"
+              unoptimized
             />
           ) : (
             <div className="flex size-full items-center justify-center bg-muted">
@@ -58,6 +61,7 @@ export function PhotoGrid({ photos, loading = false, onPhotoClick }: PhotoGridPr
               </p>
             </div>
           )}
+          </div>
 
           {/* Overlay with tags on hover */}
           {photo.tags && photo.tags.length > 0 && (

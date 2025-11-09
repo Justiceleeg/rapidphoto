@@ -11,12 +11,12 @@
 - [ ] 1.10 Test AI tagging worker (upload photo, verify job queued, verify tags generated with ≥70% confidence, verify stored in `suggested_tags`)
 
 ## 2. Backend - AI Tag Acceptance/Rejection
-- [ ] 2.1 Create AcceptTagCommand DTO (`apps/api/src/application/commands/accept-tag/accept-tag.command.ts`)
-- [ ] 2.2 Create AcceptTagHandler (`apps/api/src/application/commands/accept-tag/accept-tag.handler.ts` - move tag from `suggested_tags` to `tags`, validate tag exists)
-- [ ] 2.3 Create RejectTagCommand DTO (`apps/api/src/application/commands/reject-tag/reject-tag.command.ts`)
-- [ ] 2.4 Create RejectTagHandler (`apps/api/src/application/commands/reject-tag/reject-tag.handler.ts` - remove tag from `suggested_tags`)
-- [ ] 2.5 Add accept/reject endpoints (`apps/api/src/infrastructure/http/routes/photo.routes.ts` - `POST /api/photos/:id/tags/accept` and `POST /api/photos/:id/tags/reject`)
-- [ ] 2.6 Test accept/reject endpoints (verify accept moves tag to `tags`, verify reject removes from `suggested_tags`, verify authorization)
+- [x] 2.1 Create AcceptTagCommand DTO (`apps/api/src/application/commands/accept-tag/accept-tag.command.ts`)
+- [x] 2.2 Create AcceptTagHandler (`apps/api/src/application/commands/accept-tag/accept-tag.handler.ts` - move tag from `suggested_tags` to `tags`, validate tag exists)
+- [x] 2.3 Create RejectTagCommand DTO (`apps/api/src/application/commands/reject-tag/reject-tag.command.ts`)
+- [x] 2.4 Create RejectTagHandler (`apps/api/src/application/commands/reject-tag/reject-tag.handler.ts` - remove tag from `suggested_tags`)
+- [x] 2.5 Add accept/reject endpoints (`apps/api/src/infrastructure/http/routes/photo.routes.ts` - `POST /api/photos/:id/tags/accept` and `POST /api/photos/:id/tags/reject`)
+- [x] 2.6 Test accept/reject endpoints (verify accept moves tag to `tags`, verify reject removes from `suggested_tags`, verify authorization)
 
 ## 3. Web Frontend - AI Suggestions
 - [ ] 3.1 Update photo client with accept/reject methods (`packages/api-client/src/photo.client.ts` - add `acceptTag(photoId, tag)` and `rejectTag(photoId, tag)`)

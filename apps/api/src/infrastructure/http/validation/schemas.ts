@@ -102,3 +102,11 @@ export const uploadJobIdParamSchema = z.object({
   id: z.string().uuid("Invalid upload job ID format"),
 });
 
+/**
+ * Accept/Reject AI tag validation schema
+ * Used for accepting or rejecting AI-suggested tags
+ */
+export const tagActionSchema = z.object({
+  tag: z.string().min(1, "Tag cannot be empty").max(50, "Tag cannot exceed 50 characters"),
+});
+

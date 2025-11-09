@@ -5,11 +5,13 @@ import { GetPhotosHandler } from "../../../application/queries/get-photos/get-ph
 import { GetPhotoHandler } from "../../../application/queries/get-photo/get-photo.handler.js";
 import { GetUploadJobHandler } from "../../../application/queries/get-upload-job/get-upload-job.handler.js";
 import { UpdatePhotoTagsHandler } from "../../../application/commands/update-photo-tags/update-photo-tags.handler.js";
+import { AcceptTagHandler } from "../../../application/commands/accept-tag/accept-tag.handler.js";
+import { RejectTagHandler } from "../../../application/commands/reject-tag/reject-tag.handler.js";
 import { PhotoRepositoryImpl } from "../../database/repositories/photo.repository.impl.js";
 import { UploadJobRepositoryImpl } from "../../database/repositories/upload-job.repository.impl.js";
 import { R2Service } from "../../storage/r2.service.js";
 import { validateQuery, validateParams, validateBody } from "../middleware/validation.middleware.js";
-import { getPhotosQuerySchema, photoIdParamSchema, updatePhotoTagsSchema } from "../validation/schemas.js";
+import { getPhotosQuerySchema, photoIdParamSchema, updatePhotoTagsSchema, tagActionSchema } from "../validation/schemas.js";
 import { AppError, createNotFoundError, createForbiddenError } from "../middleware/error.middleware.js";
 
 /**
@@ -26,6 +28,8 @@ const getPhotosHandler = new GetPhotosHandler(photoRepository, r2Service);
 const getPhotoHandler = new GetPhotoHandler(photoRepository, r2Service);
 const getUploadJobHandler = new GetUploadJobHandler(uploadJobRepository);
 const updatePhotoTagsHandler = new UpdatePhotoTagsHandler(photoRepository);
+const acceptTagHandler = new AcceptTagHandler(photoRepository);
+const rejectTagHandler = new RejectTagHandler(photoRepository);
 
 /**
  * GET /api/photos
@@ -175,6 +179,68 @@ photoRoutes.put(
       }
       throw error;
     }
+  }
+);
+
+/**
+ * POST /api/photos/:id/tags/accept
+ * Accept an AI-suggested tag
+ * Moves tag from suggested_tags to confirmed tags
+ */
+photoRoutes.post(
+  "/:id/tags/accept",
+  authMiddleware,
+  validateParams(photoIdParamSchema),
+  validateBody(tagActionSchema),
+  async (c) => {
+    const user = c.get("user");
+    if (!user) {
+      throw new AppError(401, "Unauthorized", "AUTH_ERROR");
+    }
+
+    const params = c.get("validatedParams") as { id: string };
+    const photoId = params.id;
+    const body = c.get("validatedBody") as { tag: string };
+    const tag = body.tag;
+
+    await acceptTagHandler.handle({
+      photoId,
+      userId: user.id,
+      tag,
+    });
+
+    return c.json({ success: true }, 200);
+  }
+);
+
+/**
+ * POST /api/photos/:id/tags/reject
+ * Reject an AI-suggested tag
+ * Removes tag from suggested_tags without adding to confirmed tags
+ */
+photoRoutes.post(
+  "/:id/tags/reject",
+  authMiddleware,
+  validateParams(photoIdParamSchema),
+  validateBody(tagActionSchema),
+  async (c) => {
+    const user = c.get("user");
+    if (!user) {
+      throw new AppError(401, "Unauthorized", "AUTH_ERROR");
+    }
+
+    const params = c.get("validatedParams") as { id: string };
+    const photoId = params.id;
+    const body = c.get("validatedBody") as { tag: string };
+    const tag = body.tag;
+
+    await rejectTagHandler.handle({
+      photoId,
+      userId: user.id,
+      tag,
+    });
+
+    return c.json({ success: true }, 200);
   }
 );
 

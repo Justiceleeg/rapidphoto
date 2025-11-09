@@ -22,7 +22,7 @@
 - [ ] 3.2 Test thumbnails on mobile (verify thumbnails load, verify full image in viewer, test on iOS and Android)
 
 ## 4. Deploy Thumbnail Generation
-- [ ] 4.1 Deploy Redis to Railway (ensure service running and accessible)
-- [ ] 4.2 Update API environment variables (`REDIS_URL` from Railway)
-- [ ] 4.3 Redeploy with thumbnail generation (upload photo in production, verify thumbnail job runs, verify thumbnail generated, verify accessible via URL on web and mobile)
+- [x] 4.1 Deploy Redis to Railway (ensure service running and accessible)
+- [x] 4.2 Update API environment variables (`REDIS_URL` from Railway)
+- [x] 4.3 Redeploy with thumbnail generation (upload photo in production, verify thumbnail job runs, verify thumbnail generated, verify accessible via URL on web and mobile)
 

@@ -8,7 +8,7 @@ export interface GetPhotosResult {
   photos: Array<{
     id: string;
     filename: string;
-    r2Url: string | null;
+    url: string | null; // Presigned URL for viewing/downloading (temporary, expires in 1 hour)
     status: string;
     tags: string[] | null;
     createdAt: Date;

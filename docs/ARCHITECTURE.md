@@ -263,11 +263,55 @@ The upload flow uses a **direct upload pattern** with presigned URLs to avoid pr
     │                    │ 14. Query photos   │                     │
     │                    │────────────────────▶                     │
     │                    │                    │                     │
-    │ 15. Return photos  │                    │                     │
-    │     with R2 URLs   │                    │                     │
+    │                    │ 15. Generate       │                     │
+    │                    │     presigned URLs │                     │
+    │                    │──────────────────────────────────────────▶
+    │                    │                    │                     │
+    │ 16. Return photos  │                    │                     │
+    │     with temp URLs │                    │                     │
     │◀────────────────────                    │                     │
     │                    │                    │                     │
 ```
+
+### Photo Viewing Flow
+
+After upload, users can view their photos through the gallery:
+
+```
+┌────────┐          ┌─────────┐          ┌──────────┐          ┌─────────┐
+│ Client │          │ Hono API│          │PostgreSQL│          │   R2    │
+└───┬────┘          └────┬────┘          └────┬─────┘          └────┬────┘
+    │                    │                    │                     │
+    │ 1. GET /photos     │                    │                     │
+    │    ?page=1&limit=20│                    │                     │
+    │────────────────────▶                    │                     │
+    │                    │                    │                     │
+    │                    │ 2. Query user      │                     │
+    │                    │    photos          │                     │
+    │                    │────────────────────▶                     │
+    │                    │                    │                     │
+    │                    │ 3. For each photo, │                     │
+    │                    │    generate        │                     │
+    │                    │    presigned GET   │                     │
+    │                    │    URL (1hr TTL)   │                     │
+    │                    │──────────────────────────────────────────▶
+    │                    │                    │                     │
+    │ 4. Return photos   │                    │                     │
+    │    with temp URLs  │                    │                     │
+    │◀────────────────────                    │                     │
+    │                    │                    │                     │
+    │ 5. Display images  │                    │                     │
+    │    directly from   │                    │                     │
+    │    presigned URLs  │                    │                     │
+    │──────────────────────────────────────────────────────────────▶
+    │                    │                    │                     │
+```
+
+**Security Benefits:**
+- ✅ R2 bucket remains private (no public access)
+- ✅ Users can only view their own photos (API validates ownership)
+- ✅ URLs expire after 1 hour (time-limited access)
+- ✅ No need for `R2_PUBLIC_URL` environment variable
 
 ### Detailed Flow Steps
 
@@ -1391,7 +1435,8 @@ Layer 3: Authorization
 ┌────────────────────────────────────────────┐
 │  - Middleware checks on all routes         │
 │  - User can only access own photos         │
-│  - Presigned URLs expire in 1 hour         │
+│  - Presigned URLs for private R2 access    │
+│  - URLs expire in 1 hour                   │
 └────────────────────────────────────────────┘
 
 Layer 4: Input Validation
@@ -1422,9 +1467,11 @@ Layer 5: Rate Limiting (Optional)
 │    - Password hashing with bcrypt                               │
 │                                                                 │
 │  Storage (R2):                                                  │
-│    - Optional server-side encryption                            │
+│    - Private bucket (not publicly accessible)                   │
 │    - Access via presigned URLs only                             │
+│    - Presigned URLs expire after 1 hour                         │
 │    - No public listing of buckets                               │
+│    - Optional server-side encryption                            │
 └─────────────────────────────────────────────────────────────────┘
 
 ┌─────────────────────────────────────────────────────────────────┐

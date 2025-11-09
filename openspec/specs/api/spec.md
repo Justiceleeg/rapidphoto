@@ -102,3 +102,33 @@ The API SHALL provide middleware to protect routes that require authentication.
 - **WHEN** a request is made to a protected route with valid authentication
 - **THEN** the request proceeds and the user information is available
 
+### Requirement: Photo Gallery Query Endpoints
+The API SHALL provide endpoints for users to retrieve their uploaded photos with pagination and individual photo details.
+
+#### Scenario: List user photos
+- **WHEN** a GET request is made to `/api/photos` with valid authentication
+- **THEN** the API returns a paginated list of the user's photos with temporary presigned URLs
+
+#### Scenario: Get single photo
+- **WHEN** a GET request is made to `/api/photos/:id` with valid authentication
+- **THEN** the API returns the photo details with a temporary presigned URL if the photo belongs to the authenticated user
+
+#### Scenario: Unauthorized photo access
+- **WHEN** a GET request is made to `/api/photos/:id` for a photo that doesn't belong to the user
+- **THEN** the API returns a 403 Forbidden error
+
+### Requirement: Presigned URL Generation for Photo Access
+The API SHALL generate temporary presigned URLs for viewing and downloading photos from private R2 storage, eliminating the need for public bucket access.
+
+#### Scenario: Presigned URL generation for completed photos
+- **WHEN** a photo query endpoint is called for a completed photo
+- **THEN** the API generates a presigned GET URL valid for 1 hour for secure access to the R2 object
+
+#### Scenario: Pending photo URL handling
+- **WHEN** a photo query endpoint is called for a pending photo
+- **THEN** the API returns null for the URL field since the photo upload is not yet complete
+
+#### Scenario: Secure photo access
+- **WHEN** presigned URLs are generated
+- **THEN** they provide temporary, time-limited access without requiring the R2 bucket to be publicly accessible
+

@@ -1,8 +1,12 @@
 import { PhotoRepository } from "../../../domain/photo/photo.repository.js";
+import { R2Service } from "../../../infrastructure/storage/r2.service.js";
 import { GetPhotoQuery, GetPhotoResult } from "./get-photo.query.js";
 
 export class GetPhotoHandler {
-  constructor(private photoRepository: PhotoRepository) {}
+  constructor(
+    private photoRepository: PhotoRepository,
+    private r2Service: R2Service
+  ) {}
 
   async handle(query: GetPhotoQuery): Promise<GetPhotoResult> {
     const photo = await this.photoRepository.findById(query.photoId);
@@ -16,6 +20,11 @@ export class GetPhotoHandler {
       throw new Error("Unauthorized: Photo does not belong to user");
     }
 
+    // Generate presigned URL for viewing/downloading (only for completed photos)
+    const url = photo.status === "completed"
+      ? await this.r2Service.generatePresignedGetUrl(photo.r2Key)
+      : null;
+
     return {
       id: photo.id,
       userId: photo.userId,
@@ -24,7 +33,7 @@ export class GetPhotoHandler {
       fileSize: photo.fileSize,
       mimeType: photo.mimeType,
       r2Key: photo.r2Key,
-      r2Url: photo.r2Url,
+      url, // Presigned URL for viewing/downloading
       status: photo.status,
       tags: photo.tags,
       createdAt: photo.createdAt,

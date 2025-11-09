@@ -1,4 +1,4 @@
-import { S3Client, PutObjectCommand } from "@aws-sdk/client-s3";
+import { S3Client, PutObjectCommand, GetObjectCommand } from "@aws-sdk/client-s3";
 import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
 import { env } from "../../config/env.js";
 
@@ -39,9 +39,30 @@ export class R2Service {
   }
 
   /**
-   * Get the public URL for an R2 object
+   * Generate a presigned URL for viewing/downloading an object from R2
+   * This allows temporary, secure access to private R2 objects without making the bucket public.
+   * @param key The R2 object key (path)
+   * @param expiresIn Expiration time in seconds (default: 1 hour)
+   * @returns Presigned URL for GET request
+   */
+  async generatePresignedGetUrl(
+    key: string,
+    expiresIn: number = 3600
+  ): Promise<string> {
+    const command = new GetObjectCommand({
+      Bucket: env.r2.bucketName,
+      Key: key,
+    });
+
+    const url = await getSignedUrl(this.client, command, { expiresIn });
+    return url;
+  }
+
+  /**
+   * Get the public URL for an R2 object (if bucket is configured for public access)
    * @param key The R2 object key
    * @returns Public URL if configured, otherwise returns null
+   * @deprecated Use generatePresignedGetUrl() for secure, temporary access instead
    */
   getObjectUrl(key: string): string | null {
     if (!env.r2.publicUrl) {

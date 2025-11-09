@@ -11,7 +11,7 @@ export interface GetPhotoResult {
   fileSize: number;
   mimeType: string;
   r2Key: string;
-  r2Url: string | null;
+  url: string | null; // Presigned URL for viewing/downloading (temporary, expires in 1 hour)
   status: string;
   tags: string[] | null;
   createdAt: Date;

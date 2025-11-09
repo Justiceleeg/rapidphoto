@@ -1,8 +1,12 @@
 import { PhotoRepository } from "../../../domain/photo/photo.repository.js";
+import { R2Service } from "../../../infrastructure/storage/r2.service.js";
 import { GetPhotosQuery, GetPhotosResult } from "./get-photos.query.js";
 
 export class GetPhotosHandler {
-  constructor(private photoRepository: PhotoRepository) {}
+  constructor(
+    private photoRepository: PhotoRepository,
+    private r2Service: R2Service
+  ) {}
 
   async handle(query: GetPhotosQuery): Promise<GetPhotosResult> {
     const page = query.page ?? 1;
@@ -24,16 +28,28 @@ export class GetPhotosHandler {
 
     const totalPages = Math.ceil(total / limit);
 
+    // Generate presigned URLs for all photos in parallel
+    const photosWithUrls = await Promise.all(
+      photos.map(async (photo) => {
+        // Only generate URL for completed photos
+        const url = photo.status === "completed" 
+          ? await this.r2Service.generatePresignedGetUrl(photo.r2Key)
+          : null;
+
+        return {
+          id: photo.id,
+          filename: photo.filename,
+          url, // Presigned URL for viewing/downloading
+          status: photo.status,
+          tags: photo.tags,
+          createdAt: photo.createdAt,
+          updatedAt: photo.updatedAt,
+        };
+      })
+    );
+
     return {
-      photos: photos.map((photo) => ({
-        id: photo.id,
-        filename: photo.filename,
-        r2Url: photo.r2Url,
-        status: photo.status,
-        tags: photo.tags,
-        createdAt: photo.createdAt,
-        updatedAt: photo.updatedAt,
-      })),
+      photos: photosWithUrls,
       pagination: {
         page,
         limit,

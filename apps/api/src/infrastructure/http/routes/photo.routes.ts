@@ -7,14 +7,16 @@ import { GetUploadJobHandler } from "../../../application/queries/get-upload-job
 import { UpdatePhotoTagsHandler } from "../../../application/commands/update-photo-tags/update-photo-tags.handler.js";
 import { PhotoRepositoryImpl } from "../../database/repositories/photo.repository.impl.js";
 import { UploadJobRepositoryImpl } from "../../database/repositories/upload-job.repository.impl.js";
+import { R2Service } from "../../storage/r2.service.js";
 
 const photoRoutes = new Hono<{ Variables: Variables }>();
 
 // Initialize services and handlers
 const photoRepository = new PhotoRepositoryImpl();
 const uploadJobRepository = new UploadJobRepositoryImpl();
-const getPhotosHandler = new GetPhotosHandler(photoRepository);
-const getPhotoHandler = new GetPhotoHandler(photoRepository);
+const r2Service = new R2Service();
+const getPhotosHandler = new GetPhotosHandler(photoRepository, r2Service);
+const getPhotoHandler = new GetPhotoHandler(photoRepository, r2Service);
 const getUploadJobHandler = new GetUploadJobHandler(uploadJobRepository);
 const updatePhotoTagsHandler = new UpdatePhotoTagsHandler(photoRepository);
 

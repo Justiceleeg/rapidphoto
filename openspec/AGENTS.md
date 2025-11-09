@@ -494,4 +494,38 @@ All linting configs use simple, minimal rules focused on:
 - Explicit `any` types (warnings only)
 - Basic code quality checks
 
+### Pre-commit Hooks
+
+**The project uses husky and lint-staged** to automatically run checks before commits:
+
+What runs automatically:
+- ESLint (with auto-fix) on staged TypeScript/React files
+- TypeScript type checking on affected apps (no build, just validation)
+- Only checks files you're committing (not the entire codebase)
+
+Bypass hooks when needed:
+```bash
+# Skip pre-commit checks
+git commit --no-verify -m "message"
+# or short form
+git commit -n -m "message"
+```
+
+Run checks manually:
+```bash
+# Run all linting
+pnpm lint
+
+# Run TypeScript checks
+pnpm typecheck
+
+# Run only on staged files (what the hook does)
+pnpm exec lint-staged
+```
+
+Configuration files:
+- `.husky/pre-commit` - Git hook script
+- `.lintstagedrc.json` - Rules for what to check
+- See `docs/PRE_COMMIT_HOOKS.md` for full documentation
+
 Remember: Specs are truth. Changes are proposals. Keep them in sync.

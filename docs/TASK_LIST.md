@@ -1,5 +1,7 @@
 # RapidPhotoUpload - Implementation Task List (Vertical Slices)
 
+> **Note**: This document contains historical task planning. Some technical details (particularly regarding UI frameworks) are outdated. The app now uses shadcn/ui (web) and BNA UI (mobile). Refer to `docs/STYLING.md` for current styling conventions.
+
 ## Quick Reference
 
 **Project**: High-performance photo upload system with web and mobile clients  
@@ -9,8 +11,8 @@
 
 ### Tech Stack Summary
 - **Backend**: Hono + TypeScript, PostgreSQL, Drizzle ORM, Better-Auth, Cloudflare R2
-- **Web**: Next.js 15, React Query, Zustand, Tamagui
-- **Mobile**: React Native + Expo, React Query, Zustand, Tamagui
+- **Web**: Next.js 16, React Query, Zustand, shadcn/ui, Tailwind CSS v4
+- **Mobile**: React Native + Expo, React Query, Zustand, BNA UI
 - **Deployment**: Railway (Full stack)
 - **Monorepo**: pnpm workspace
 

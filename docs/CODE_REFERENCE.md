@@ -1,5 +1,7 @@
 # Code Reference
 
+> **Note**: This document contains historical code references. The Tamagui sections are outdated. The app now uses shadcn/ui (web) and BNA UI (mobile). Refer to `docs/STYLING.md` for current styling conventions and component patterns.
+
 This file contains all code examples referenced in the task list. Organized by category for easy lookup.
 
 ## Monorepo Setup

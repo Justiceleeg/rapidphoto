@@ -21,4 +21,5 @@ Keep this managed block so 'openspec update' can refresh the instructions.
 
 **When working on web or mobile apps** (`apps/web/` or `apps/mobile/`), always reference `docs/STYLING.md` for styling guidelines.
 
-This project uses Tamagui for all UI components and styling. Do not add custom CSS or use invalid theme values.
+- **Web**: Uses shadcn/ui + Tailwind CSS v4. Do not add custom CSS files.
+- **Mobile**: Uses BNA UI components. Use StyleSheet for styling, not inline styles.

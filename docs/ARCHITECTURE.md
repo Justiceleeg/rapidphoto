@@ -150,9 +150,9 @@ Testing: Vitest
 
 ### Frontend Web
 ```yaml
-Framework: Next.js 15 (App Router)
+Framework: Next.js 16 (App Router)
 Language: TypeScript
-UI: React 19 + Tamagui
+UI: React 19 + shadcn/ui + Tailwind CSS v4
 State Management:
   - React Query (server state)
   - Zustand (client state)
@@ -164,6 +164,7 @@ Real-time: EventSource (SSE)
 ```yaml
 Framework: React Native + Expo
 Language: TypeScript
+UI: BNA UI
 Router: Expo Router (file-based)
 State Management:
   - React Query (server state)
@@ -1089,8 +1090,8 @@ apps/web/
 │   └── stores/
 │       └── upload-store.ts           # Zustand upload state
 │
-└── styles/
-    └── globals.css                   # Tamagui styles
+└── app/
+    └── globals.css                   # Tailwind CSS + theme variables
 ```
 
 ### State Management Strategy

@@ -1,4 +1,5 @@
 import { UploadJobRepository } from "../../../domain/upload-job/upload-job.repository.js";
+import { createNotFoundError, createForbiddenError } from "../../../infrastructure/http/middleware/error.middleware.js";
 import { GetUploadJobQuery, GetUploadJobResult } from "./get-upload-job.query.js";
 
 export class GetUploadJobHandler {
@@ -8,12 +9,12 @@ export class GetUploadJobHandler {
     const job = await this.uploadJobRepository.findById(query.jobId);
 
     if (!job) {
-      throw new Error(`Upload job with id ${query.jobId} not found`);
+      throw createNotFoundError("Upload job", query.jobId);
     }
 
     // Verify job belongs to user
     if (job.userId !== query.userId) {
-      throw new Error("Unauthorized: Upload job does not belong to user");
+      throw createForbiddenError("Upload job does not belong to user");
     }
 
     return {

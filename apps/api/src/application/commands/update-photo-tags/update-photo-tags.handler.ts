@@ -1,38 +1,24 @@
 import { PhotoRepository } from "../../../domain/photo/photo.repository.js";
+import { createNotFoundError, createForbiddenError } from "../../../infrastructure/http/middleware/error.middleware.js";
 import { UpdatePhotoTagsCommand, UpdatePhotoTagsResult } from "./update-photo-tags.command.js";
 
 export class UpdatePhotoTagsHandler {
   constructor(private photoRepository: PhotoRepository) {}
 
   async handle(command: UpdatePhotoTagsCommand): Promise<UpdatePhotoTagsResult> {
-    // Validate tags
-    if (!Array.isArray(command.tags)) {
-      throw new Error("Tags must be an array");
-    }
-
-    // Validate each tag
-    for (const tag of command.tags) {
-      if (typeof tag !== "string") {
-        throw new Error("All tags must be strings");
-      }
-      if (tag.trim().length === 0) {
-        throw new Error("Tags cannot be empty strings");
-      }
-      if (tag.length > 50) {
-        throw new Error("Tags cannot exceed 50 characters");
-      }
-    }
+    // Note: Tag validation is handled by Zod at the route level
+    // No need to validate here - tags are already validated and normalized
 
     // Find photo
     const photo = await this.photoRepository.findById(command.photoId);
 
     if (!photo) {
-      throw new Error(`Photo with id ${command.photoId} not found`);
+      throw createNotFoundError("Photo", command.photoId);
     }
 
     // Verify photo belongs to user
     if (photo.userId !== command.userId) {
-      throw new Error("Unauthorized: Photo does not belong to user");
+      throw createForbiddenError("Photo does not belong to user");
     }
 
     // Normalize tags: trim, remove duplicates, convert to lowercase

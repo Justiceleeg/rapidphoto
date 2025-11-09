@@ -2,6 +2,7 @@ import { PhotoRepository } from "../../../domain/photo/photo.repository.js";
 import { UploadJobRepository } from "../../../domain/upload-job/upload-job.repository.js";
 import { R2Service } from "../../../infrastructure/storage/r2.service.js";
 import { ProgressService } from "../../../infrastructure/sse/progress.service.js";
+import { createNotFoundError, createForbiddenError } from "../../../infrastructure/http/middleware/error.middleware.js";
 import { CompletePhotoCommand } from "./complete-photo.command.js";
 
 export class CompletePhotoHandler {
@@ -17,12 +18,12 @@ export class CompletePhotoHandler {
     const photo = await this.photoRepository.findById(command.photoId);
 
     if (!photo) {
-      throw new Error(`Photo with id ${command.photoId} not found`);
+      throw createNotFoundError("Photo", command.photoId);
     }
 
     // Verify photo belongs to user
     if (photo.userId !== command.userId) {
-      throw new Error("Unauthorized: Photo does not belong to user");
+      throw createForbiddenError("Photo does not belong to user");
     }
 
     // Get R2 URL (public URL if configured, otherwise null)

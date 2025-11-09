@@ -9,16 +9,10 @@ export class GetPhotosHandler {
   ) {}
 
   async handle(query: GetPhotosQuery): Promise<GetPhotosResult> {
+    // Note: Pagination validation is handled by Zod at the route level
+    // page is validated as positive integer, limit is validated as positive integer with max 100
     const page = query.page ?? 1;
     const limit = query.limit ?? 20;
-
-    // Validate pagination parameters
-    if (page < 1) {
-      throw new Error("Page must be greater than 0");
-    }
-    if (limit < 1 || limit > 100) {
-      throw new Error("Limit must be between 1 and 100");
-    }
 
     const { photos, total } = await this.photoRepository.findByUserIdPaginated(
       query.userId,

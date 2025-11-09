@@ -1,5 +1,6 @@
 import { PhotoRepository } from "../../../domain/photo/photo.repository.js";
 import { R2Service } from "../../../infrastructure/storage/r2.service.js";
+import { createNotFoundError, createForbiddenError } from "../../../infrastructure/http/middleware/error.middleware.js";
 import { GetPhotoQuery, GetPhotoResult } from "./get-photo.query.js";
 
 export class GetPhotoHandler {
@@ -12,12 +13,12 @@ export class GetPhotoHandler {
     const photo = await this.photoRepository.findById(query.photoId);
 
     if (!photo) {
-      throw new Error(`Photo with id ${query.photoId} not found`);
+      throw createNotFoundError("Photo", query.photoId);
     }
 
     // Verify photo belongs to user
     if (photo.userId !== query.userId) {
-      throw new Error("Unauthorized: Photo does not belong to user");
+      throw createForbiddenError("Photo does not belong to user");
     }
 
     // Generate presigned URL for viewing/downloading (only for completed photos)

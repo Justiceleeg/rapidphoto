@@ -3,6 +3,7 @@ import "./config/dotenv.js";
 
 import { Hono } from "hono";
 import { cors } from "hono/cors";
+import { logger } from "hono/logger";
 import { serve } from "@hono/node-server";
 import { env } from "./config/env.js";
 import authRoutes from "./infrastructure/http/routes/auth.routes.js";
@@ -12,13 +13,35 @@ import uploadJobRoutes from "./infrastructure/http/routes/upload-job.routes.js";
 import sseRoutes from "./infrastructure/http/routes/sse.routes.js";
 import { authMiddleware } from "./infrastructure/auth/auth.middleware.js";
 import { auth } from "./infrastructure/auth/better-auth.js";
+import { errorHandler } from "./infrastructure/http/middleware/error.middleware.js";
 
 export type Variables = {
   user: typeof auth.$Infer.Session.user | null;
   session: typeof auth.$Infer.Session.session | null;
+  validatedBody?: unknown;
+  validatedQuery?: unknown;
+  validatedParams?: unknown;
 };
 
 const app = new Hono<{ Variables: Variables }>();
+
+// Error handler (catches all errors)
+app.onError(errorHandler);
+
+// Logger middleware (logs requests and responses)
+app.use(
+  "*",
+  logger((message, ...rest) => {
+    if (env.nodeEnv === "development") {
+      console.log(message, ...rest);
+    } else {
+      // In production, only log errors
+      if (message.includes("error") || message.includes("Error")) {
+        console.error(message, ...rest);
+      }
+    }
+  })
+);
 
 // CORS middleware
 app.use(

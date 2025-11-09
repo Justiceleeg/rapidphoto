@@ -8,6 +8,9 @@ import { PhotoRepositoryImpl } from "../../database/repositories/photo.repositor
 import { UploadJobRepositoryImpl } from "../../database/repositories/upload-job.repository.impl.js";
 import { R2Service } from "../../storage/r2.service.js";
 import { progressService } from "../../sse/progress.service.instance.js";
+import { validateBody, validateParams } from "../middleware/validation.middleware.js";
+import { initUploadBodySchema, photoIdParamSchema } from "../validation/schemas.js";
+import { AppError, createNotFoundError, createForbiddenError } from "../middleware/error.middleware.js";
 
 const uploadRoutes = new Hono<{ Variables: Variables }>();
 
@@ -33,117 +36,101 @@ const failPhotoHandler = new FailPhotoHandler(
 );
 
 // POST /api/upload/init - Initialize photo upload (single or batch)
-uploadRoutes.post("/init", authMiddleware, async (c) => {
-  try {
+uploadRoutes.post(
+  "/init",
+  authMiddleware,
+  validateBody(initUploadBodySchema),
+  async (c) => {
     const user = c.get("user");
     if (!user) {
-      return c.json({ error: "Unauthorized" }, 401);
+      throw new AppError(401, "Unauthorized", "AUTH_ERROR");
     }
 
-    const body = await c.req.json();
+    const body = c.get("validatedBody") as Array<{ filename: string; fileSize: number; mimeType: string }>;
     
-    // Support both single photo and array of photos
-    const photos = Array.isArray(body) ? body : [body];
-    
-    // Validate required fields for each photo
-    for (const photo of photos) {
-      if (!photo.filename || !photo.fileSize || !photo.mimeType) {
-        return c.json(
-          { error: "Missing required fields: filename, fileSize, mimeType" },
-          400
-        );
-      }
-    }
+    // Body is already normalized to array by schema transform
+    const normalizedPhotos = body.map((p) => ({
+      filename: p.filename,
+      fileSize: typeof p.fileSize === "number" ? p.fileSize : Number(p.fileSize),
+      mimeType: p.mimeType,
+    }));
 
     const result = await initUploadHandler.handle({
       userId: user.id,
-      photos: photos.map((p) => ({
-        filename: p.filename,
-        fileSize: Number(p.fileSize),
-        mimeType: p.mimeType,
-      })),
+      photos: normalizedPhotos,
     });
 
     return c.json(result, 201);
-  } catch (error: any) {
-    console.error("Error initializing upload:", error);
-    const errorMessage = error?.message || String(error);
-    return c.json(
-      { error: "Failed to initialize upload", details: errorMessage },
-      500
-    );
   }
-});
+);
 
 // Export complete handler separately for mounting at /api/photos
 export const completePhotoRoute = new Hono<{ Variables: Variables }>();
 
-completePhotoRoute.post("/:id/complete", authMiddleware, async (c) => {
-  try {
+completePhotoRoute.post(
+  "/:id/complete",
+  authMiddleware,
+  validateParams(photoIdParamSchema),
+  async (c) => {
     const user = c.get("user");
     if (!user) {
-      return c.json({ error: "Unauthorized" }, 401);
+      throw new AppError(401, "Unauthorized", "AUTH_ERROR");
     }
 
-    const photoId = c.req.param("id");
-    if (!photoId) {
-      return c.json({ error: "Photo ID is required" }, 400);
-    }
+    const params = c.get("validatedParams") as { id: string };
+    const photoId = params.id;
 
-    await completePhotoHandler.handle({
-      photoId,
-      userId: user.id,
-    });
+    try {
+      await completePhotoHandler.handle({
+        photoId,
+        userId: user.id,
+      });
+    } catch (error: any) {
+      if (error.message.includes("not found")) {
+        throw createNotFoundError("Photo", photoId);
+      }
+      if (error.message.includes("Unauthorized")) {
+        throw createForbiddenError("Photo does not belong to user");
+      }
+      throw error;
+    }
 
     return c.json({ success: true }, 200);
-  } catch (error: any) {
-    if (error.message.includes("not found")) {
-      return c.json({ error: "Photo not found" }, 404);
-    }
-    if (error.message.includes("Unauthorized")) {
-      return c.json({ error: "Unauthorized" }, 403);
-    }
-    console.error("Error completing upload:", error);
-    return c.json(
-      { error: "Failed to complete upload" },
-      500
-    );
   }
-});
+);
 
 // POST /api/photos/:id/failed - Report failed photo upload
-completePhotoRoute.post("/:id/failed", authMiddleware, async (c) => {
-  try {
+completePhotoRoute.post(
+  "/:id/failed",
+  authMiddleware,
+  validateParams(photoIdParamSchema),
+  async (c) => {
     const user = c.get("user");
     if (!user) {
-      return c.json({ error: "Unauthorized" }, 401);
+      throw new AppError(401, "Unauthorized", "AUTH_ERROR");
     }
 
-    const photoId = c.req.param("id");
-    if (!photoId) {
-      return c.json({ error: "Photo ID is required" }, 400);
-    }
+    const params = c.get("validatedParams") as { id: string };
+    const photoId = params.id;
 
-    await failPhotoHandler.handle({
-      photoId,
-      userId: user.id,
-    });
+    try {
+      await failPhotoHandler.handle({
+        photoId,
+        userId: user.id,
+      });
+    } catch (error: any) {
+      if (error.message.includes("not found")) {
+        throw createNotFoundError("Photo", photoId);
+      }
+      if (error.message.includes("Unauthorized")) {
+        throw createForbiddenError("Photo does not belong to user");
+      }
+      throw error;
+    }
 
     return c.json({ success: true }, 200);
-  } catch (error: any) {
-    if (error.message.includes("not found")) {
-      return c.json({ error: "Photo not found" }, 404);
-    }
-    if (error.message.includes("Unauthorized")) {
-      return c.json({ error: "Unauthorized" }, 403);
-    }
-    console.error("Error reporting failed upload:", error);
-    return c.json(
-      { error: "Failed to report failed upload" },
-      500
-    );
   }
-});
+);
 
 export default uploadRoutes;
 

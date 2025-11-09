@@ -8,6 +8,9 @@ import { UpdatePhotoTagsHandler } from "../../../application/commands/update-pho
 import { PhotoRepositoryImpl } from "../../database/repositories/photo.repository.impl.js";
 import { UploadJobRepositoryImpl } from "../../database/repositories/upload-job.repository.impl.js";
 import { R2Service } from "../../storage/r2.service.js";
+import { validateQuery, validateParams, validateBody } from "../middleware/validation.middleware.js";
+import { getPhotosQuerySchema, photoIdParamSchema, updatePhotoTagsSchema } from "../validation/schemas.js";
+import { AppError, createNotFoundError, createForbiddenError } from "../middleware/error.middleware.js";
 
 const photoRoutes = new Hono<{ Variables: Variables }>();
 
@@ -21,154 +24,139 @@ const getUploadJobHandler = new GetUploadJobHandler(uploadJobRepository);
 const updatePhotoTagsHandler = new UpdatePhotoTagsHandler(photoRepository);
 
 // GET /api/photos - List photos with pagination
-photoRoutes.get("/", authMiddleware, async (c) => {
-  try {
+photoRoutes.get(
+  "/",
+  authMiddleware,
+  validateQuery(getPhotosQuerySchema),
+  async (c) => {
     const user = c.get("user");
     if (!user) {
-      return c.json({ error: "Unauthorized" }, 401);
+      throw new AppError(401, "Unauthorized", "AUTH_ERROR");
     }
 
-    const page = c.req.query("page") ? parseInt(c.req.query("page")!, 10) : undefined;
-    const limit = c.req.query("limit") ? parseInt(c.req.query("limit")!, 10) : undefined;
+    const query = c.get("validatedQuery") as {
+      page?: number;
+      limit?: number;
+      tags?: string[];
+      includeSuggested?: boolean;
+    };
 
     const result = await getPhotosHandler.handle({
       userId: user.id,
-      page,
-      limit,
+      page: query?.page,
+      limit: query?.limit,
+      // tags and includeSuggested will be added in Slice 6
     });
 
     return c.json(result, 200);
-  } catch (error: any) {
-    if (error.message.includes("Page must be") || error.message.includes("Limit must be")) {
-      return c.json({ error: error.message }, 400);
-    }
-    console.error("Error getting photos:", error);
-    return c.json(
-      { error: "Failed to get photos", details: error?.message || String(error) },
-      500
-    );
   }
-});
+);
 
 // GET /api/photos/:id - Get single photo
-photoRoutes.get("/:id", authMiddleware, async (c) => {
-  try {
+photoRoutes.get(
+  "/:id",
+  authMiddleware,
+  validateParams(photoIdParamSchema),
+  async (c) => {
     const user = c.get("user");
     if (!user) {
-      return c.json({ error: "Unauthorized" }, 401);
+      throw new AppError(401, "Unauthorized", "AUTH_ERROR");
     }
 
-    const photoId = c.req.param("id");
-    if (!photoId) {
-      return c.json({ error: "Photo ID is required" }, 400);
-    }
+    const params = c.get("validatedParams") as { id: string };
+    const photoId = params.id;
 
-    const result = await getPhotoHandler.handle({
-      photoId,
-      userId: user.id,
-    });
+    try {
+      const result = await getPhotoHandler.handle({
+        photoId,
+        userId: user.id,
+      });
 
-    return c.json(result, 200);
-  } catch (error: any) {
-    if (error.message.includes("not found")) {
-      return c.json({ error: "Photo not found" }, 404);
+      return c.json(result, 200);
+    } catch (error: any) {
+      if (error.message.includes("not found")) {
+        throw createNotFoundError("Photo", photoId);
+      }
+      if (error.message.includes("Unauthorized")) {
+        throw createForbiddenError("Photo does not belong to user");
+      }
+      throw error;
     }
-    if (error.message.includes("Unauthorized")) {
-      return c.json({ error: "Unauthorized" }, 403);
-    }
-    console.error("Error getting photo:", error);
-    return c.json(
-      { error: "Failed to get photo", details: error?.message || String(error) },
-      500
-    );
   }
-});
+);
 
 // DELETE /api/photos/:id - Delete photo
-photoRoutes.delete("/:id", authMiddleware, async (c) => {
-  try {
+photoRoutes.delete(
+  "/:id",
+  authMiddleware,
+  validateParams(photoIdParamSchema),
+  async (c) => {
     const user = c.get("user");
     if (!user) {
-      return c.json({ error: "Unauthorized" }, 401);
+      throw new AppError(401, "Unauthorized", "AUTH_ERROR");
     }
 
-    const photoId = c.req.param("id");
-    if (!photoId) {
-      return c.json({ error: "Photo ID is required" }, 400);
-    }
+    const params = c.get("validatedParams") as { id: string };
+    const photoId = params.id;
 
     // Verify photo exists and belongs to user
     const photo = await photoRepository.findById(photoId);
     if (!photo) {
-      return c.json({ error: "Photo not found" }, 404);
+      throw createNotFoundError("Photo", photoId);
     }
     if (photo.userId !== user.id) {
-      return c.json({ error: "Unauthorized" }, 403);
+      throw createForbiddenError("Photo does not belong to user");
     }
 
     await photoRepository.delete(photoId);
 
     return c.json({ success: true }, 200);
-  } catch (error: any) {
-    console.error("Error deleting photo:", error);
-    return c.json(
-      { error: "Failed to delete photo", details: error?.message || String(error) },
-      500
-    );
   }
-});
+);
 
 // PUT /api/photos/:id/tags - Update photo tags
-photoRoutes.put("/:id/tags", authMiddleware, async (c) => {
-  try {
+photoRoutes.put(
+  "/:id/tags",
+  authMiddleware,
+  validateParams(photoIdParamSchema),
+  validateBody(updatePhotoTagsSchema),
+  async (c) => {
     const user = c.get("user");
     if (!user) {
-      return c.json({ error: "Unauthorized" }, 401);
+      throw new AppError(401, "Unauthorized", "AUTH_ERROR");
     }
 
-    const photoId = c.req.param("id");
-    if (!photoId) {
-      return c.json({ error: "Photo ID is required" }, 400);
-    }
+    const params = c.get("validatedParams") as { id: string };
+    const photoId = params.id;
+    const body = c.get("validatedBody") as { tags: string[] };
+    const tags = body.tags;
 
-    const body = await c.req.json();
-    
-    if (!body || typeof body !== "object") {
-      return c.json({ error: "Request body must be an object" }, 400);
-    }
-    
-    if (!body.tags || !Array.isArray(body.tags)) {
-      return c.json({ error: "Tags must be an array" }, 400);
-    }
+    try {
+      const result = await updatePhotoTagsHandler.handle({
+        photoId,
+        userId: user.id,
+        tags,
+      });
 
-    const result = await updatePhotoTagsHandler.handle({
-      photoId,
-      userId: user.id,
-      tags: body.tags,
-    });
-
-    return c.json(result, 200);
-  } catch (error: any) {
-    if (error.message.includes("not found")) {
-      return c.json({ error: "Photo not found" }, 404);
+      return c.json(result, 200);
+    } catch (error: any) {
+      if (error.message.includes("not found")) {
+        throw createNotFoundError("Photo", photoId);
+      }
+      if (error.message.includes("Unauthorized")) {
+        throw createForbiddenError("Photo does not belong to user");
+      }
+      if (
+        error.message.includes("must be") ||
+        error.message.includes("cannot") ||
+        error.message.includes("Tags")
+      ) {
+        throw new AppError(400, error.message, "VALIDATION_ERROR");
+      }
+      throw error;
     }
-    if (error.message.includes("Unauthorized")) {
-      return c.json({ error: "Unauthorized" }, 403);
-    }
-    if (
-      error.message.includes("must be") ||
-      error.message.includes("cannot") ||
-      error.message.includes("Tags")
-    ) {
-      return c.json({ error: error.message }, 400);
-    }
-    console.error("Error updating photo tags:", error);
-    return c.json(
-      { error: "Failed to update photo tags", details: error?.message || String(error) },
-      500
-    );
   }
-});
+);
 
 export default photoRoutes;
 

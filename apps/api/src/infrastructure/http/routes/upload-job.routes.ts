@@ -3,6 +3,9 @@ import type { Variables } from "../../../index.js";
 import { authMiddleware } from "../../auth/auth.middleware.js";
 import { GetUploadJobHandler } from "../../../application/queries/get-upload-job/get-upload-job.handler.js";
 import { UploadJobRepositoryImpl } from "../../database/repositories/upload-job.repository.impl.js";
+import { validateParams } from "../middleware/validation.middleware.js";
+import { uploadJobIdParamSchema } from "../validation/schemas.js";
+import { AppError, createNotFoundError, createForbiddenError } from "../middleware/error.middleware.js";
 
 const uploadJobRoutes = new Hono<{ Variables: Variables }>();
 
@@ -11,38 +14,37 @@ const uploadJobRepository = new UploadJobRepositoryImpl();
 const getUploadJobHandler = new GetUploadJobHandler(uploadJobRepository);
 
 // GET /api/upload-jobs/:id - Get upload job by ID
-uploadJobRoutes.get("/:id", authMiddleware, async (c) => {
-  try {
+uploadJobRoutes.get(
+  "/:id",
+  authMiddleware,
+  validateParams(uploadJobIdParamSchema),
+  async (c) => {
     const user = c.get("user");
     if (!user) {
-      return c.json({ error: "Unauthorized" }, 401);
+      throw new AppError(401, "Unauthorized", "AUTH_ERROR");
     }
 
-    const jobId = c.req.param("id");
-    if (!jobId) {
-      return c.json({ error: "Job ID is required" }, 400);
-    }
+    const params = c.get("validatedParams") as { id: string };
+    const jobId = params.id;
 
-    const result = await getUploadJobHandler.handle({
-      jobId,
-      userId: user.id,
-    });
+    try {
+      const result = await getUploadJobHandler.handle({
+        jobId,
+        userId: user.id,
+      });
 
-    return c.json(result, 200);
-  } catch (error: any) {
-    if (error.message.includes("not found")) {
-      return c.json({ error: "Upload job not found" }, 404);
+      return c.json(result, 200);
+    } catch (error: any) {
+      if (error.message.includes("not found")) {
+        throw createNotFoundError("Upload job", jobId);
+      }
+      if (error.message.includes("Unauthorized")) {
+        throw createForbiddenError("Upload job does not belong to user");
+      }
+      throw error;
     }
-    if (error.message.includes("Unauthorized")) {
-      return c.json({ error: "Unauthorized" }, 403);
-    }
-    console.error("Error getting upload job:", error);
-    return c.json(
-      { error: "Failed to get upload job", details: error?.message || String(error) },
-      500
-    );
   }
-});
+);
 
 export default uploadJobRoutes;
 

@@ -8,7 +8,8 @@
  *    - R2_ACCESS_KEY_ID
  *    - R2_SECRET_ACCESS_KEY
  *    - R2_BUCKET_NAME
- * 3. Run: npx tsx scripts/empty-r2-bucket.ts
+ * 3. Run with .env file from apps/api directory:
+ *    DOTENV_CONFIG_PATH=apps/api/.env npx tsx -r dotenv/config scripts/empty-r2-bucket.ts
  */
 
 import { S3Client, ListObjectsV2Command, DeleteObjectsCommand } from '@aws-sdk/client-s3';

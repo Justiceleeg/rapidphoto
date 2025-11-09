@@ -4,7 +4,7 @@ import { R2Service } from "../../../infrastructure/storage/r2.service.js";
 import { ProgressService } from "../../../infrastructure/sse/progress.service.js";
 import { createNotFoundError, createForbiddenError } from "../../../infrastructure/http/middleware/error.middleware.js";
 import { CompletePhotoCommand } from "./complete-photo.command.js";
-import { queueThumbnailGeneration } from "../../../infrastructure/queue/photo-queue.js";
+import { queueThumbnailGeneration, queueAITagging } from "../../../infrastructure/queue/photo-queue.js";
 
 /**
  * Handler for completing photo uploads
@@ -61,6 +61,16 @@ export class CompletePhotoHandler {
     }).catch((error) => {
       // Log error but don't fail the photo completion
       console.error(`Failed to queue thumbnail generation for photo ${command.photoId}:`, error);
+    });
+
+    // Queue AI tagging job (fire and forget - don't wait for completion)
+    queueAITagging({
+      photoId: command.photoId,
+      r2Key: photo.r2Key,
+      userId: command.userId,
+    }).catch((error) => {
+      // Log error but don't fail the photo completion
+      console.error(`Failed to queue AI tagging for photo ${command.photoId}:`, error);
     });
 
     // If photo is part of an upload job, update job progress

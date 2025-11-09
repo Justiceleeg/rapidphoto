@@ -4,10 +4,10 @@
 - [x] 1.3 Generate and apply migration (`pnpm db:generate && pnpm db:migrate`)
 - [x] 1.4 Update Photo entity interface (`apps/api/src/domain/photo/photo.entity.ts` - add `suggestedTags?: string[]`)
 - [x] 1.5 Update PhotoRepository interface (`apps/api/src/domain/photo/photo.repository.ts` - ensure update method supports new fields)
-- [ ] 1.6 Setup AWS Rekognition client (`pnpm add @aws-sdk/client-rekognition`, create `apps/api/src/infrastructure/ai/rekognition.service.ts` and `rekognition.config.ts`)
-- [ ] 1.7 Create AI tagging worker (`apps/api/src/infrastructure/queue/workers/ai-tagging.worker.ts` - download image, call Rekognition DetectLabels, filter ≥70% confidence, store in `suggested_tags`)
-- [ ] 1.8 Register AI tagging worker (`apps/api/src/infrastructure/queue/workers/index.ts`)
-- [ ] 1.9 Queue tagging job after photo completion (`apps/api/src/application/commands/complete-photo/complete-photo.handler.ts` - queue AI tagging job alongside thumbnail job)
+- [x] 1.6 Setup AWS Rekognition client (`pnpm add @aws-sdk/client-rekognition`, create `apps/api/src/infrastructure/ai/rekognition.service.ts` and `rekognition.config.ts`)
+- [x] 1.7 Create AI tagging worker (`apps/api/src/infrastructure/queue/workers/ai-tagging.worker.ts` - download image, call Rekognition DetectLabels, filter ≥70% confidence, store in `suggested_tags`)
+- [x] 1.8 Register AI tagging worker (`apps/api/src/infrastructure/queue/workers/index.ts`)
+- [x] 1.9 Queue tagging job after photo completion (`apps/api/src/application/commands/complete-photo/complete-photo.handler.ts` - queue AI tagging job alongside thumbnail job)
 - [ ] 1.10 Test AI tagging worker (upload photo, verify job queued, verify tags generated with ≥70% confidence, verify stored in `suggested_tags`)
 
 ## 2. Backend - AI Tag Acceptance/Rejection

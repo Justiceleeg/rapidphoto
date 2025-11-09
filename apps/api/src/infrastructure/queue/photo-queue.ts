@@ -17,9 +17,18 @@ export interface ThumbnailGenerationJobData {
 }
 
 /**
+ * Job data for AI tagging
+ */
+export interface AITaggingJobData {
+  photoId: string;
+  r2Key: string;
+  userId: string;
+}
+
+/**
  * Photo processing job types
  */
-export type PhotoProcessingJobData = ThumbnailGenerationJobData;
+export type PhotoProcessingJobData = ThumbnailGenerationJobData | AITaggingJobData;
 
 /**
  * Photo processing queue instance
@@ -37,6 +46,17 @@ export async function queueThumbnailGeneration(
 ): Promise<void> {
   await photoQueue.add('generate-thumbnail', data, {
     jobId: `thumbnail-${data.photoId}`, // Prevent duplicate jobs
+  });
+}
+
+/**
+ * Add an AI tagging job to the queue
+ */
+export async function queueAITagging(
+  data: AITaggingJobData
+): Promise<void> {
+  await photoQueue.add('ai-tagging', data, {
+    jobId: `ai-tagging-${data.photoId}`, // Prevent duplicate jobs
   });
 }
 

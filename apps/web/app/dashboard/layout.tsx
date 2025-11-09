@@ -4,6 +4,7 @@ import { useEffect } from "react";
 import { useRouter, usePathname } from "next/navigation";
 import Link from "next/link";
 import { useAuth } from "@/lib/hooks/use-auth";
+import { useUploadCacheInvalidation } from "@/lib/hooks/use-upload-cache-invalidation";
 import { Button } from "@/components/ui/button";
 
 export default function DashboardLayout({
@@ -14,6 +15,9 @@ export default function DashboardLayout({
   const router = useRouter();
   const pathname = usePathname();
   const { user, isAuthenticated, isLoading } = useAuth();
+
+  // Set up cache invalidation for uploads (refreshes gallery when uploads complete)
+  useUploadCacheInvalidation();
 
   useEffect(() => {
     if (!isLoading && !isAuthenticated) {

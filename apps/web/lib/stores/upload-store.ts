@@ -8,6 +8,16 @@ import type {
   InitBatchUploadResponse,
 } from "@rapidphoto/api-client";
 
+// Type for query client callback (to avoid direct dependency)
+type InvalidateQueriesCallback = () => void;
+
+// Global callback for cache invalidation (set by hook)
+let invalidatePhotosQueryCallback: InvalidateQueriesCallback | null = null;
+
+export function setInvalidatePhotosCallback(callback: InvalidateQueriesCallback | null) {
+  invalidatePhotosQueryCallback = callback;
+}
+
 export type UploadState = "idle" | "pending" | "uploading" | "completed" | "error";
 
 export type PhotoUploadStatus = "pending" | "uploading" | "completed" | "failed";
@@ -211,6 +221,11 @@ export const useUploadStore = create<UploadStore>()(
       await uploadClient.completePhoto(initResult.photoId);
       console.log("Upload completed successfully");
       set({ uploadState: "completed", progress: 100 });
+
+      // Invalidate photos query cache so gallery refreshes
+      if (invalidatePhotosQueryCallback) {
+        invalidatePhotosQueryCallback();
+      }
     } catch (error) {
       console.error("Upload error:", error);
       const errorMessage =
@@ -311,6 +326,11 @@ export const useUploadStore = create<UploadStore>()(
               status: "completed",
               progress: 100,
             });
+
+            // Invalidate photos query cache so gallery refreshes
+            if (invalidatePhotosQueryCallback) {
+              invalidatePhotosQueryCallback();
+            }
           } catch (error) {
             console.error("Upload error:", {
               fileName,

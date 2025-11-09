@@ -3,12 +3,28 @@ import { R2Service } from "../../../infrastructure/storage/r2.service.js";
 import { createNotFoundError, createForbiddenError } from "../../../infrastructure/http/middleware/error.middleware.js";
 import { GetPhotoQuery, GetPhotoResult } from "./get-photo.query.js";
 
+/**
+ * Handler for querying a single photo by ID
+ * Generates presigned URL for completed photos
+ */
 export class GetPhotoHandler {
+  /**
+   * @param photoRepository - Repository for photo data access
+   * @param r2Service - Service for R2 storage operations
+   */
   constructor(
     private photoRepository: PhotoRepository,
     private r2Service: R2Service
   ) {}
 
+  /**
+   * Get a single photo by ID
+   * Generates presigned URL if photo is completed
+   * 
+   * @param query - Query parameters for photo retrieval
+   * @returns Photo details with presigned URL if completed
+   * @throws {AppError} If photo not found or user doesn't own the photo
+   */
   async handle(query: GetPhotoQuery): Promise<GetPhotoResult> {
     const photo = await this.photoRepository.findById(query.photoId);
 

@@ -12,6 +12,10 @@ import { validateQuery, validateParams, validateBody } from "../middleware/valid
 import { getPhotosQuerySchema, photoIdParamSchema, updatePhotoTagsSchema } from "../validation/schemas.js";
 import { AppError, createNotFoundError, createForbiddenError } from "../middleware/error.middleware.js";
 
+/**
+ * Photo routes for photo management operations
+ * Handles listing, retrieving, updating, and deleting photos
+ */
 const photoRoutes = new Hono<{ Variables: Variables }>();
 
 // Initialize services and handlers
@@ -23,7 +27,11 @@ const getPhotoHandler = new GetPhotoHandler(photoRepository, r2Service);
 const getUploadJobHandler = new GetUploadJobHandler(uploadJobRepository);
 const updatePhotoTagsHandler = new UpdatePhotoTagsHandler(photoRepository);
 
-// GET /api/photos - List photos with pagination
+/**
+ * GET /api/photos
+ * List photos with pagination
+ * Returns paginated list of user's photos with presigned URLs
+ */
 photoRoutes.get(
   "/",
   authMiddleware,
@@ -52,7 +60,11 @@ photoRoutes.get(
   }
 );
 
-// GET /api/photos/:id - Get single photo
+/**
+ * GET /api/photos/:id
+ * Get a single photo by ID
+ * Returns photo details with presigned URL if completed
+ */
 photoRoutes.get(
   "/:id",
   authMiddleware,
@@ -85,7 +97,11 @@ photoRoutes.get(
   }
 );
 
-// DELETE /api/photos/:id - Delete photo
+/**
+ * DELETE /api/photos/:id
+ * Delete a photo
+ * Removes photo record from database (R2 object remains)
+ */
 photoRoutes.delete(
   "/:id",
   authMiddleware,
@@ -114,7 +130,11 @@ photoRoutes.delete(
   }
 );
 
-// PUT /api/photos/:id/tags - Update photo tags
+/**
+ * PUT /api/photos/:id/tags
+ * Update photo tags
+ * Normalizes tags (lowercase, trim, deduplicate) before saving
+ */
 photoRoutes.put(
   "/:id/tags",
   authMiddleware,

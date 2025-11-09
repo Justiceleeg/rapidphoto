@@ -4,8 +4,15 @@ import { env } from "../../../config/env.js";
 
 /**
  * Custom error class for application errors
+ * Provides structured error information with status code, message, error code, and optional details
  */
 export class AppError extends Error {
+  /**
+   * @param statusCode - HTTP status code (400, 401, 403, 404, 500)
+   * @param message - Human-readable error message
+   * @param code - Optional error code for programmatic error handling
+   * @param details - Optional additional error details
+   */
   constructor(
     public statusCode: number,
     public message: string,
@@ -31,6 +38,11 @@ interface ErrorResponse {
 /**
  * Error handler for Hono app
  * Catches all errors and returns consistent error responses
+ * Handles HTTPException, AppError, Zod validation errors, and generic errors
+ * 
+ * @param error - The error that was thrown
+ * @param c - Hono context
+ * @returns JSON error response with consistent format
  */
 export function errorHandler(error: Error, c: Context) {
   // Log error with context
@@ -52,7 +64,8 @@ export function errorHandler(error: Error, c: Context) {
       timestamp: new Date().toISOString(),
     };
 
-    if (env.nodeEnv === "development" && error.cause) {
+    // HTTPException may have cause property in some cases
+    if (env.nodeEnv === "development" && "cause" in error && error.cause) {
       response.details = error.cause;
     }
 

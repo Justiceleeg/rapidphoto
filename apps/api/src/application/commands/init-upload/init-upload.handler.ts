@@ -4,13 +4,29 @@ import { PhotoRepository } from "../../../domain/photo/photo.repository.js";
 import { UploadJobRepository } from "../../../domain/upload-job/upload-job.repository.js";
 import { InitUploadCommand, InitUploadResult } from "./init-upload.command.js";
 
+/**
+ * Handler for initializing photo uploads
+ * Supports both single photo and batch uploads (up to 100 photos)
+ */
 export class InitUploadHandler {
+  /**
+   * @param photoRepository - Repository for photo data access
+   * @param uploadJobRepository - Repository for upload job data access
+   * @param r2Service - Service for R2 storage operations
+   */
   constructor(
     private photoRepository: PhotoRepository,
     private uploadJobRepository: UploadJobRepository,
     private r2Service: R2Service
   ) {}
 
+  /**
+   * Initialize a photo upload (single or batch)
+   * Creates photo records with "pending" status and generates presigned URLs for direct client upload
+   * 
+   * @param command - Upload initialization command
+   * @returns Upload result with presigned URLs and photo/job IDs
+   */
   async handle(command: InitUploadCommand): Promise<InitUploadResult> {
     const photosArray = Array.isArray(command.photos)
       ? command.photos

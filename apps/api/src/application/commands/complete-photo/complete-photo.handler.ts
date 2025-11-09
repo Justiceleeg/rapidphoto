@@ -5,7 +5,17 @@ import { ProgressService } from "../../../infrastructure/sse/progress.service.js
 import { createNotFoundError, createForbiddenError } from "../../../infrastructure/http/middleware/error.middleware.js";
 import { CompletePhotoCommand } from "./complete-photo.command.js";
 
+/**
+ * Handler for completing photo uploads
+ * Marks photo as completed, updates upload job progress, and publishes progress events
+ */
 export class CompletePhotoHandler {
+  /**
+   * @param photoRepository - Repository for photo data access
+   * @param uploadJobRepository - Repository for upload job data access
+   * @param r2Service - Service for R2 storage operations
+   * @param progressService - Service for publishing upload progress events
+   */
   constructor(
     private photoRepository: PhotoRepository,
     private uploadJobRepository: UploadJobRepository,
@@ -13,6 +23,13 @@ export class CompletePhotoHandler {
     private progressService: ProgressService
   ) {}
 
+  /**
+   * Mark a photo upload as completed
+   * Updates photo status, upload job progress, and publishes progress events via SSE
+   * 
+   * @param command - Complete photo command
+   * @throws {AppError} If photo not found or user doesn't own the photo
+   */
   async handle(command: CompletePhotoCommand): Promise<void> {
     // Find photo by ID
     const photo = await this.photoRepository.findById(command.photoId);

@@ -2,9 +2,16 @@ import { S3Client, PutObjectCommand, GetObjectCommand } from "@aws-sdk/client-s3
 import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
 import { env } from "../../config/env.js";
 
+/**
+ * Service for interacting with Cloudflare R2 storage
+ * Provides methods for generating presigned URLs for upload and download
+ */
 export class R2Service {
   private client: S3Client;
 
+  /**
+   * Initialize R2 service with S3-compatible client
+   */
   constructor() {
     this.client = new S3Client({
       region: "auto",

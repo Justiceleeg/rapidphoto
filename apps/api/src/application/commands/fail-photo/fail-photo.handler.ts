@@ -4,13 +4,29 @@ import { ProgressService } from "../../../infrastructure/sse/progress.service.js
 import { createNotFoundError, createForbiddenError } from "../../../infrastructure/http/middleware/error.middleware.js";
 import { FailPhotoCommand } from "./fail-photo.command.js";
 
+/**
+ * Handler for marking photo uploads as failed
+ * Updates photo status, upload job progress, and publishes progress events
+ */
 export class FailPhotoHandler {
+  /**
+   * @param photoRepository - Repository for photo data access
+   * @param uploadJobRepository - Repository for upload job data access
+   * @param progressService - Service for publishing upload progress events
+   */
   constructor(
     private photoRepository: PhotoRepository,
     private uploadJobRepository: UploadJobRepository,
     private progressService: ProgressService
   ) {}
 
+  /**
+   * Mark a photo upload as failed
+   * Updates photo status, upload job progress, and publishes progress events via SSE
+   * 
+   * @param command - Fail photo command
+   * @throws {AppError} If photo not found or user doesn't own the photo
+   */
   async handle(command: FailPhotoCommand): Promise<void> {
     // Find photo by ID
     const photo = await this.photoRepository.findById(command.photoId);

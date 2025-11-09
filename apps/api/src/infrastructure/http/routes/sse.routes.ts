@@ -5,12 +5,21 @@ import { authMiddleware } from "../../auth/auth.middleware.js";
 import { UploadJobRepositoryImpl } from "../../database/repositories/upload-job.repository.impl.js";
 import { progressService } from "../../sse/progress.service.instance.js";
 
+/**
+ * SSE routes for real-time progress updates
+ * Handles Server-Sent Events for upload progress tracking
+ */
 const sseRoutes = new Hono<{ Variables: Variables }>();
 
 // Initialize services
 const uploadJobRepository = new UploadJobRepositoryImpl();
 
-// GET /api/upload-progress/:jobId - SSE endpoint for upload progress
+/**
+ * GET /api/upload-progress/:jobId
+ * SSE endpoint for upload progress
+ * Streams real-time progress events for batch uploads
+ * Automatically closes connection when job is completed or failed
+ */
 sseRoutes.get("/upload-progress/:jobId", authMiddleware, async (c) => {
   try {
     const user = c.get("user");

@@ -3,8 +3,12 @@ import { z } from "zod";
 import { createValidationError } from "./error.middleware.js";
 
 /**
- * Validation middleware factory
- * Creates middleware that validates request body, query, or params against a Zod schema
+ * Validation middleware factory for request body
+ * Validates request body against a Zod schema and stores validated data in context
+ * 
+ * @param schema - Zod schema to validate against
+ * @returns Hono middleware function
+ * @throws {AppError} If validation fails
  */
 export function validateBody<T extends z.ZodTypeAny>(schema: T) {
   return async (c: Context, next: Next) => {
@@ -24,7 +28,12 @@ export function validateBody<T extends z.ZodTypeAny>(schema: T) {
 }
 
 /**
- * Validation middleware for query parameters
+ * Validation middleware factory for query parameters
+ * Validates query parameters against a Zod schema and stores validated data in context
+ * 
+ * @param schema - Zod schema to validate against
+ * @returns Hono middleware function
+ * @throws {AppError} If validation fails
  */
 export function validateQuery<T extends z.ZodTypeAny>(schema: T) {
   return async (c: Context, next: Next) => {
@@ -47,7 +56,12 @@ export function validateQuery<T extends z.ZodTypeAny>(schema: T) {
 }
 
 /**
- * Validation middleware for route parameters
+ * Validation middleware factory for route parameters
+ * Validates route parameters against a Zod schema and stores validated data in context
+ * 
+ * @param schema - Zod schema to validate against
+ * @returns Hono middleware function
+ * @throws {AppError} If validation fails
  */
 export function validateParams<T extends z.ZodTypeAny>(schema: T) {
   return async (c: Context, next: Next) => {

@@ -2,9 +2,22 @@ import { UploadJobRepository } from "../../../domain/upload-job/upload-job.repos
 import { createNotFoundError, createForbiddenError } from "../../../infrastructure/http/middleware/error.middleware.js";
 import { GetUploadJobQuery, GetUploadJobResult } from "./get-upload-job.query.js";
 
+/**
+ * Handler for querying upload job details
+ */
 export class GetUploadJobHandler {
+  /**
+   * @param uploadJobRepository - Repository for upload job data access
+   */
   constructor(private uploadJobRepository: UploadJobRepository) {}
 
+  /**
+   * Get upload job details by ID
+   * 
+   * @param query - Query parameters for upload job retrieval
+   * @returns Upload job details with progress information
+   * @throws {AppError} If upload job not found or user doesn't own the job
+   */
   async handle(query: GetUploadJobQuery): Promise<GetUploadJobResult> {
     const job = await this.uploadJobRepository.findById(query.jobId);
 

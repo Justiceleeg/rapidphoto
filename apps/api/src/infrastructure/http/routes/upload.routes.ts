@@ -12,6 +12,10 @@ import { validateBody, validateParams } from "../middleware/validation.middlewar
 import { initUploadBodySchema, photoIdParamSchema } from "../validation/schemas.js";
 import { AppError, createNotFoundError, createForbiddenError } from "../middleware/error.middleware.js";
 
+/**
+ * Upload routes for photo upload operations
+ * Handles single and batch photo upload initialization, completion, and failure
+ */
 const uploadRoutes = new Hono<{ Variables: Variables }>();
 
 // Initialize services and handlers
@@ -35,7 +39,12 @@ const failPhotoHandler = new FailPhotoHandler(
   progressService
 );
 
-// POST /api/upload/init - Initialize photo upload (single or batch)
+/**
+ * POST /api/upload/init
+ * Initialize photo upload (single or batch)
+ * Creates photo records and generates presigned URLs for direct client upload
+ * Supports 1-100 photos per batch
+ */
 uploadRoutes.post(
   "/init",
   authMiddleware,
@@ -64,9 +73,17 @@ uploadRoutes.post(
   }
 );
 
-// Export complete handler separately for mounting at /api/photos
+/**
+ * Complete photo routes (mounted at /api/photos)
+ * Handles photo upload completion and failure reporting
+ */
 export const completePhotoRoute = new Hono<{ Variables: Variables }>();
 
+/**
+ * POST /api/photos/:id/complete
+ * Mark a photo upload as completed
+ * Updates photo status, upload job progress, and publishes SSE events
+ */
 completePhotoRoute.post(
   "/:id/complete",
   authMiddleware,
@@ -99,7 +116,11 @@ completePhotoRoute.post(
   }
 );
 
-// POST /api/photos/:id/failed - Report failed photo upload
+/**
+ * POST /api/photos/:id/failed
+ * Report a failed photo upload
+ * Updates photo status, upload job progress, and publishes SSE events
+ */
 completePhotoRoute.post(
   "/:id/failed",
   authMiddleware,

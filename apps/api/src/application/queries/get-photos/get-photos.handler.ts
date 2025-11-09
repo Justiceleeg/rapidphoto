@@ -2,12 +2,27 @@ import { PhotoRepository } from "../../../domain/photo/photo.repository.js";
 import { R2Service } from "../../../infrastructure/storage/r2.service.js";
 import { GetPhotosQuery, GetPhotosResult } from "./get-photos.query.js";
 
+/**
+ * Handler for querying user photos with pagination
+ * Generates presigned URLs for completed photos
+ */
 export class GetPhotosHandler {
+  /**
+   * @param photoRepository - Repository for photo data access
+   * @param r2Service - Service for R2 storage operations
+   */
   constructor(
     private photoRepository: PhotoRepository,
     private r2Service: R2Service
   ) {}
 
+  /**
+   * Get paginated list of photos for a user
+   * Generates presigned URLs for completed photos in parallel
+   * 
+   * @param query - Query parameters for photo retrieval
+   * @returns Paginated list of photos with presigned URLs
+   */
   async handle(query: GetPhotosQuery): Promise<GetPhotosResult> {
     // Note: Pagination validation is handled by Zod at the route level
     // page is validated as positive integer, limit is validated as positive integer with max 100

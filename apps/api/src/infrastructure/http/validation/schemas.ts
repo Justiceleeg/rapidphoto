@@ -2,6 +2,11 @@ import { z } from "zod";
 
 /**
  * Auth validation schemas
+ * Note: These are defined but not used as Better-Auth handles its own validation
+ */
+
+/**
+ * Signup request validation schema
  */
 export const signupSchema = z.object({
   email: z.string().email("Invalid email format"),
@@ -9,6 +14,9 @@ export const signupSchema = z.object({
   name: z.string().min(1, "Name is required"),
 });
 
+/**
+ * Signin request validation schema
+ */
 export const signinSchema = z.object({
   email: z.string().email("Invalid email format"),
   password: z.string().min(1, "Password is required"),
@@ -17,18 +25,21 @@ export const signinSchema = z.object({
 /**
  * Upload validation schemas
  */
+
+/**
+ * Photo metadata validation schema
+ */
 export const photoMetadataSchema = z.object({
   filename: z.string().min(1, "Filename is required"),
   fileSize: z.number().positive("File size must be positive"),
   mimeType: z.string().min(1, "MIME type is required").regex(/^image\//, "Must be an image file"),
 });
 
-export const initUploadSchema = z.object({
-  photos: z.array(photoMetadataSchema).min(1, "At least one photo is required").max(100, "Maximum 100 photos allowed"),
-});
-
-// Support single photo or array
-// Support single photo or array of photos
+/**
+ * Upload initialization body schema
+ * Supports both single photo object and array of photos (1-100 photos)
+ * Normalizes input to always return an array
+ */
 export const initUploadBodySchema = z.union([
   photoMetadataSchema,
   z.array(photoMetadataSchema).min(1, "At least one photo is required").max(100, "Maximum 100 photos allowed"),
@@ -37,16 +48,27 @@ export const initUploadBodySchema = z.union([
   return Array.isArray(val) ? val : [val];
 });
 
+/**
+ * Complete photo request validation schema
+ */
 export const completePhotoSchema = z.object({
   photoId: z.string().uuid("Invalid photo ID format"),
 });
 
+/**
+ * Fail photo request validation schema
+ */
 export const failPhotoSchema = z.object({
   photoId: z.string().uuid("Invalid photo ID format"),
 });
 
 /**
  * Photo query validation schemas
+ */
+
+/**
+ * Get photos query parameters validation schema
+ * Supports pagination, tag filtering, and suggested tags inclusion
  */
 export const getPhotosQuerySchema = z.object({
   page: z.coerce.number().int().positive().optional(),
@@ -58,19 +80,23 @@ export const getPhotosQuerySchema = z.object({
   includeSuggested: z.coerce.boolean().optional(),
 });
 
+/**
+ * Update photo tags request body validation schema
+ * Validates tag array (max 20 tags, each max 50 characters)
+ */
 export const updatePhotoTagsSchema = z.object({
   tags: z.array(z.string().min(1, "Tag cannot be empty").max(50, "Tag cannot exceed 50 characters")).max(20, "Maximum 20 tags allowed"),
 });
 
 /**
- * Photo ID param validation
+ * Photo ID route parameter validation schema
  */
 export const photoIdParamSchema = z.object({
   id: z.string().uuid("Invalid photo ID format"),
 });
 
 /**
- * Upload job ID param validation
+ * Upload job ID route parameter validation schema
  */
 export const uploadJobIdParamSchema = z.object({
   id: z.string().uuid("Invalid upload job ID format"),

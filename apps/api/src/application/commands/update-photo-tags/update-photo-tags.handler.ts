@@ -2,9 +2,24 @@ import { PhotoRepository } from "../../../domain/photo/photo.repository.js";
 import { createNotFoundError, createForbiddenError } from "../../../infrastructure/http/middleware/error.middleware.js";
 import { UpdatePhotoTagsCommand, UpdatePhotoTagsResult } from "./update-photo-tags.command.js";
 
+/**
+ * Handler for updating photo tags
+ * Normalizes tags (lowercase, trim, deduplicate) before saving
+ */
 export class UpdatePhotoTagsHandler {
+  /**
+   * @param photoRepository - Repository for photo data access
+   */
   constructor(private photoRepository: PhotoRepository) {}
 
+  /**
+   * Update tags for a photo
+   * Tags are normalized: converted to lowercase, trimmed, and duplicates removed
+   * 
+   * @param command - Update photo tags command
+   * @returns Updated photo with normalized tags
+   * @throws {AppError} If photo not found or user doesn't own the photo
+   */
   async handle(command: UpdatePhotoTagsCommand): Promise<UpdatePhotoTagsResult> {
     // Note: Tag validation is handled by Zod at the route level
     // No need to validate here - tags are already validated and normalized

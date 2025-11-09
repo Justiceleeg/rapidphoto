@@ -45,15 +45,15 @@
   - Improve type safety
 
 ## 6. Documentation
-- [ ] 6.1 Add JSDoc comments to application layer
+- [x] 6.1 Add JSDoc comments to application layer
   - Document command/query handlers
   - Document DTOs
   - Document use cases
-- [ ] 6.2 Add JSDoc comments to domain layer
+- [x] 6.2 Add JSDoc comments to domain layer
   - Document entities
   - Document repository interfaces
   - Document domain logic
-- [ ] 6.3 Add JSDoc comments to infrastructure layer
+- [x] 6.3 Add JSDoc comments to infrastructure layer
   - Document route handlers
   - Document middleware
   - Document services

@@ -7,13 +7,21 @@ import { validateParams } from "../middleware/validation.middleware.js";
 import { uploadJobIdParamSchema } from "../validation/schemas.js";
 import { AppError, createNotFoundError, createForbiddenError } from "../middleware/error.middleware.js";
 
+/**
+ * Upload job routes for batch upload job management
+ * Handles retrieving upload job details and progress
+ */
 const uploadJobRoutes = new Hono<{ Variables: Variables }>();
 
 // Initialize services and handlers
 const uploadJobRepository = new UploadJobRepositoryImpl();
 const getUploadJobHandler = new GetUploadJobHandler(uploadJobRepository);
 
-// GET /api/upload-jobs/:id - Get upload job by ID
+/**
+ * GET /api/upload-jobs/:id
+ * Get upload job by ID
+ * Returns upload job details with progress information
+ */
 uploadJobRoutes.get(
   "/:id",
   authMiddleware,

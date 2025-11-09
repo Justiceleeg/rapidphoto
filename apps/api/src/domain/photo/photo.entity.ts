@@ -29,6 +29,8 @@ export interface Photo {
   status: PhotoStatus;
   /** User-defined tags (normalized: lowercase, trimmed, deduplicated) */
   tags: string[] | null;
+  /** AI-generated tag suggestions (≥70% confidence) */
+  suggestedTags: string[] | null;
   /** Creation timestamp */
   createdAt: Date;
   /** Last update timestamp */

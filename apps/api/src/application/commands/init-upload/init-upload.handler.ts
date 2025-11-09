@@ -52,6 +52,7 @@ export class InitUploadHandler {
         thumbnailKey: null,
         status: "pending",
         tags: null,
+        suggestedTags: null,
       });
 
       // Generate presigned URL for upload
@@ -104,6 +105,7 @@ export class InitUploadHandler {
         thumbnailKey: null,
         status: "pending",
         tags: null,
+        suggestedTags: null,
       });
 
       // Generate presigned URL for upload

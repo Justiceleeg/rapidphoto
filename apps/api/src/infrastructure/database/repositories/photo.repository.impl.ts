@@ -23,8 +23,10 @@ export class PhotoRepositoryImpl implements PhotoRepository {
         mimeType: photoData.mimeType,
         r2Key: photoData.r2Key,
         r2Url: photoData.r2Url,
+        thumbnailKey: photoData.thumbnailKey,
         status: photoData.status,
         tags: photoData.tags ?? null,
+        suggestedTags: photoData.suggestedTags ?? null,
         createdAt: now,
         updatedAt: now,
       })
@@ -85,8 +87,10 @@ export class PhotoRepositoryImpl implements PhotoRepository {
       ...(updates.mimeType !== undefined && { mimeType: updates.mimeType }),
       ...(updates.r2Key !== undefined && { r2Key: updates.r2Key }),
       ...(updates.r2Url !== undefined && { r2Url: updates.r2Url }),
+      ...(updates.thumbnailKey !== undefined && { thumbnailKey: updates.thumbnailKey }),
       ...(updates.status !== undefined && { status: updates.status }),
       ...(updates.tags !== undefined && { tags: updates.tags }),
+      ...(updates.suggestedTags !== undefined && { suggestedTags: updates.suggestedTags }),
       updatedAt: new Date(),
     };
 
@@ -120,6 +124,7 @@ export class PhotoRepositoryImpl implements PhotoRepository {
       thumbnailKey: row.thumbnailKey,
       status: row.status as PhotoStatus,
       tags: row.tags ?? null,
+      suggestedTags: row.suggestedTags ?? null,
       createdAt: row.createdAt,
       updatedAt: row.updatedAt,
     };

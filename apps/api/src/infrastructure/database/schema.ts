@@ -1,4 +1,4 @@
-import { pgTable, text, timestamp, boolean, integer } from "drizzle-orm/pg-core";
+import { pgTable, text, timestamp, boolean, integer, index } from "drizzle-orm/pg-core";
 
 // Better-Auth required tables
 export const user = pgTable("user", {
@@ -93,9 +93,14 @@ export const photo = pgTable("photo", {
   thumbnailKey: text("thumbnail_key"),
   status: text("status").notNull().default("pending"),
   tags: text("tags").array(),
+  suggestedTags: text("suggested_tags").array(),
   createdAt: timestamp("created_at").defaultNow().notNull(),
   updatedAt: timestamp("updated_at")
     .defaultNow()
     .$onUpdate(() => new Date())
     .notNull(),
-});
+}, (table) => ({
+  // GIN indexes for efficient tag search (supports @>, &&, and other array operators)
+  tagsIdx: index("photo_tags_idx").using("gin", table.tags),
+  suggestedTagsIdx: index("photo_suggested_tags_idx").using("gin", table.suggestedTags),
+}));

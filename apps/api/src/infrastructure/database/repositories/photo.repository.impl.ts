@@ -117,6 +117,7 @@ export class PhotoRepositoryImpl implements PhotoRepository {
       mimeType: row.mimeType,
       r2Key: row.r2Key,
       r2Url: row.r2Url,
+      thumbnailKey: row.thumbnailKey,
       status: row.status as PhotoStatus,
       tags: row.tags ?? null,
       createdAt: row.createdAt,

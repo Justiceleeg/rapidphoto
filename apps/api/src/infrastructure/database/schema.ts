@@ -90,6 +90,7 @@ export const photo = pgTable("photo", {
   mimeType: text("mime_type").notNull(),
   r2Key: text("r2_key").notNull(),
   r2Url: text("r2_url"),
+  thumbnailKey: text("thumbnail_key"),
   status: text("status").notNull().default("pending"),
   tags: text("tags").array(),
   createdAt: timestamp("created_at").defaultNow().notNull(),

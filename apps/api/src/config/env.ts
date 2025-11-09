@@ -11,6 +11,7 @@ export const env = {
   authSecret: process.env.BETTER_AUTH_SECRET || "",
   authUrl: process.env.BETTER_AUTH_URL || "http://localhost:4000",
   allowedOrigins: getAllowedOrigins(),
+  redisUrl: process.env.REDIS_URL || "redis://localhost:6379",
   r2: {
     accountId: process.env.R2_ACCOUNT_ID || "",
     accessKeyId: process.env.R2_ACCESS_KEY_ID || "",

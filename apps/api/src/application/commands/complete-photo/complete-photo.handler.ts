@@ -4,6 +4,7 @@ import { R2Service } from "../../../infrastructure/storage/r2.service.js";
 import { ProgressService } from "../../../infrastructure/sse/progress.service.js";
 import { createNotFoundError, createForbiddenError } from "../../../infrastructure/http/middleware/error.middleware.js";
 import { CompletePhotoCommand } from "./complete-photo.command.js";
+import { queueThumbnailGeneration } from "../../../infrastructure/queue/photo-queue.js";
 
 /**
  * Handler for completing photo uploads
@@ -50,6 +51,16 @@ export class CompletePhotoHandler {
     await this.photoRepository.update(command.photoId, {
       status: "completed",
       r2Url,
+    });
+
+    // Queue thumbnail generation job (fire and forget - don't wait for completion)
+    queueThumbnailGeneration({
+      photoId: command.photoId,
+      r2Key: photo.r2Key,
+      userId: command.userId,
+    }).catch((error) => {
+      // Log error but don't fail the photo completion
+      console.error(`Failed to queue thumbnail generation for photo ${command.photoId}:`, error);
     });
 
     // If photo is part of an upload job, update job progress

@@ -36,6 +36,13 @@
       "when": 1762653836434,
       "tag": "0004_useful_speedball",
       "breakpoints": true
+    },
+    {
+      "idx": 5,
+      "version": "7",
+      "when": 1762712696591,
+      "tag": "0005_cool_earthquake",
+      "breakpoints": true
     }
   ]
 }

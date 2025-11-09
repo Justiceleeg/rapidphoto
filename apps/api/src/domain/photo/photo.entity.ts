@@ -23,6 +23,8 @@ export interface Photo {
   r2Key: string;
   /** R2 public URL (null if not set) */
   r2Url: string | null;
+  /** R2 storage key for thumbnail (null if not generated) */
+  thumbnailKey: string | null;
   /** Current upload status */
   status: PhotoStatus;
   /** User-defined tags (normalized: lowercase, trimmed, deduplicated) */

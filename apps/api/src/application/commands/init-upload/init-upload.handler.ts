@@ -49,6 +49,7 @@ export class InitUploadHandler {
         mimeType: photoMeta.mimeType,
         r2Key,
         r2Url: null,
+        thumbnailKey: null,
         status: "pending",
         tags: null,
       });
@@ -100,6 +101,7 @@ export class InitUploadHandler {
         mimeType: photoMeta.mimeType,
         r2Key,
         r2Url: null,
+        thumbnailKey: null,
         status: "pending",
         tags: null,
       });

@@ -22,7 +22,7 @@ export default function LoginPage() {
       const result = await signIn(email, password);
       if (result.data) {
         toast.success("Login successful!");
-        router.push("/dashboard");
+        router.push("/");
       } else {
         toast.error(result.error?.message || "Login failed");
       }

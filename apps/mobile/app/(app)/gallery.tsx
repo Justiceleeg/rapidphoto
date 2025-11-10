@@ -1,18 +1,26 @@
-"use client";
-
 import { useState } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { RefreshControl, StyleSheet, Alert } from "react-native";
+import { useRouter } from "expo-router";
+import * as ImagePicker from "expo-image-picker";
+import { useAuth } from "@/lib/hooks/use-auth";
+import { useUploadStore } from "@/lib/stores/upload-store";
 import { photoClient } from "@/lib/api-client";
 import { Photo } from "@rapidphoto/api-client";
 import { PhotoGrid } from "@/components/gallery/PhotoGrid";
-import { PhotoModal } from "@/components/gallery/PhotoModal";
+import { PhotoViewer } from "@/components/gallery/PhotoViewer";
 import { TagSearch } from "@/components/gallery/TagSearch";
+import { View } from "@/components/ui/view";
+import { Text } from "@/components/ui/text";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
-import { ChevronLeft, ChevronRight } from "lucide-react";
-import { toast } from "sonner";
+import { useColor } from "@/hooks/useColor";
+import { authClient } from "@/lib/auth-client";
 
-export default function GalleryPage() {
+export default function GalleryScreen() {
+  const router = useRouter();
+  const { user } = useAuth();
+  const uploadStore = useUploadStore();
   const [page, setPage] = useState(1);
   const [selectedPhoto, setSelectedPhoto] = useState<Photo | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -23,16 +31,50 @@ export default function GalleryPage() {
   const queryClient = useQueryClient();
   const limit = 20;
 
+  const backgroundColor = useColor("background");
+  const foregroundColor = useColor("foreground");
+  const destructiveColor = useColor("destructive");
+  const mutedForegroundColor = useColor("mutedForeground");
+
+  // Upload handlers
+  const handleImageSelected = (
+    uri: string,
+    filename: string,
+    mimeType: string,
+    fileSize: number
+  ) => {
+    uploadStore.setSelectedFile({ uri, filename, mimeType, fileSize });
+    uploadStore.upload().then(() => {
+      queryClient.invalidateQueries({ queryKey: ["photos"] });
+    });
+  };
+
+  const handleImagesSelected = (
+    images: Array<{ uri: string; filename: string; mimeType: string; fileSize: number }>
+  ) => {
+    uploadStore.setSelectedFiles(images);
+    uploadStore.uploadBatch().then(() => {
+      queryClient.invalidateQueries({ queryKey: ["photos"] });
+    });
+  };
+
+  const handleSignOut = async () => {
+    try {
+      await authClient.signOut();
+      router.replace("/(auth)/login");
+    } catch (error) {
+      console.error("Sign out error:", error);
+      Alert.alert("Error", "Failed to sign out");
+    }
+  };
+
   // Fetch photos with tag search
-  const { data, isLoading, error } = useQuery({
+  const { data, isLoading, error, refetch, isRefetching } = useQuery({
     queryKey: ["photos", page, limit, searchTags, includeSuggested],
     queryFn: () => {
       // When search is blank, show all photos (don't pass tags or includeSuggested)
       if (searchTags.length === 0) {
-        return photoClient.getPhotos({
-          page,
-          limit,
-        });
+        return photoClient.getPhotos({ page, limit });
       }
       // When tags are selected, explicitly pass includeSuggested (true or false)
       // When false, only search user tags; when true, search both user and AI-suggested tags
@@ -50,10 +92,9 @@ export default function GalleryPage() {
     mutationFn: (photoId: string) => photoClient.deletePhoto(photoId),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["photos"] });
-      toast.success("Photo deleted successfully");
     },
     onError: (error: Error) => {
-      toast.error(error.message || "Failed to delete photo");
+      Alert.alert("Error", error.message || "Failed to delete photo");
     },
   });
 
@@ -90,11 +131,9 @@ export default function GalleryPage() {
           };
         }
       );
-
-      toast.success("Tags updated successfully");
     },
     onError: (error: Error) => {
-      toast.error(error.message || "Failed to update tags");
+      Alert.alert("Error", error.message || "Failed to update tags");
     },
   });
 
@@ -128,10 +167,10 @@ export default function GalleryPage() {
       }
     },
     onSuccess: () => {
-      toast.success("Tag accepted");
+      // Toast/Alert handled by optimistic update
     },
     onError: (error: Error) => {
-      toast.error(error.message || "Failed to accept tag");
+      Alert.alert("Error", error.message || "Failed to accept tag");
       // Refetch on error to sync state
       queryClient.invalidateQueries({ queryKey: ["photos"] });
     },
@@ -166,10 +205,10 @@ export default function GalleryPage() {
       }
     },
     onSuccess: () => {
-      toast.success("Tag rejected");
+      // Toast/Alert handled by optimistic update
     },
     onError: (error: Error) => {
-      toast.error(error.message || "Failed to reject tag");
+      Alert.alert("Error", error.message || "Failed to reject tag");
       // Refetch on error to sync state
       queryClient.invalidateQueries({ queryKey: ["photos"] });
     },
@@ -192,7 +231,7 @@ export default function GalleryPage() {
   const handleUpdateTags = (photoId: string, tags: string[]) => {
     if (!Array.isArray(tags)) {
       console.error("Tags must be an array", tags);
-      toast.error("Invalid tags format");
+      Alert.alert("Error", "Invalid tags format");
       return;
     }
     updateTagsMutation.mutate({ photoId, tags });
@@ -206,18 +245,8 @@ export default function GalleryPage() {
     rejectTagMutation.mutate({ photoId, tag });
   };
 
-  const handlePreviousPage = () => {
-    if (page > 1) {
-      setPage(page - 1);
-      window.scrollTo({ top: 0, behavior: "smooth" });
-    }
-  };
-
-  const handleNextPage = () => {
-    if (data && page < data.pagination.totalPages) {
-      setPage(page + 1);
-      window.scrollTo({ top: 0, behavior: "smooth" });
-    }
+  const handleRefresh = () => {
+    refetch();
   };
 
   const handleClearSearch = () => {
@@ -229,32 +258,95 @@ export default function GalleryPage() {
 
   if (error) {
     return (
-      <Card className="flex items-center justify-center p-12 text-center">
-        <div>
-          <p className="text-lg font-medium text-destructive">
-            Error loading photos
-          </p>
-          <p className="text-sm text-muted-foreground">
-            {error instanceof Error
-              ? error.message
-              : "An unknown error occurred"}
-          </p>
-        </div>
-      </Card>
+      <View style={[styles.container, { backgroundColor }]}>
+        <Card style={styles.errorCard}>
+          <View style={styles.errorContainer}>
+            <Text variant="title" style={[styles.errorTitle, { color: destructiveColor }]}>
+              Error loading photos
+            </Text>
+            <Text variant="body" style={{ color: mutedForegroundColor }}>
+              {error instanceof Error
+                ? error.message
+                : "An unknown error occurred"}
+            </Text>
+          </View>
+        </Card>
+      </View>
     );
   }
 
   return (
-    <div className="space-y-6">
-      <div className="flex items-center justify-between">
-        <h1 className="text-3xl font-bold">Gallery</h1>
-        {data && (
-          <p className="text-sm text-muted-foreground">
-            {data.pagination.total} photo
-            {data.pagination.total !== 1 ? "s" : ""}
-          </p>
-        )}
-      </div>
+    <View style={[styles.container, { backgroundColor }]}>
+      <View style={styles.header}>
+        <View style={styles.headerLeft}>
+          <Text variant="heading" style={styles.title}>
+            Gallery
+          </Text>
+          {user && (
+            <Text variant="body" style={[styles.username, { color: mutedForegroundColor }]}>
+              {user.name || user.email}
+            </Text>
+          )}
+          {data && (
+            <Text variant="body" style={{ color: mutedForegroundColor }}>
+              {data.pagination.total} photo{data.pagination.total !== 1 ? "s" : ""}
+            </Text>
+          )}
+        </View>
+        <View style={styles.headerRight}>
+          <Button
+            variant="outline"
+            size="sm"
+            onPress={async () => {
+              // Request permissions
+              const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
+              if (status !== "granted") {
+                Alert.alert("Permissions Required", "We need photo library permissions to upload photos.");
+                return;
+              }
+              // Launch image picker
+              const result = await ImagePicker.launchImageLibraryAsync({
+                mediaTypes: ImagePicker.MediaTypeOptions.Images,
+                allowsEditing: false,
+                quality: 1,
+                allowsMultipleSelection: true,
+              });
+              if (!result.canceled && result.assets && result.assets.length > 0) {
+                if (result.assets.length === 1) {
+                  const asset = result.assets[0];
+                  handleImageSelected(
+                    asset.uri,
+                    asset.fileName || `photo_${Date.now()}.jpg`,
+                    asset.mimeType || "image/jpeg",
+                    asset.fileSize || 0
+                  );
+                } else {
+                  const images = result.assets.map((asset) => ({
+                    uri: asset.uri,
+                    filename: asset.fileName || `photo_${Date.now()}_${Math.random().toString(36).substr(2, 9)}.jpg`,
+                    mimeType: asset.mimeType || "image/jpeg",
+                    fileSize: asset.fileSize || 0,
+                  }));
+                  handleImagesSelected(images);
+                }
+              }
+            }}
+            animation={false}
+            style={styles.uploadButton}
+          >
+            Upload
+          </Button>
+          <Button
+            variant="ghost"
+            size="sm"
+            onPress={handleSignOut}
+            animation={false}
+            style={styles.signOutButton}
+          >
+            Sign Out
+          </Button>
+        </View>
+      </View>
 
       {/* Tag Search */}
       <TagSearch
@@ -279,51 +371,18 @@ export default function GalleryPage() {
         onClear={handleClearSearch}
       />
 
-      <PhotoGrid
-        photos={data?.photos || []}
-        loading={isLoading}
-        onPhotoClick={handlePhotoClick}
-      />
+      <View style={styles.content}>
+        <PhotoGrid
+          photos={data?.photos || []}
+          loading={isLoading}
+          onPhotoClick={handlePhotoClick}
+          refreshing={isRefetching}
+          onRefresh={handleRefresh}
+        />
+      </View>
 
-      {/* Pagination */}
-      {data && data.pagination.totalPages > 1 && (
-        <Card className="flex items-center justify-between p-4">
-          <div className="flex items-center gap-2">
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={handlePreviousPage}
-              disabled={page === 1 || isLoading}
-            >
-              <ChevronLeft className="mr-1 size-4" />
-              Previous
-            </Button>
-            <span className="text-sm text-muted-foreground">
-              Page {data.pagination.page} of {data.pagination.totalPages}
-            </span>
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={handleNextPage}
-              disabled={page >= data.pagination.totalPages || isLoading}
-            >
-              Next
-              <ChevronRight className="ml-1 size-4" />
-            </Button>
-          </div>
-          <p className="text-sm text-muted-foreground">
-            Showing {data.pagination.limit * (data.pagination.page - 1) + 1}-
-            {Math.min(
-              data.pagination.limit * data.pagination.page,
-              data.pagination.total
-            )}{" "}
-            of {data.pagination.total}
-          </p>
-        </Card>
-      )}
-
-      {/* Photo Modal */}
-      <PhotoModal
+      {/* Photo Viewer Modal */}
+      <PhotoViewer
         photo={selectedPhoto}
         open={isModalOpen}
         onClose={handleCloseModal}
@@ -332,6 +391,58 @@ export default function GalleryPage() {
         onAcceptTag={handleAcceptTag}
         onRejectTag={handleRejectTag}
       />
-    </div>
+    </View>
   );
 }
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    paddingTop: 60, // Account for status bar
+  },
+  header: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    paddingHorizontal: 16,
+    paddingVertical: 16,
+  },
+  headerLeft: {
+    flex: 1,
+    gap: 4,
+  },
+  headerRight: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 8,
+  },
+  title: {
+    fontWeight: "bold",
+    fontSize: 28,
+  },
+  username: {
+    fontSize: 14,
+  },
+  uploadButton: {
+    marginRight: 4,
+  },
+  signOutButton: {
+    marginLeft: 4,
+  },
+  content: {
+    flex: 1,
+  },
+  errorCard: {
+    margin: 16,
+    padding: 48,
+  },
+  errorContainer: {
+    alignItems: "center",
+    gap: 8,
+  },
+  errorTitle: {
+    fontSize: 18,
+    fontWeight: "600",
+  },
+});
+

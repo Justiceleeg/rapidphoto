@@ -22,7 +22,7 @@ export default function LoginScreen() {
     try {
       const result = await authClient.signIn.email({ email, password });
       if (result.data) {
-        router.replace("/(tabs)");
+        router.replace("/(app)/gallery");
       }
     } catch (error) {
       console.error("Login error:", error);

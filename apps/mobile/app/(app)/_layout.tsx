@@ -1,8 +1,8 @@
-import { Tabs, Redirect } from 'expo-router';
+import { Stack, Redirect } from 'expo-router';
 import { useAuth } from '@/lib/hooks/use-auth';
 import { ActivityIndicator, View, StyleSheet } from 'react-native';
 
-export default function TabsLayout() {
+export default function AppLayout() {
   const { isAuthenticated, isLoading } = useAuth();
 
   if (isLoading) {
@@ -17,12 +17,7 @@ export default function TabsLayout() {
     return <Redirect href="/(auth)/login" />;
   }
 
-  return (
-    <Tabs screenOptions={{ headerShown: false }}>
-      <Tabs.Screen name="index" options={{ title: 'Home' }} />
-      <Tabs.Screen name="gallery" options={{ title: 'Gallery' }} />
-    </Tabs>
-  );
+  return <Stack screenOptions={{ headerShown: false }} />;
 }
 
 const styles = StyleSheet.create({

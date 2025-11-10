@@ -23,7 +23,7 @@ export default function RegisterScreen() {
     try {
       const result = await authClient.signUp.email({ email, password, name });
       if (result.data) {
-        router.replace("/(tabs)");
+        router.replace("/(app)/gallery");
       }
     } catch (error) {
       console.error("Registration error:", error);

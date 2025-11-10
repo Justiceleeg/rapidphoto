@@ -59,22 +59,49 @@ export function UploadProgress({ jobId }: UploadProgressProps) {
         }
 
         setProgress(data);
+
+        // Close connection if job is completed or failed
+        if (data.status === "completed" || data.status === "failed") {
+          console.log("Job completed, closing SSE connection");
+          eventSource.close();
+          setIsConnected(false);
+        }
       } catch (error) {
         console.error("Error parsing SSE message:", error);
       }
     };
 
     eventSource.onerror = (error) => {
-      console.error("SSE connection error:", error);
-      setIsConnected(false);
-      // EventSource will automatically try to reconnect
+      // Only log error if we haven't already closed the connection
+      if (eventSource.readyState === EventSource.CLOSED) {
+        // Connection was closed, likely because job completed
+        setIsConnected(false);
+        return;
+      }
+      
+      // Check if it's a 404 or other error
+      if (eventSource.readyState === EventSource.CONNECTING) {
+        console.warn("SSE connection failed, job may not exist yet");
+        setIsConnected(false);
+        // Don't keep retrying if it's a 404
+        setTimeout(() => {
+          if (eventSource.readyState === EventSource.CONNECTING) {
+            eventSource.close();
+          }
+        }, 5000);
+      } else {
+        console.error("SSE connection error:", error);
+        setIsConnected(false);
+      }
     };
 
     // Cleanup on unmount
     return () => {
       console.log("Closing SSE connection");
-      eventSource.close();
-      eventSourceRef.current = null;
+      if (eventSourceRef.current) {
+        eventSourceRef.current.close();
+        eventSourceRef.current = null;
+      }
     };
   }, [jobId]);
 

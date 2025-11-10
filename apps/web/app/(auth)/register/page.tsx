@@ -23,7 +23,7 @@ export default function RegisterPage() {
       const result = await signUp(email, password, name);
       if (result.data) {
         toast.success("Registration successful!");
-        router.push("/dashboard");
+        router.push("/");
       } else {
         toast.error(result.error?.message || "Registration failed");
       }

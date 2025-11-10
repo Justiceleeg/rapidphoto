@@ -35,6 +35,7 @@ export function PhotoModal({
   onRejectTag,
 }: PhotoModalProps) {
   const [isEditingTags, setIsEditingTags] = useState(false);
+  const [isDownloading, setIsDownloading] = useState(false);
 
   // Reset editing state when modal closes (wrapped in handler to avoid setState in effect)
   const handleOpenChange = (newOpen: boolean) => {
@@ -49,14 +50,39 @@ export function PhotoModal({
   // Get first 3 AI-suggested tags
   const suggestedTags = photo.suggestedTags?.slice(0, 3) || [];
 
-  const handleDownload = () => {
-    if (photo.url) {
+  const handleDownload = async () => {
+    if (!photo.url) return;
+
+    setIsDownloading(true);
+    try {
+      // Fetch the image as a blob to ensure proper download
+      const response = await fetch(photo.url);
+      if (!response.ok) {
+        throw new Error("Failed to fetch image");
+      }
+      
+      const blob = await response.blob();
+      
+      // Create an object URL from the blob
+      const objectUrl = URL.createObjectURL(blob);
+      
+      // Create a temporary link element and trigger download
       const link = document.createElement("a");
-      link.href = photo.url;
+      link.href = objectUrl;
       link.download = photo.filename;
       document.body.appendChild(link);
       link.click();
       document.body.removeChild(link);
+      
+      // Clean up the object URL after a short delay
+      setTimeout(() => {
+        URL.revokeObjectURL(objectUrl);
+      }, 100);
+    } catch (error) {
+      console.error("Download error:", error);
+      alert("Failed to download image. Please try again.");
+    } finally {
+      setIsDownloading(false);
     }
   };
 
@@ -232,10 +258,10 @@ export function PhotoModal({
               variant="default"
               size="sm"
               onClick={handleDownload}
-              disabled={!photo.url || photo.status !== "completed"}
+              disabled={!photo.url || photo.status !== "completed" || isDownloading}
             >
               <Download className="mr-2 size-4" />
-              Download
+              {isDownloading ? "Downloading..." : "Download"}
             </Button>
           </div>
         </div>

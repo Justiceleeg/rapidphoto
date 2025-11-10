@@ -47,10 +47,11 @@ RapidPhotoUpload is a high-performance photo upload system designed to handle up
 │   │   Web Frontend          │   │   │   Mobile App                │   │
 │   │   (Next.js 15)          │   │   │   (React Native + Expo)     │   │
 │   │                         │   │   │                             │   │
-│   │   - Upload Interface    │   │   │   - Image Picker            │   │
-│   │   - Gallery             │   │   │   - Upload Progress         │   │
-│   │   - Authentication      │   │   │   - Gallery                 │   │
-│   │   - Real-time Progress  │   │   │   - Authentication          │   │
+│   │   - Gallery (main page) │   │   │   - Gallery (main screen)  │   │
+│   │   - Drag-and-drop upload│   │   │   - Upload button           │   │
+│   │   - Upload button       │   │   │   - Upload Progress         │   │
+│   │   - Authentication      │   │   │   - Authentication          │   │
+│   │   - Real-time Progress  │   │   │   - Real-time Progress      │   │
 │   └────────────┬────────────┘   │   └────────────┬────────────────┘   │
 │                │                 │                │                    │
 └────────────────┼─────────────────┴────────────────┼────────────────────┘
@@ -1093,22 +1094,16 @@ app.use('/api/photos/*', authMiddleware);
 apps/web/
 │
 ├── app/                              # Next.js App Router
-│   ├── layout.tsx                    # Root layout with providers
+│   ├── layout.tsx                    # Root layout with header (username, signout, photo count, upload button)
+│   ├── page.tsx                      # Gallery page (root page, drag-and-drop enabled)
 │   ├── providers.tsx                 # React Query + Auth providers
 │   │
-│   ├── (auth)/                       # Auth route group
-│   │   ├── layout.tsx                # Auth layout (centered form)
-│   │   ├── login/
-│   │   │   └── page.tsx              # Login page
-│   │   └── register/
-│   │       └── page.tsx              # Register page
-│   │
-│   └── (dashboard)/                  # Protected route group
-│       ├── layout.tsx                # Dashboard layout (nav, protected)
-│       ├── upload/
-│       │   └── page.tsx              # Upload interface
-│       └── gallery/
-│           └── page.tsx              # Photo gallery
+│   └── (auth)/                       # Auth route group
+│       ├── layout.tsx                # Auth layout (centered form)
+│       ├── login/
+│       │   └── page.tsx              # Login page
+│       └── register/
+│           └── page.tsx              # Register page
 │
 ├── components/
 │   ├── upload/
@@ -1234,8 +1229,7 @@ apps/mobile/
 │   │
 │   └── (tabs)/                       # Tab navigation
 │       ├── _layout.tsx               # Tab bar setup
-│       ├── index.tsx                 # Upload tab
-│       └── gallery.tsx               # Gallery tab
+│       └── gallery.tsx               # Gallery tab (main screen with header: username, signout, photo count, upload button)
 │
 ├── components/
 │   ├── upload/

@@ -16,8 +16,8 @@
 - [x] 2.5 Test tag search on web (verify single tag search, multi-tag search with AND logic, toggle "Include AI-suggested tags", clear search, verify autocomplete works)
 
 ## 3. Mobile Frontend - Tag Search
-- [ ] 3.1 Add search input to mobile gallery screen (`apps/mobile/app/(tabs)/gallery.tsx` - add search input at top, tag autocomplete, "Include AI-suggested tags" toggle)
-- [ ] 3.2 Test tag search on mobile (verify search by tags, toggle AI suggestions in search, verify autocomplete works, test on iOS and Android)
+- [x] 3.1 Add search input to mobile gallery screen (`apps/mobile/app/(tabs)/gallery.tsx` - add search input at top, tag autocomplete, "Include AI-suggested tags" toggle)
+- [x] 3.2 Test tag search on mobile (verify search by tags, toggle AI suggestions in search, verify autocomplete works, test on iOS and Android)
 
 ## 4. Deploy Tag Search
 - [ ] 4.1 Redeploy all services with tag search (push changes, verify Railway auto-deploys)

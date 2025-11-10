@@ -5,6 +5,7 @@ import { photoClient } from "@/lib/api-client";
 import { Photo } from "@rapidphoto/api-client";
 import { PhotoGrid } from "@/components/gallery/PhotoGrid";
 import { PhotoViewer } from "@/components/gallery/PhotoViewer";
+import { TagSearch } from "@/components/gallery/TagSearch";
 import { View } from "@/components/ui/view";
 import { Text } from "@/components/ui/text";
 import { Card } from "@/components/ui/card";
@@ -14,6 +15,10 @@ export default function GalleryScreen() {
   const [page, setPage] = useState(1);
   const [selectedPhoto, setSelectedPhoto] = useState<Photo | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [searchTags, setSearchTags] = useState<string[]>([]);
+  const [includeSuggested, setIncludeSuggested] = useState(false);
+  // Pending state for checkbox that doesn't trigger refetch
+  const [pendingIncludeSuggested, setPendingIncludeSuggested] = useState(false);
   const queryClient = useQueryClient();
   const limit = 20;
 
@@ -22,10 +27,23 @@ export default function GalleryScreen() {
   const destructiveColor = useColor("destructive");
   const mutedForegroundColor = useColor("mutedForeground");
 
-  // Fetch photos
+  // Fetch photos with tag search
   const { data, isLoading, error, refetch, isRefetching } = useQuery({
-    queryKey: ["photos", page, limit],
-    queryFn: () => photoClient.getPhotos({ page, limit }),
+    queryKey: ["photos", page, limit, searchTags, includeSuggested],
+    queryFn: () => {
+      // When search is blank, show all photos (don't pass tags or includeSuggested)
+      if (searchTags.length === 0) {
+        return photoClient.getPhotos({ page, limit });
+      }
+      // When tags are selected, explicitly pass includeSuggested (true or false)
+      // When false, only search user tags; when true, search both user and AI-suggested tags
+      return photoClient.getPhotos({
+        page,
+        limit,
+        tags: searchTags,
+        includeSuggested: includeSuggested, // Explicitly pass false when unchecked
+      });
+    },
   });
 
   // Delete photo mutation
@@ -59,7 +77,7 @@ export default function GalleryScreen() {
 
       // Update the photo in the cache without refetching
       queryClient.setQueryData(
-        ["photos", page, limit],
+        ["photos", page, limit, searchTags, includeSuggested],
         (oldData: { photos: Photo[]; pagination: unknown } | undefined) => {
           if (!oldData) return oldData;
           return {
@@ -94,7 +112,7 @@ export default function GalleryScreen() {
 
         // Update cache
         queryClient.setQueryData(
-          ["photos", page, limit],
+          ["photos", page, limit, searchTags, includeSuggested],
           (oldData: { photos: Photo[]; pagination: unknown } | undefined) => {
             if (!oldData) return oldData;
             return {
@@ -132,7 +150,7 @@ export default function GalleryScreen() {
 
         // Update cache
         queryClient.setQueryData(
-          ["photos", page, limit],
+          ["photos", page, limit, searchTags, includeSuggested],
           (oldData: { photos: Photo[]; pagination: unknown } | undefined) => {
             if (!oldData) return oldData;
             return {
@@ -190,6 +208,13 @@ export default function GalleryScreen() {
     refetch();
   };
 
+  const handleClearSearch = () => {
+    setSearchTags([]);
+    setIncludeSuggested(false);
+    setPendingIncludeSuggested(false);
+    setPage(1); // Reset to first page when clearing search
+  };
+
   if (error) {
     return (
       <View style={[styles.container, { backgroundColor }]}>
@@ -221,6 +246,29 @@ export default function GalleryScreen() {
           </Text>
         )}
       </View>
+
+      {/* Tag Search */}
+      <TagSearch
+        tags={searchTags}
+        includeSuggested={pendingIncludeSuggested}
+        onTagsChange={(tags) => {
+          setSearchTags(tags);
+          // Apply pending includeSuggested when tags change (search is executed)
+          setIncludeSuggested(pendingIncludeSuggested);
+          setPage(1); // Reset to first page when search changes
+        }}
+        onIncludeSuggestedChange={(include) => {
+          setPendingIncludeSuggested(include);
+          // If tags are already selected, apply the checkbox change immediately
+          // This ensures the search respects the checkbox state
+          if (searchTags.length > 0) {
+            setIncludeSuggested(include);
+            setPage(1); // Reset to first page when filter changes
+          }
+          // If no tags are selected yet, the checkbox state will be applied when tags are submitted
+        }}
+        onClear={handleClearSearch}
+      />
 
       <View style={styles.content}>
         <PhotoGrid

@@ -74,7 +74,7 @@ export function TagInput({
       if (enableAutocomplete && filteredSuggestions.length > 0 && showSuggestions) {
         selectSuggestion(filteredSuggestions[0]);
       } else {
-        addTag();
+      addTag();
       }
     } else if (e.key === "ArrowDown" && enableAutocomplete && filteredSuggestions.length > 0) {
       e.preventDefault();
@@ -146,12 +146,12 @@ export function TagInput({
 
       {/* Input Field with Autocomplete */}
       <div className="relative">
-        <Input
+      <Input
           ref={inputRef}
-          type="text"
-          value={inputValue}
+        type="text"
+        value={inputValue}
           onChange={handleInputChange}
-          onKeyDown={handleKeyDown}
+        onKeyDown={handleKeyDown}
           onFocus={() => {
             if (enableAutocomplete && inputValue.trim().length > 0 && filteredSuggestions.length > 0) {
               setShowSuggestions(true);
@@ -166,9 +166,9 @@ export function TagInput({
               setShowSuggestions(false);
             }, 200);
           }}
-          placeholder={placeholder}
-          className="w-full"
-        />
+        placeholder={placeholder}
+        className="w-full"
+      />
         
         {/* Autocomplete Suggestions Dropdown */}
         {enableAutocomplete && showSuggestions && filteredSuggestions.length > 0 && (

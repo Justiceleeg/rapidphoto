@@ -26,6 +26,7 @@
 - **Slice 6A**: Thumbnail Generation (Backend + Web + Mobile + Deploy) (Post-MVP) (2-3 hours) - 20 tasks
 - **Slice 6B**: AI Tagging (Backend + Web + Mobile + Deploy) (Post-MVP) (3-4 hours) - 25 tasks
 - **Slice 6C**: Tag Search & Autocomplete (Backend + Web + Mobile + Deploy) (Post-MVP) (2-3 hours) - 14 tasks
+- **Slice 7**: UI Cleanup & Simplified Navigation (Web + Mobile + Deploy) (2-3 hours) - 18 tasks
 
 ---
 
@@ -2028,6 +2029,184 @@
 
 ---
 
+## Slice 7: UI Cleanup & Simplified Navigation (Web + Mobile + Deploy)
+
+**Goal**: Simplify UI by making gallery the main page, removing dashboard/upload pages, adding drag-and-drop upload, and adding signout button  
+**Time**: 2-3 hours  
+**Prerequisites**: [S6C-17] (Slice 6C complete)  
+**Status**: Post-MVP Enhancement  
+**Verification**: Gallery is the only page, drag-and-drop upload works, upload button visible, signout button works
+
+### Chunk 7.1: Web Frontend - UI Cleanup
+
+**Prerequisites**: [S6C-13]
+
+- **[S7-01]** Remove dashboard layout and routing
+  - **Time**: 15 min | **Complexity**: Low
+  - **Dependencies**: [S4-19]
+  - **Files**: 
+    - Remove `apps/web/app/(dashboard)/layout.tsx`
+    - Remove `apps/web/app/(dashboard)/upload/page.tsx`
+    - Update routing to make gallery the root page
+
+- **[S7-02]** Move gallery to root page
+  - **Time**: 20 min | **Complexity**: Low
+  - **Dependencies**: [S7-01]
+  - **Files**: 
+    - Move `apps/web/app/(dashboard)/gallery/page.tsx` to `apps/web/app/page.tsx`
+    - Update imports and paths
+
+- **[S7-03]** Create simplified root layout with header
+  - **Time**: 30 min | **Complexity**: Medium
+  - **Dependencies**: [S7-02]
+  - **File**: `apps/web/app/layout.tsx`
+  - **Note**: 
+    - Add header with username display
+    - Add signout button to the right of username
+    - Display photo count (e.g., "# 42 photos")
+    - Add upload button to the right of photo count
+
+- **[S7-04]** Add drag-and-drop upload to gallery
+  - **Time**: 45 min | **Complexity**: Medium
+  - **Dependencies**: [S7-02], [S3-15]
+  - **File**: `apps/web/app/page.tsx`
+  - **Note**: 
+    - Use `react-dropzone` or native drag-and-drop API
+    - Handle file drop on gallery area
+    - Trigger upload flow when files dropped
+    - Show visual feedback during drag
+
+- **[S7-05]** Add upload button to header
+  - **Time**: 30 min | **Complexity**: Medium
+  - **Dependencies**: [S7-03]
+  - **File**: `apps/web/app/layout.tsx` or header component
+  - **Note**: 
+    - Button positioned to the right of photo count
+    - Opens file picker on click
+    - Triggers upload flow
+
+- **[S7-06]** Add signout button to header
+  - **Time**: 20 min | **Complexity**: Low
+  - **Dependencies**: [S7-03], [S1-29]
+  - **File**: `apps/web/app/layout.tsx` or header component
+  - **Note**: 
+    - Button positioned to the right of username
+    - Calls signout function from auth hooks
+    - Redirects to login page after signout
+
+- **[S7-07]** Update auth redirects
+  - **Time**: 15 min | **Complexity**: Low
+  - **Dependencies**: [S7-02]
+  - **Files**: 
+    - `apps/web/app/(auth)/login/page.tsx`
+    - `apps/web/app/(auth)/register/page.tsx`
+  - **Note**: Redirect to `/` (gallery) instead of `/dashboard` after login
+
+- **[S7-08]** Test simplified UI on web
+  - **Time**: 20 min | **Complexity**: Low
+  - **Dependencies**: [S7-06]
+  - **Tests**:
+    - Verify gallery is root page
+    - Test drag-and-drop upload
+    - Test upload button
+    - Test signout button
+    - Verify no dashboard/upload pages accessible
+
+**Verification**: Gallery is the only page, drag-and-drop works, upload button works, signout button works
+
+### Chunk 7.2: Mobile Frontend - UI Cleanup
+
+**Prerequisites**: [S6C-15]
+
+- **[S7-09]** Remove upload tab and simplify navigation
+  - **Time**: 20 min | **Complexity**: Low
+  - **Dependencies**: [S4-26]
+  - **Files**: 
+    - Update `apps/mobile/app/(tabs)/_layout.tsx`
+    - Remove upload tab
+    - Make gallery the default/main tab
+
+- **[S7-10]** Add header with username and signout to gallery screen
+  - **Time**: 30 min | **Complexity**: Medium
+  - **Dependencies**: [S7-09]
+  - **File**: `apps/mobile/app/(tabs)/gallery.tsx`
+  - **Note**: 
+    - Add header with username display
+    - Add signout button to the right of username
+    - Display photo count (e.g., "# 42 photos")
+    - Add upload button to the right of photo count
+
+- **[S7-11]** Add upload button to gallery header
+  - **Time**: 30 min | **Complexity**: Medium
+  - **Dependencies**: [S7-10]
+  - **File**: `apps/mobile/app/(tabs)/gallery.tsx`
+  - **Note**: 
+    - Button positioned to the right of photo count
+    - Opens image picker on press
+    - Triggers upload flow
+
+- **[S7-12]** Add signout button to gallery header
+  - **Time**: 20 min | **Complexity**: Low
+  - **Dependencies**: [S7-10], [S1-52]
+  - **File**: `apps/mobile/app/(tabs)/gallery.tsx`
+  - **Note**: 
+    - Button positioned to the right of username
+    - Calls signout function from auth client
+    - Navigates to login screen after signout
+
+- **[S7-13]** Update auth navigation
+  - **Time**: 15 min | **Complexity**: Low
+  - **Dependencies**: [S7-09]
+  - **Files**: 
+    - `apps/mobile/app/(auth)/login.tsx`
+    - `apps/mobile/app/(auth)/register.tsx`
+  - **Note**: Navigate to gallery tab after login
+
+- **[S7-14]** Test simplified UI on mobile
+  - **Time**: 20 min | **Complexity**: Low
+  - **Dependencies**: [S7-12]
+  - **Tests**:
+    - Verify gallery is main screen
+    - Test upload button
+    - Test signout button
+    - Verify no upload tab
+    - Test on iOS and Android
+
+**Verification**: Gallery is main screen, upload button works, signout button works
+
+### Chunk 7.3: Deploy UI Cleanup
+
+**Prerequisites**: [S7-08], [S7-14]
+
+- **[S7-15]** Redeploy web with simplified UI
+  - **Time**: 10 min | **Complexity**: Low
+  - **Dependencies**: [S7-08]
+  - **Action**: Push changes, Railway auto-deploys
+
+- **[S7-16]** Test simplified UI in production (web)
+  - **Time**: 20 min | **Complexity**: Low
+  - **Dependencies**: [S7-15]
+  - **Tests**:
+    - Verify gallery is root page
+    - Test drag-and-drop upload
+    - Test upload button
+    - Test signout button
+    - Verify header displays correctly
+
+- **[S7-17]** Test simplified UI in production (mobile)
+  - **Time**: 20 min | **Complexity**: Low
+  - **Dependencies**: [S7-15]
+  - **Tests**:
+    - Verify gallery is main screen
+    - Test upload button
+    - Test signout button
+    - Verify header displays correctly
+    - Test on iOS and Android
+
+**Verification**: ✅ Simplified UI works in production on web and mobile
+
+---
+
 ## Verification Checklist
 
 ### Slice 0: Foundation
@@ -2089,6 +2268,16 @@
 - ✅ Tag autocomplete works on mobile
 - ✅ Multi-tag search (AND logic) works
 - ✅ Tag search deployed and working in production
+
+### Slice 7: UI Cleanup & Simplified Navigation (Post-MVP)
+- ✅ Gallery is the main/only page on web
+- ✅ Gallery is the main/only screen on mobile
+- ✅ Drag-and-drop upload works on web
+- ✅ Upload button works on web and mobile
+- ✅ Signout button works on web and mobile
+- ✅ Dashboard and upload pages removed
+- ✅ Header displays username, photo count, and buttons correctly
+- ✅ Simplified UI deployed and working in production
 
 ---
 

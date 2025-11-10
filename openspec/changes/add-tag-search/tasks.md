@@ -20,6 +20,6 @@
 - [x] 3.2 Test tag search on mobile (verify search by tags, toggle AI suggestions in search, verify autocomplete works, test on iOS and Android)
 
 ## 4. Deploy Tag Search
-- [ ] 4.1 Redeploy all services with tag search (push changes, verify Railway auto-deploys)
-- [ ] 4.2 Test tag search in production (verify search by user tags, search including AI suggestions, multi-tag search, test autocomplete, verify on web and mobile)
+- [x] 4.1 Redeploy all services with tag search (push changes, verify Railway auto-deploys)
+- [x] 4.2 Test tag search in production (verify search by user tags, search including AI suggestions, multi-tag search, test autocomplete, verify on web and mobile)
 

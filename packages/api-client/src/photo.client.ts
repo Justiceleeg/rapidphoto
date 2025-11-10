@@ -2,7 +2,7 @@
  * Photo client methods
  */
 
-import { ApiClient } from './client';
+import { ApiClient } from "./client";
 
 export interface Photo {
   id: string;
@@ -51,13 +51,13 @@ export class PhotoClient {
       if (params.page !== undefined) queryParams.page = params.page;
       if (params.limit !== undefined) queryParams.limit = params.limit;
       if (params.tags && params.tags.length > 0) {
-        queryParams.tags = params.tags.join(',');
+        queryParams.tags = params.tags.join(",");
       }
       if (params.includeSuggested !== undefined) {
         queryParams.includeSuggested = params.includeSuggested;
       }
     }
-    return this.client.get<GetPhotosResponse>('/api/photos', {
+    return this.client.get<GetPhotosResponse>("/api/photos", {
       params: queryParams,
     });
   }
@@ -79,14 +79,17 @@ export class PhotoClient {
   /**
    * Update photo tags
    */
-  async updatePhotoTags(id: string, tagsOrData: string[] | UpdatePhotoTagsRequest): Promise<Photo> {
+  async updatePhotoTags(
+    id: string,
+    tagsOrData: string[] | UpdatePhotoTagsRequest
+  ): Promise<Photo> {
     // Handle both tags array and data object for flexibility
     const tags = Array.isArray(tagsOrData) ? tagsOrData : tagsOrData.tags;
-    
+
     if (!Array.isArray(tags)) {
       throw new Error(`Invalid tags: ${JSON.stringify(tagsOrData)}`);
     }
-    
+
     // Always send as { tags: [...] }
     return this.client.put<Photo>(`/api/photos/${id}/tags`, { tags });
   }
@@ -113,10 +116,53 @@ export class PhotoClient {
     if (prefix) {
       params.prefix = prefix;
     }
-    const response = await this.client.get<{ tags: string[] }>('/api/photos/tags', {
-      params,
-    });
+    const response = await this.client.get<{ tags: string[] }>(
+      "/api/photos/tags",
+      {
+        params,
+      }
+    );
     return response.tags;
   }
-}
 
+  /**
+   * Download a photo file as a blob
+   * Proxies through the API to avoid CORS issues with presigned URLs
+   */
+  async downloadPhoto(id: string): Promise<Blob> {
+    // Use the client's baseURL to build the download URL
+    const endpoint = `/api/photos/${id}/download`;
+    const baseURL = this.client.getBaseURL();
+    const url = `${baseURL}${
+      endpoint.startsWith("/") ? endpoint : `/${endpoint}`
+    }`;
+
+    const response = await fetch(url, {
+      method: "GET",
+      credentials: "include",
+    });
+
+    if (!response.ok) {
+      let errorMessage = `HTTP error! status: ${response.status}`;
+      try {
+        const errorText = await response.text();
+        if (errorText) {
+          try {
+            const error = JSON.parse(errorText) as {
+              message?: string;
+              error?: string;
+            };
+            errorMessage = error.message || error.error || errorMessage;
+          } catch {
+            errorMessage = errorText || errorMessage;
+          }
+        }
+      } catch (err) {
+        errorMessage = response.statusText || errorMessage;
+      }
+      throw new Error(errorMessage);
+    }
+
+    return response.blob();
+  }
+}

@@ -97,6 +97,62 @@ photoRoutes.get(
 );
 
 /**
+ * GET /api/photos/:id/download
+ * Download a photo file
+ * Proxies the download from R2 with proper CORS headers
+ * Must be defined before /:id route to match correctly
+ */
+photoRoutes.get(
+  "/:id/download",
+  authMiddleware,
+  validateParams(photoIdParamSchema),
+  async (c) => {
+    const user = c.get("user");
+    if (!user) {
+      throw new AppError(401, "Unauthorized", "AUTH_ERROR");
+    }
+
+    const params = c.get("validatedParams") as { id: string };
+    const photoId = params.id;
+
+    try {
+      // Verify photo exists and belongs to user
+      const photo = await photoRepository.findById(photoId);
+      if (!photo) {
+        throw createNotFoundError("Photo", photoId);
+      }
+      if (photo.userId !== user.id) {
+        throw createForbiddenError("Photo does not belong to user");
+      }
+
+      // Only allow download of completed photos
+      if (photo.status !== "completed") {
+        throw new AppError(400, "Photo is not ready for download", "VALIDATION_ERROR");
+      }
+
+      // Download the file from R2
+      const { buffer, contentType } = await r2Service.downloadObject(photo.r2Key);
+
+      // Set headers for download
+      c.header("Content-Type", contentType || "application/octet-stream");
+      c.header("Content-Disposition", `attachment; filename="${photo.filename}"`);
+      c.header("Content-Length", buffer.length.toString());
+
+      // Return the file
+      return c.body(buffer, 200);
+    } catch (error: any) {
+      if (error.message.includes("not found")) {
+        throw createNotFoundError("Photo", photoId);
+      }
+      if (error.message.includes("Unauthorized") || error.message.includes("belong")) {
+        throw createForbiddenError("Photo does not belong to user");
+      }
+      throw error;
+    }
+  }
+);
+
+/**
  * GET /api/photos/:id
  * Get a single photo by ID
  * Returns photo details with presigned URL if completed

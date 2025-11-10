@@ -14,6 +14,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Download, Trash2, Check, X, Sparkles } from "lucide-react";
 import { TagInput } from "./TagInput";
+import { photoClient } from "@/lib/api-client";
 
 interface PhotoModalProps {
   photo: Photo | null;
@@ -51,17 +52,12 @@ export function PhotoModal({
   const suggestedTags = photo.suggestedTags?.slice(0, 3) || [];
 
   const handleDownload = async () => {
-    if (!photo.url) return;
+    if (!photo.id || photo.status !== "completed") return;
 
     setIsDownloading(true);
     try {
-      // Fetch the image as a blob to ensure proper download
-      const response = await fetch(photo.url);
-      if (!response.ok) {
-        throw new Error("Failed to fetch image");
-      }
-      
-      const blob = await response.blob();
+      // Download the image as a blob through the API (avoids CORS issues)
+      const blob = await photoClient.downloadPhoto(photo.id);
       
       // Create an object URL from the blob
       const objectUrl = URL.createObjectURL(blob);
@@ -258,7 +254,7 @@ export function PhotoModal({
               variant="default"
               size="sm"
               onClick={handleDownload}
-              disabled={!photo.url || photo.status !== "completed" || isDownloading}
+              disabled={!photo.id || photo.status !== "completed" || isDownloading}
             >
               <Download className="mr-2 size-4" />
               {isDownloading ? "Downloading..." : "Download"}

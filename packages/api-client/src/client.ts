@@ -24,6 +24,13 @@ export class ApiClient {
   }
 
   /**
+   * Get the base URL
+   */
+  getBaseURL(): string {
+    return this.baseURL;
+  }
+
+  /**
    * Build URL with query parameters
    */
   private buildURL(

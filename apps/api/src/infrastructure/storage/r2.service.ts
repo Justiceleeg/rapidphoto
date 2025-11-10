@@ -66,6 +66,42 @@ export class R2Service {
   }
 
   /**
+   * Download an object from R2 as a buffer
+   * @param key The R2 object key (path)
+   * @returns Object with buffer and content type
+   */
+  async downloadObject(key: string): Promise<{
+    buffer: Buffer;
+    contentType?: string;
+    contentLength?: number;
+  }> {
+    const command = new GetObjectCommand({
+      Bucket: env.r2.bucketName,
+      Key: key,
+    });
+
+    const response = await this.client.send(command);
+    
+    if (!response.Body) {
+      throw new Error(`No body in R2 response for key: ${key}`);
+    }
+
+    // Convert stream to buffer
+    const chunks: Uint8Array[] = [];
+    for await (const chunk of response.Body as AsyncIterable<Uint8Array>) {
+      chunks.push(chunk);
+    }
+    
+    const buffer = Buffer.concat(chunks);
+    
+    return {
+      buffer,
+      contentType: response.ContentType,
+      contentLength: response.ContentLength,
+    };
+  }
+
+  /**
    * Get the public URL for an R2 object (if bucket is configured for public access)
    * @param key The R2 object key
    * @returns Public URL if configured, otherwise returns null

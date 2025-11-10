@@ -77,7 +77,17 @@ export const getPhotosQuerySchema = z.object({
     if (!val) return undefined;
     return val.split(",").filter(Boolean);
   }),
-  includeSuggested: z.coerce.boolean().optional(),
+  includeSuggested: z
+    .string()
+    .optional()
+    .transform((val) => {
+      if (val === undefined) return undefined;
+      // Handle string "true" and "false" correctly
+      if (val === "true") return true;
+      if (val === "false") return false;
+      // Fallback to boolean coercion for other values
+      return Boolean(val);
+    }),
 });
 
 /**

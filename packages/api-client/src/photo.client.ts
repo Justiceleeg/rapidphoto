@@ -20,6 +20,8 @@ export interface Photo {
 export interface GetPhotosRequest {
   page?: number;
   limit?: number;
+  tags?: string[];
+  includeSuggested?: boolean;
 }
 
 export interface GetPhotosResponse {
@@ -40,11 +42,23 @@ export class PhotoClient {
   constructor(private client: ApiClient) {}
 
   /**
-   * Get photos with pagination
+   * Get photos with pagination and optional tag filtering
    */
   async getPhotos(params?: GetPhotosRequest): Promise<GetPhotosResponse> {
+    // Convert tags array to comma-separated string for query parameter
+    const queryParams: Record<string, string | number | boolean> = {};
+    if (params) {
+      if (params.page !== undefined) queryParams.page = params.page;
+      if (params.limit !== undefined) queryParams.limit = params.limit;
+      if (params.tags && params.tags.length > 0) {
+        queryParams.tags = params.tags.join(',');
+      }
+      if (params.includeSuggested !== undefined) {
+        queryParams.includeSuggested = params.includeSuggested;
+      }
+    }
     return this.client.get<GetPhotosResponse>('/api/photos', {
-      params: params as Record<string, string | number | boolean>,
+      params: queryParams,
     });
   }
 
@@ -89,6 +103,20 @@ export class PhotoClient {
    */
   async rejectTag(id: string, tag: string): Promise<void> {
     return this.client.post<void>(`/api/photos/${id}/tags/reject`, { tag });
+  }
+
+  /**
+   * Get distinct tags for autocomplete
+   */
+  async getTags(prefix?: string): Promise<string[]> {
+    const params: Record<string, string> = {};
+    if (prefix) {
+      params.prefix = prefix;
+    }
+    const response = await this.client.get<{ tags: string[] }>('/api/photos/tags', {
+      params,
+    });
+    return response.tags;
   }
 }
 

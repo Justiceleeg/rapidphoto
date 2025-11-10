@@ -133,13 +133,16 @@ photoRoutes.get(
       // Download the file from R2
       const { buffer, contentType } = await r2Service.downloadObject(photo.r2Key);
 
-      // Set headers for download
-      c.header("Content-Type", contentType || "application/octet-stream");
-      c.header("Content-Disposition", `attachment; filename="${photo.filename}"`);
-      c.header("Content-Length", buffer.length.toString());
-
-      // Return the file
-      return c.body(buffer, 200);
+      // Return the file as a Response
+      // Convert Buffer to Uint8Array for Response constructor
+      return new Response(new Uint8Array(buffer), {
+        status: 200,
+        headers: {
+          "Content-Type": contentType || "application/octet-stream",
+          "Content-Disposition": `attachment; filename="${photo.filename}"`,
+          "Content-Length": buffer.length.toString(),
+        },
+      });
     } catch (error: any) {
       if (error.message.includes("not found")) {
         throw createNotFoundError("Photo", photoId);
